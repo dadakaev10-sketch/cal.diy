@@ -17,8 +17,14 @@
 - Working branch: codex/central-platform-foundation.
 - Read AGENTS.md and upstream deployment/startup configuration.
 - VPS capacity checked: approximately 19 GiB available memory and 167 GiB free disk.
-- No new production service, database, credentials or customer accounts created.
-- No tenant isolation implementation or security verification completed yet.
+- Coolify project DADAKAEV-CAL / testing created with a dedicated private PostgreSQL database.
+- Application UUID: 9puawzlwbkyvjcr4miryzpxx; database UUID: o3zsdgjfjiiww0gz3hxh9ht3.
+- Protected test deployment at the agreed origin uses branch codex/central-platform-foundation, commit 19b939c.
+- HTTPS verified; anonymous setup access returns 401. Authenticated setup responds successfully; public signup redirects to an error page.
+- HTTP Basic Authentication is enabled; credentials are stored encrypted in Coolify application settings. No default account or customer data seeded.
+- Initial administrator must complete the protected setup with the confirmed email and a privately chosen password.
+- Automatic deployment is disabled for this unfinished development branch.
+- Team availability membership authorization is hardened and unit-tested; full multi-tenant isolation remains incomplete.
 
 ## Security model to implement
 
