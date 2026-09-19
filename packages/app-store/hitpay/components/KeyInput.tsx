@@ -1,15 +1,14 @@
 "use client";
 
-import classNames from "classnames";
-import type { FormEvent } from "react";
-import React, { forwardRef, useState, useEffect, useId, useCallback } from "react";
-
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import { Label } from "@calcom/ui/components/form";
-import { Input } from "@calcom/ui/components/form";
 import type { InputFieldProps } from "@calcom/ui/components/form";
+import { Input, Label } from "@calcom/ui/components/form";
 import { Icon } from "@calcom/ui/components/icon";
 import { Skeleton } from "@calcom/ui/components/skeleton";
+import classNames from "classnames";
+import type React from "react";
+import type { FormEvent } from "react";
+import { forwardRef, useCallback, useEffect, useId, useState } from "react";
 
 type AddonProps = {
   children: React.ReactNode;
@@ -142,7 +141,7 @@ export const KeyField: React.FC<InputFieldProps & { defaultValue: string }> = fo
           className={classNames(
             className,
             "disabled:bg-subtle disabled:hover:border-subtle mb-0 rounded-r-none border-r-0 disabled:cursor-not-allowed",
-            addOnLeading && "rounded-l-none border-l-0",
+            Boolean(addOnLeading) && "rounded-l-none border-l-0",
             isPasswordVisible && "inline-block",
             !isPasswordVisible && "hidden",
             "my-0! ring-0!"
@@ -157,7 +156,7 @@ export const KeyField: React.FC<InputFieldProps & { defaultValue: string }> = fo
           className={classNames(
             className,
             "disabled:bg-subtle disabled:hover:border-subtle mb-0 rounded-r-none border-r-0 disabled:cursor-not-allowed",
-            addOnLeading && "rounded-l-none border-l-0",
+            Boolean(addOnLeading) && "rounded-l-none border-l-0",
             !isPasswordVisible && "inline-block",
             isPasswordVisible && "hidden",
             "my-0! ring-0!"
