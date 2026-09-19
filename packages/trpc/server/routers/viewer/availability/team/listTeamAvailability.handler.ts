@@ -2,18 +2,17 @@ import type { Dayjs } from "@calcom/dayjs";
 import dayjs from "@calcom/dayjs";
 import type { DateRange } from "@calcom/features/schedules/lib/date-ranges";
 import { buildDateRanges } from "@calcom/features/schedules/lib/date-ranges";
+import { TeamAccessService } from "@calcom/features/teams/services/TeamAccessService";
 import { UserRepository } from "@calcom/features/users/repositories/UserRepository";
 import { prisma } from "@calcom/prisma";
 import { Prisma } from "@calcom/prisma/client";
-
 import { TRPCError } from "@trpc/server";
-
 import type { TrpcSessionUser } from "../../../../types";
 import type { TListTeamAvailaiblityScheme } from "./listTeamAvailability.schema";
 
 type GetOptions = {
   ctx: {
-    user: NonNullable<TrpcSessionUser>;
+    user: Pick<NonNullable<TrpcSessionUser>, "id" | "organizationId">;
   };
   input: TListTeamAvailaiblityScheme;
 };
@@ -35,6 +34,7 @@ async function getTeamMembers({
 }) {
   const memberships = await prisma.membership.findMany({
     where: {
+      accepted: true,
       teamId: {
         in: teamId ? [teamId] : teamIds,
       },
@@ -150,6 +150,7 @@ async function getInfoForAllTeams({ ctx, input }: GetOptions) {
     .findMany({
       where: {
         userId: ctx.user.id,
+        accepted: true,
       },
       select: {
         id: true,
@@ -176,7 +177,7 @@ async function getInfoForAllTeams({ ctx, input }: GetOptions) {
     {
       count: number;
     }[]
-  >`SELECT COUNT(DISTINCT "userId")::integer from "Membership" WHERE "teamId" IN (${Prisma.join(teamIds)})`;
+  >`SELECT COUNT(DISTINCT "userId")::integer from "Membership" WHERE "accepted" = true AND "teamId" IN (${Prisma.join(teamIds)})`;
 
   return {
     teamMembers,
@@ -186,7 +187,7 @@ async function getInfoForAllTeams({ ctx, input }: GetOptions) {
 
 export const listTeamAvailabilityHandler = async ({ ctx, input }: GetOptions) => {
   const { cursor, limit, searchString } = input;
-  const teamId = input.teamId || ctx.user.organizationId;
+  const teamId = input.teamId ?? ctx.user.organizationId;
 
   let teamMembers: Member[] = [];
   let totalTeamMembers = 0;
@@ -198,48 +199,34 @@ export const listTeamAvailabilityHandler = async ({ ctx, input }: GetOptions) =>
     teamMembers = teamAllInfo.teamMembers;
     totalTeamMembers = teamAllInfo.totalTeamMembers;
   } else {
-    const isMember = await prisma.membership.findUnique({
+    await new TeamAccessService(prisma).requireMembership(ctx.user.id, teamId);
+    totalTeamMembers = await prisma.membership.count({
       where: {
-        userId_teamId: {
-          userId: ctx.user.id,
-          teamId,
-        },
+        teamId: teamId,
+        accepted: true,
+        ...(searchString
+          ? {
+              OR: [
+                { user: { username: { contains: searchString } } },
+                { user: { name: { contains: searchString } } },
+                { user: { email: { contains: searchString } } },
+              ],
+            }
+          : {}),
       },
     });
 
-    if (!isMember) {
-      teamMembers = [];
-      totalTeamMembers = 0;
-    } else {
-      const { cursor, limit } = input;
-
-      totalTeamMembers = await prisma.membership.count({
-        where: {
-          teamId: teamId,
-          ...(searchString
-            ? {
-                OR: [
-                  { user: { username: { contains: searchString } } },
-                  { user: { name: { contains: searchString } } },
-                  { user: { email: { contains: searchString } } },
-                ],
-              }
-            : {}),
-        },
-      });
-
-      // I couldnt get this query to work direct on membership table
-      teamMembers = await getTeamMembers({
-        teamId,
-        cursor,
-        limit,
-        organizationId: ctx.user.organizationId,
-        searchString,
-      });
-    }
+    // I couldnt get this query to work direct on membership table
+    teamMembers = await getTeamMembers({
+      teamId,
+      cursor,
+      limit,
+      organizationId: ctx.user.organizationId,
+      searchString,
+    });
   }
 
-  let nextCursor: typeof cursor | undefined = undefined;
+  let nextCursor: typeof cursor | undefined;
   if (teamMembers && teamMembers.length > limit) {
     const nextItem = teamMembers.pop();
     nextCursor = nextItem?.id;
@@ -258,6 +245,7 @@ export const listTeamAvailabilityHandler = async ({ ctx, input }: GetOptions) =>
     const membership = await prisma.membership.findFirst({
       where: {
         userId: ctx.user.id,
+        accepted: true,
       },
       select: {
         id: true,

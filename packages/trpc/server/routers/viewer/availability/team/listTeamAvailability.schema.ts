@@ -6,7 +6,7 @@ export const ZListTeamAvailaiblityScheme = z.object({
   startDate: z.string(),
   endDate: z.string(),
   loggedInUsersTz: z.string(),
-  teamId: z.number().optional(),
+  teamId: z.number().int().positive().optional(),
   searchString: z.string().toLowerCase().optional(),
 });
 
