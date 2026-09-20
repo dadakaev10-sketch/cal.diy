@@ -11,7 +11,7 @@
 - Email delivery is planned centrally through Resend with business-specific display names and reply-to addresses; optional business-owned delivery credentials can follow. No customer email delivery until configured and tested.
 - Keep MIT copyright/license notices. Branding is configurable; final product name/logo are pending.
 
-## Current state (2026-09-20)
+## Initial deployment state (2026-09-20; see release update below)
 
 - Fork cloned at upstream commit 6bc45298226f96ff79e0c070c8b2ce39727e8477.
 - Working branch: codex/central-platform-foundation.
@@ -95,7 +95,7 @@ The owner approved scoped Prisma schema changes, cross-package changes and full 
 
 The owner requested direct use of each studio's own Stripe account, without a shared platform payment account. This is a new integration path, not a configuration change to the upstream Connect app. Commercial eligibility for a Georgia-operated hosted service remains a Stripe confirmation gate before live use; accepting customer keys is not proof of eligibility.
 
-### Slice 1: implemented locally, not connected to booking or deployed
+### Slice 1: implementation snapshot before deployment
 
 - Test-only credential encryption helpers using AES-256-GCM, with authenticated binding to Team ID and immutable connection UUID. Tampering or copying encrypted configuration to a different studio/connection fails closed.
 - Only restricted test keys are accepted; live keys and unrestricted secret keys are rejected. This is format validation, not remote account/permission verification.
@@ -115,7 +115,7 @@ The owner requested direct use of each studio's own Stripe account, without a sh
 7. End-to-end test two isolated studios, concurrent bookings, retries, incorrect signatures, declined payments, refunds and key rotation. Use studio-authorized test credentials supplied through a secure configuration surface, never chat.
 8. Obtain provider eligibility confirmation before enabling live keys. Keep the existing installation unchanged until the complete test flow is verified.
 
-### Slice 2: studio configuration implementation (local, not deployed)
+### Slice 2: implementation snapshot before deployment
 
 - Added `MerchantStripeConnection` model and additive SQL migration. Encrypted payload is in a separate table, never upstream `Credential.key`. The relation prevents accidentally deleting a studio while a financial connection exists.
 - Owner-only service verifies accepted Team membership before accessing status or contacting Stripe, and again inside the serializable save transaction. It reads the key's own Stripe account without a Connect account override and checks that its balance is test-mode.
@@ -141,9 +141,21 @@ References: https://docs.stripe.com/keys-best-practices and https://docs.stripe.
 
 ## Test operator steps
 
+The slice snapshots above describe their original implementation stage. The migrations and runtime configuration have subsequently been deployed; see the release update below. Booking integration is still outstanding.
+
 1. Sign in as the platform administrator and open Settings → Studio payments.
 2. Create a Test Studio; this assigns the current administrator as its owner, not a different customer's account.
 3. Save the studio's real sandbox account ID and restricted test credentials in the protected form, never in chat or Git. Initial Account/Balance reads and the Checkout permissions must be granted in that studio's sandbox.
 4. Start a technical test, for example 2,000 cents and 50%. Complete hosted Checkout using Stripe's documented test card details only.
 5. Return to settings and explicitly check payment status. Verify the matching EUR 10 test payment in the same studio's Stripe dashboard. A successful redirect alone is insufficient.
 6. Repeat with a declined test card, an expired session and a second isolated studio before connecting the adapter to bookings.
+
+## Protected sandbox release update (2026-09-20)
+
+- Code revision `c11c1cd` includes slices 1–3 and starts the web workspace directly, preserving runtime-only integration configuration that Turbo's strict environment filter previously removed.
+- Both additive merchant Stripe migrations have been applied to the dedicated test database. No existing booking/payment records were repurposed.
+- A database backup was successfully restored into an isolated temporary database and checked, then that temporary database was removed.
+- The dedicated encryption key is configured only at runtime, with a separate root-only recovery copy. Neither key material nor Stripe credentials are committed.
+- Combined focused tests: 106 passing tests across nine files; full repository CI typecheck passes. Production image build passes. Provider calls in unit tests are mocked.
+- HTTP Basic Authentication, disabled public signup and disabled auto-deploy remain in place. No live keys or real payments are enabled.
+- Real studio sandbox credentials and an authenticated end-to-end checkout test are still required. Resend delivery, public studio registration, invitations, appointment reservations/payment fulfillment, cancellation/refunds and complete tenant-isolation verification remain release gates.
