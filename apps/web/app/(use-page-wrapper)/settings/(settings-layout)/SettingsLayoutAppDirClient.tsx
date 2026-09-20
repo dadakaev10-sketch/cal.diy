@@ -52,6 +52,11 @@ const getTabs = (
           trackingMetadata: { section: "my_account", page: "general" },
         },
         {
+          name: "merchant_stripe_title",
+          href: "/settings/my-account/studio-payments",
+          trackingMetadata: { section: "my_account", page: "studio_payments" },
+        },
+        {
           name: "calendars",
           href: "/settings/my-account/calendars",
           trackingMetadata: { section: "my_account", page: "calendars" },
