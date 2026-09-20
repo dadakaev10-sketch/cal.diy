@@ -1105,6 +1105,19 @@ model EventTypeCustomInput {
   @@index([eventTypeId])
 }
 
+model StudioRegistrationRequest {
+  tokenHash  String   @id
+  email      String
+  locale     String   @default("de")
+  studioName String?
+  createdBy  Int?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+}
+
 model ResetPasswordRequest {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
