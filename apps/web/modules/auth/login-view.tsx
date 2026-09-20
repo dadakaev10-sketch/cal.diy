@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
-import { HOSTED_CAL_FEATURES, WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
+import { HOSTED_CAL_FEATURES, WEBAPP_URL } from "@calcom/lib/constants";
 import { emailRegex } from "@calcom/lib/emailSchema";
 import { getSafeRedirectUrl } from "@calcom/lib/getSafeRedirectUrl";
 import { useCompatSearchParams } from "@calcom/lib/hooks/useCompatSearchParams";
@@ -27,6 +27,7 @@ import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
+import styles from "./studio-auth.module.css";
 
 interface LoginValues {
   email: string;
@@ -36,13 +37,9 @@ interface LoginValues {
   csrfToken: string;
 }
 
-const MicrosoftIcon = () => (
-  <img className="size-4" src="/microsoft-logo.svg" alt="" />
-);
+const MicrosoftIcon = () => <img className="size-4" src="/microsoft-logo.svg" alt="" />;
 
-const GoogleIcon = () => (
-  <img className="size-4" src="/google-icon-colored.svg" alt="" />
-);
+const GoogleIcon = () => <img className="size-4" src="/google-icon-colored.svg" alt="" />;
 
 function BackgroundGrid() {
   const rows = 9;
@@ -158,7 +155,8 @@ export default function Login({
       callbackUrl,
       redirect: false,
     });
-    if (!res) setErrorMessage(errorMessages[ErrorCode.InternalServerError]);
+    if (res?.status === 429) setErrorMessage(t("studio_login_throttled"));
+    else if (!res) setErrorMessage(errorMessages[ErrorCode.InternalServerError]);
     // we're logged in! let's do a hard refresh to the desired url
     else if (!res.error) {
       setLastUsed("credentials");
@@ -171,11 +169,10 @@ export default function Login({
   };
 
   const showSocialLogin = isGoogleLoginEnabled || isOutlookLoginEnabled;
-  const showSignupLink =
-    process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== "true" && searchParams?.get("register") !== "false";
+  const showSignupLink = searchParams?.get("register") !== "false";
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-default/80 px-4 py-10">
+    <div className={`${styles.login} relative flex min-h-screen items-center justify-center px-4 py-10`}>
       <BackgroundGrid />
 
       <div className="relative z-10 flex w-full max-w-md flex-col items-center">
@@ -183,7 +180,9 @@ export default function Login({
         <div className="w-full rounded-xl border border-subtle bg-default p-10 shadow-sm">
           {/* Logo */}
           <div className="mb-2 text-center">
-            <h1 className="font-cal text-xl font-bold text-emphasis">Cal.diy</h1>
+            <h1 className="text-xl font-semibold tracking-tight">
+              <a href="/">DADAKAEV CAL</a>
+            </h1>
           </div>
 
           {/* Heading */}
@@ -267,7 +266,7 @@ export default function Login({
                   <Field>
                     <div className="flex w-full items-center justify-between">
                       <FieldLabel>{t("password")}</FieldLabel>
-                      <Link href="/auth/forgot-password" className="text-sm text-subtle hover:text-emphasis">
+                      <Link href="/register?recovery=1" className="text-sm text-subtle hover:text-emphasis">
                         {t("forgot")}
                       </Link>
                     </div>
@@ -369,16 +368,13 @@ export default function Login({
         {!twoFactorRequired && (
           <div className="mt-6 flex items-center justify-center gap-4 text-center">
             {showSignupLink && (
-              <Link
-                href={
-                  callbackUrl
-                    ? `${WEBSITE_URL}/signup?redirect=${encodeURIComponent(callbackUrl)}`
-                    : `${WEBSITE_URL}/signup`
-                }
-                className="text-sm font-medium text-emphasis hover:underline">
-                {t("create_account")}
+              <Link href="/register" className="text-sm font-medium text-emphasis hover:underline">
+                {t("home_register")}
               </Link>
             )}
+            <a href="/" className="text-sm text-subtle hover:underline">
+              {t("studio_back_home")}
+            </a>
           </div>
         )}
       </div>

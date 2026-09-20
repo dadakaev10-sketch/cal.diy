@@ -69,7 +69,10 @@ export async function studioAccessGate(req: NextRequest) {
         RETURNING "attempts"`;
       if (!rows[0] || rows[0].attempts > 20) {
         return NextResponse.json(
-          { error: "Too many sign-in attempts. Please try again later." },
+          {
+            error: "Too many sign-in attempts. Please try again later.",
+            url: new URL("/auth/login?error=RateLimited", req.url).href,
+          },
           { status: 429, headers: { "Retry-After": "600", "Cache-Control": "no-store" } }
         );
       }
@@ -90,7 +93,7 @@ export async function studioAccessGate(req: NextRequest) {
     }
   } catch {
     return NextResponse.json(
-      { error: "Service unavailable" },
+      { error: "Service unavailable", url: new URL("/auth/login?error=InternalServerError", req.url).href },
       { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }

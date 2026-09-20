@@ -19,9 +19,18 @@ describe("public studio homepage", () => {
       if (href) expect(container.querySelector(href)).not.toBeNull();
     }
     expect(container.querySelector('a[href="/auth/login"]')).not.toBeNull();
+    expect(container.querySelector(`a[href="/register?lang=${language}"]`)).not.toBeNull();
     expect(container.querySelector('a[href="/signup"]')).toBeNull();
     expect(container.querySelector("form")).toBeNull();
     expect(screen.getByText(i18n.t("home_demo_label"))).toBeTruthy();
     expect(screen.getByText(i18n.t("home_early"))).toBeTruthy();
+  });
+  it("keeps the homepage visible with a dashboard link for signed-in users", async () => {
+    const i18n = createInstance();
+    await i18n.init({ lng: "en", resources: { en: { translation: en } } });
+    render(<StudioHome t={i18n.t} language="en" signedIn />);
+    expect(screen.getByRole("link", { name: en.studio_open_dashboard }).getAttribute("href")).toBe(
+      "/event-types"
+    );
   });
 });

@@ -1,7 +1,15 @@
 import type { TFunction } from "i18next";
 import styles from "./home.module.css";
 
-export default function StudioHome({ t, language }: { t: TFunction; language: "de" | "en" }) {
+export default function StudioHome({
+  t,
+  language,
+  signedIn = false,
+}: {
+  t: TFunction;
+  language: "de" | "en";
+  signedIn?: boolean;
+}) {
   return (
     <div className={styles.home} lang={language} id="top">
       <a className={styles.skip} href="#content">
@@ -24,8 +32,10 @@ export default function StudioHome({ t, language }: { t: TFunction; language: "d
           <a href={language === "de" ? "/?lang=en" : "/?lang=de"} aria-label={t("home_language")}>
             {language === "de" ? "EN" : "DE"}
           </a>
-          <a href="/auth/login">{t("home_login")}</a>
-          <a className={styles.buttonSmall} href="#registration">
+          <a href={signedIn ? "/event-types" : "/auth/login"}>
+            {t(signedIn ? "studio_open_dashboard" : "home_login")}
+          </a>
+          <a className={styles.buttonSmall} href={`/register?lang=${language}`}>
             {t("home_register")} <span aria-hidden="true">↗</span>
           </a>
         </div>
@@ -46,7 +56,7 @@ export default function StudioHome({ t, language }: { t: TFunction; language: "d
             </h1>
             <p className={styles.lead}>{t("home_description")}</p>
             <div className={styles.actions}>
-              <a className={styles.button} href="#registration">
+              <a className={styles.button} href={`/register?lang=${language}`}>
                 {t("home_register")} <span aria-hidden="true">↗</span>
               </a>
               <a className={styles.textLink} href="#preview">
