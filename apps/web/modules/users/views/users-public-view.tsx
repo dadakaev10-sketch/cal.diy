@@ -59,9 +59,9 @@ export function UserPage(props: PageProps) {
           className={classNames(
             shouldAlignCentrally ? "mx-auto" : "",
             isEmbed ? "border-booker border-booker-width  bg-default rounded-md" : "",
-            "max-w-3xl px-4 py-12"
+            "w-full max-w-2xl px-4 py-8 sm:py-14"
           )}>
-          <div className="border-subtle bg-default text-default mb-8 overflow-hidden rounded-xl border">
+          <div className="border-subtle bg-default text-default mb-6 overflow-hidden rounded-2xl border shadow-sm">
             {isOrg && user.profile.organization?.bannerUrl && (
               <OrgBanner
                 alt={user.profile.organization.name ?? "Organization banner"}
@@ -69,9 +69,13 @@ export function UserPage(props: PageProps) {
                 className="p-1 border border-subtle rounded-xl w-full object-cover"
               />
             )}
-            <div className="p-4">
+            <div
+              className={classNames(
+                "flex flex-col px-6 py-8 sm:px-8 sm:py-10",
+                shouldAlignCentrally ? "items-center text-center" : "items-start text-left"
+              )}>
               <UserAvatar
-                size="lg"
+                size="xl"
                 user={{
                   avatarUrl: user.avatarUrl,
                   profile: user.profile,
@@ -82,7 +86,7 @@ export function UserPage(props: PageProps) {
               />
               <h1
                 className={classNames(
-                  "font-cal text-emphasis mb-1 text-xl",
+                  "font-cal text-emphasis mb-2 text-2xl tracking-tight",
                   isOrg && user.profile.organization?.bannerUrl ? "" : "mt-4"
                 )}
                 data-testid="name-title">
@@ -104,7 +108,7 @@ export function UserPage(props: PageProps) {
                 <>
                   {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via safeBio */}
                   <div
-                    className="text-default wrap-break-word text-sm [&_a]:text-blue-500 [&_a]:underline [&_a]:hover:text-blue-600"
+                    className="text-default max-w-md wrap-break-word text-sm leading-relaxed [&_a]:text-blue-500 [&_a]:underline [&_a]:hover:text-blue-600"
                     dangerouslySetInnerHTML={{ __html: props.safeBio }}
                   />
                 </>
@@ -112,9 +116,7 @@ export function UserPage(props: PageProps) {
             </div>
           </div>
 
-          <div
-            className={classNames("rounded-md ", !isEventListEmpty && "border-subtle border")}
-            data-testid="event-types">
+          <div className="grid gap-3" data-testid="event-types">
             {eventTypes.map((type) => (
               <Link
                 key={type.id}
@@ -130,16 +132,16 @@ export function UserPage(props: PageProps) {
                     eventType: type,
                   });
                 }}
-                className="bg-default border-subtle dark:bg-cal-muted dark:hover:bg-subtle hover:bg-cal-muted group relative border-b transition first:rounded-t-md last:rounded-b-md last:border-b-0"
+                className="bg-default border-subtle dark:bg-cal-muted dark:hover:bg-subtle hover:bg-cal-muted group relative rounded-xl border shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emphasis"
                 data-testid="event-type-link">
                 <Icon
                   name="arrow-right"
-                  className="text-emphasis absolute right-4 top-4 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100"
+                  className="text-emphasis absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
                 />
                 {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
-                <div className="block w-full p-5">
+                <div className="block w-full py-6 pl-6 pr-14">
                   <div className="flex flex-wrap items-center">
-                    <h2 className="text-default pr-2 text-sm font-semibold">{type.title}</h2>
+                    <h2 className="text-default pr-2 text-base font-semibold">{type.title}</h2>
                   </div>
                   <EventTypeDescription eventType={type} isPublic={true} shortenDescription />
                 </div>
