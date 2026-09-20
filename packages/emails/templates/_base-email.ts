@@ -1,14 +1,14 @@
-import { decodeHTML } from "entities";
-import { z } from "zod";
-
+import process from "node:process";
 import dayjs from "@calcom/dayjs";
 import { FeaturesRepository } from "@calcom/features/flags/features.repository";
+import { ErrorWithCode } from "@calcom/lib/errors";
 import isSmsCalEmail from "@calcom/lib/isSmsCalEmail";
-import { serverConfig } from "@calcom/lib/serverConfig";
 import { getServerErrorFromUnknown } from "@calcom/lib/server/getServerErrorFromUnknown";
+import { serverConfig } from "@calcom/lib/serverConfig";
 import { setTestEmail } from "@calcom/lib/testEmails";
 import { prisma } from "@calcom/prisma";
-
+import { decodeHTML } from "entities";
+import { z } from "zod";
 import { sanitizeDisplayName } from "../lib/sanitizeDisplayName";
 
 export default class BaseEmail {
@@ -29,11 +29,12 @@ export default class BaseEmail {
   protected async getNodeMailerPayload(): Promise<Record<string, unknown>> {
     return {};
   }
-  public async sendEmail() {
+  public async sendEmail(options: { throwOnError?: boolean } = {}) {
     const featuresRepository = new FeaturesRepository(prisma);
     const emailsDisabled = await featuresRepository.checkIfFeatureIsEnabledGlobally("emails");
     /** If email kill switch exists and is active, we prevent emails being sent. */
     if (emailsDisabled) {
+      if (options.throwOnError) throw ErrorWithCode.Factory.InternalServerError("Email unavailable");
       console.warn("Skipped Sending Email due to active Kill Switch");
       return new Promise((r) => r("Skipped Sending Email due to active Kill Switch"));
     }
@@ -54,6 +55,7 @@ export default class BaseEmail {
     const to = "to" in payload ? (payload.to as string) : "";
 
     if (isSmsCalEmail(to)) {
+      if (options.throwOnError) throw ErrorWithCode.Factory.BadRequest("Email unavailable");
       console.log(`Skipped Sending Email to faux email: ${to}`);
       return new Promise((r) => r(`Skipped Sending Email to faux email: ${to}`));
     }
@@ -78,21 +80,22 @@ export default class BaseEmail {
         (_err, info) => {
           if (_err) {
             const err = getServerErrorFromUnknown(_err);
-            this.printNodeMailerError(err);
+            if (!options.throwOnError) this.printNodeMailerError(err);
             reject(err);
           } else {
             resolve(info);
           }
         }
       )
-    ).catch((e) =>
+    ).catch((e) => {
+      if (options.throwOnError) throw ErrorWithCode.Factory.InternalServerError("Email delivery failed");
       console.error(
         "sendEmail",
         `from: ${"from" in payloadWithUnEscapedSubject ? payloadWithUnEscapedSubject.from : ""}`,
         `subject: ${"subject" in payloadWithUnEscapedSubject ? payloadWithUnEscapedSubject.subject : ""}`,
         e
-      )
-    );
+      );
+    });
     return new Promise((resolve) => resolve("send mail async"));
   }
   protected getMailerOptions() {
