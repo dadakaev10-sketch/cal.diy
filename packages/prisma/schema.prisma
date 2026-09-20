@@ -1223,6 +1223,14 @@ model ApiKey {
   @@index([userId])
 }
 
+model StudioAuthThrottle {
+  key         String   @id
+  windowStart DateTime
+  attempts    Int
+
+  @@index([windowStart])
+}
+
 model RateLimit {
   id            String   @id @default(uuid())
   name          String
