@@ -1,5 +1,11 @@
+import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
+import { redirect } from "next/navigation";
 import styles from "../../modules/auth/studio-auth.module.css";
+import StudioRegistrationForm from "../../modules/auth/studio-registration-form";
+import { studioRegistrationKeys } from "../../modules/auth/studio-registration-labels";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Studio registration | DADAKAEV CAL",
@@ -13,7 +19,8 @@ export default async function RegisterPage({
 }) {
   const params = await searchParams;
   const language = params.lang === "en" ? "en" : "de";
-  const recovery = params.recovery === "1";
+  if (params.recovery === "1") redirect("/recover");
+  const enabled = process.env.STUDIO_REGISTRATION_ENABLED === "true";
   const t = await getTranslation(language, "common");
   return (
     <main className={styles.shell} lang={language}>
@@ -22,18 +29,22 @@ export default async function RegisterPage({
           DADAKAEV <strong>CAL</strong>
         </a>
         <p className={styles.eyebrow}>{t("studio_account_access")}</p>
-        <h1>{t(recovery ? "forgot_password" : "home_register")}</h1>
-        <p>{t(recovery ? "studio_recovery_pending" : "studio_registration_pending")}</p>
-        <div className={styles.notice}>{t("studio_registration_safety")}</div>
-        <a className={styles.primary} href="/auth/login">
+        <h1>{t("home_register")}</h1>
+        <p>{t(enabled ? "studio_registration_intro" : "studio_registration_disabled")}</p>
+        {enabled ? (
+          <StudioRegistrationForm
+            mode="request"
+            locale={language}
+            labels={Object.fromEntries(studioRegistrationKeys.map((key) => [key, t(key)]))}
+          />
+        ) : null}
+        <a className={enabled ? styles.secondary : styles.primary} href="/auth/login">
           {t("home_login")}
         </a>
         <a className={styles.secondary} href="/">
           {t("studio_back_home")}
         </a>
-        <a
-          className={styles.language}
-          href={`/register?lang=${language === "de" ? "en" : "de"}${recovery ? "&recovery=1" : ""}`}>
+        <a className={styles.language} href={`/register?lang=${language === "de" ? "en" : "de"}`}>
           {language === "de" ? "English" : "Deutsch"}
         </a>
       </section>

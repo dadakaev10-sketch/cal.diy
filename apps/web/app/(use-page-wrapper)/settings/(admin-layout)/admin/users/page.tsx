@@ -20,6 +20,7 @@ const Page = async () => {
       description={t("admin_users_description")}
       CTA={
         <div className="mt-4 space-x-5 sm:ml-16 sm:mt-0 sm:flex-none">
+          <Button href="/studio-admin">{t("studio_admin_create")}</Button>
           <Button href="/settings/admin/users/add">{t("add_new_user")}</Button>
         </div>
       }>

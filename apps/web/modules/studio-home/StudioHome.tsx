@@ -5,10 +5,12 @@ export default function StudioHome({
   t,
   language,
   signedIn = false,
+  registrationEnabled = false,
 }: {
   t: TFunction;
   language: "de" | "en";
   signedIn?: boolean;
+  registrationEnabled?: boolean;
 }) {
   return (
     <div className={styles.home} lang={language} id="top">
@@ -63,7 +65,9 @@ export default function StudioHome({
                 {t("home_demo")} <span aria-hidden="true">↓</span>
               </a>
             </div>
-            <p className={styles.note}>{t("home_early")}</p>
+            <p className={styles.note}>
+              {t(registrationEnabled ? "studio_registration_testing" : "home_early")}
+            </p>
           </div>
           <figure className={styles.preview} id="preview" aria-label={t("home_preview")}>
             <div className={styles.previewTop}>

@@ -1,3 +1,4 @@
+import process from "node:process";
 import { getServerSession } from "@calcom/features/auth/lib/getServerSession";
 import { getTranslation } from "@calcom/i18n/server";
 import { buildLegacyRequest } from "@lib/buildLegacyCtx";
@@ -17,7 +18,14 @@ const RedirectPage = async ({ searchParams }: { searchParams: Promise<{ lang?: s
 
   const language = (await searchParams).lang === "en" ? "en" : "de";
   const t = await getTranslation(language, "common");
-  return <StudioHome t={t} language={language} signedIn={!!session?.user?.id} />;
+  return (
+    <StudioHome
+      t={t}
+      language={language}
+      signedIn={!!session?.user?.id}
+      registrationEnabled={process.env.STUDIO_REGISTRATION_ENABLED === "true"}
+    />
+  );
 };
 
 export default RedirectPage;

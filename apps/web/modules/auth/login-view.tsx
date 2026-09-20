@@ -266,7 +266,7 @@ export default function Login({
                   <Field>
                     <div className="flex w-full items-center justify-between">
                       <FieldLabel>{t("password")}</FieldLabel>
-                      <Link href="/register?recovery=1" className="text-sm text-subtle hover:text-emphasis">
+                      <Link href="/recover" className="text-sm text-subtle hover:text-emphasis">
                         {t("forgot")}
                       </Link>
                     </div>
