@@ -1,10 +1,15 @@
 import { createHmac } from "node:crypto";
 import process from "node:process";
-import { studioPasswordStamp } from "@calcom/features/auth/lib/studioAccountSecurity";
+import {
+  studioAccountRateLimit,
+  studioPasswordStamp,
+  validStudioOrigin,
+} from "@calcom/features/auth/lib/studioAccountSecurity";
 import prisma from "@calcom/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { studioPublicBookingRoute } from "./studioPublicBooking";
 
 const publicPages = new Set(["/", "/auth/login", "/auth/error", "/auth/logout", "/register", "/recover"]);
 const publicAssets = new Set([
@@ -57,6 +62,7 @@ export function studioRouteAccess(path: string, method: string) {
   ) {
     return "public";
   }
+  if (studioPublicBookingRoute(normalized, method)) return "public";
   return "private";
 }
 
@@ -72,6 +78,32 @@ export async function studioAccessGate(req: NextRequest) {
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   try {
+    const bookingRoute = studioPublicBookingRoute(path, req.method);
+    if (bookingRoute && bookingRoute !== "booking-page") {
+      if (
+        !["GET", "HEAD"].includes(req.method) &&
+        (!validStudioOrigin(req) || !req.headers.get("content-type")?.startsWith("application/json"))
+      ) {
+        return NextResponse.json({ error: "Invalid booking request" }, { status: 403 });
+      }
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      const limits = {
+        "booking-read": 1200,
+        "booking-slot": 120,
+        "booking-write": 20,
+        "booking-verification": 20,
+      };
+      const limit = limits[bookingRoute];
+      if (!(await studioAccountRateLimit(bookingRoute, ip, limit))) {
+        return NextResponse.json(
+          { error: "Too many requests" },
+          {
+            status: 429,
+            headers: { "Retry-After": "600", "Cache-Control": "no-store" },
+          }
+        );
+      }
+    }
     if (path === "/api/auth/callback/credentials" && req.method === "POST") {
       // The Coolify proxy replaces untrusted forwarded addresses; only that proxy can reach this container.
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";

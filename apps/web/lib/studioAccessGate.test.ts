@@ -14,12 +14,28 @@ beforeEach(() => {
   vi.resetAllMocks();
   vi.stubEnv("STUDIO_ACCESS_GATE_ENABLED", "true");
   vi.stubEnv("NEXTAUTH_SECRET", "test-secret");
+  vi.stubEnv("NEXTAUTH_URL", "https://test.local");
   vi.stubEnv("STUDIO_REGISTRATION_ENABLED", "false");
   mocks.token.mockResolvedValue(null);
   mocks.query.mockResolvedValue([{ attempts: 1 }]);
 });
 
 describe("studio access boundary", () => {
+  it("allows guest booking pages and fails closed on booking mutation abuse", async () => {
+    expect(await studioAccessGate(new NextRequest("https://test.local/dadakaev"))).toBeNull();
+    const request = (origin: string) =>
+      new NextRequest("https://test.local/api/book/event", {
+        method: "POST",
+        headers: { origin, "content-type": "application/json" },
+        body: "{}",
+      });
+    expect((await studioAccessGate(request("https://other.example")))?.status).toBe(403);
+    expect(await studioAccessGate(request("https://test.local"))).toBeNull();
+    mocks.query.mockResolvedValue([{ attempts: 21 }]);
+    expect((await studioAccessGate(request("https://test.local")))?.status).toBe(429);
+    mocks.query.mockRejectedValue(new Error("unavailable"));
+    expect((await studioAccessGate(request("https://test.local")))?.status).toBe(503);
+  });
   it("opens only explicitly enabled registration routes and methods", () => {
     expect(studioRouteAccess("/api/studio-registration/request", "POST")).toBe("private");
     vi.stubEnv("STUDIO_REGISTRATION_ENABLED", "true");
