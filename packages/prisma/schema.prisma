@@ -622,6 +622,8 @@ model Team {
 
   features TeamFeatures[]
 
+  merchantStripeConnection MerchantStripeConnection?
+
   /// @zod.import(["import { intervalLimitsType } from '../../zod-utils'"]).custom.use(intervalLimitsType)
   bookingLimits                Json?
   includeManagedEventsInLimits Boolean                 @default(false)
@@ -647,6 +649,40 @@ model Team {
 
   @@unique([slug, parentId])
   @@index([parentId])
+}
+
+model MerchantStripeConnection {
+  id                   String                       @id @default(uuid())
+  teamId               Int                          @unique
+  team                 Team                         @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  accountId            String
+  encryptedCredentials Json
+  verifiedAt           DateTime
+  updatedByUserId      Int
+  revision             Int                          @default(1)
+  createdAt            DateTime                     @default(now())
+  updatedAt            DateTime                     @updatedAt
+  testCheckouts        MerchantStripeTestCheckout[]
+}
+
+// Isolated sandbox probes never create or confirm real bookings.
+model MerchantStripeTestCheckout {
+  id                String                   @id
+  connectionId      String
+  connection        MerchantStripeConnection @relation(fields: [connectionId], references: [id], onDelete: Restrict)
+  createdByUserId   Int
+  totalMinor        Int
+  dueNowMinor       Int
+  prepaymentPercent Int
+  currency          String                   @default("eur")
+  sessionId         String?                  @unique
+  paymentIntentId   String?
+  status            String                   @default("CREATING")
+  createdAt         DateTime                 @default(now())
+  expiresAt         DateTime
+  updatedAt         DateTime                 @updatedAt
+
+  @@index([connectionId, createdAt])
 }
 
 model CreditBalance {
