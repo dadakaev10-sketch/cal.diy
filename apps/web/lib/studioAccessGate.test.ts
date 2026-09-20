@@ -51,6 +51,9 @@ describe("studio access boundary", () => {
     for (const stamp of [undefined, studioPasswordStamp("old-hash", "test-secret")]) {
       mocks.token.mockResolvedValue({ sub: "7", studioPasswordStamp: stamp });
       expect((await studioAccessGate(new NextRequest("https://test.local/api/private")))?.status).toBe(401);
+      expect(
+        (await studioAccessGate(new NextRequest("https://test.local/api/trpc/slots/getSchedule")))?.status
+      ).toBe(401);
     }
   });
 

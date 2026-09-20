@@ -128,13 +128,14 @@ export async function studioAccessGate(req: NextRequest) {
         );
       }
     }
-    if (access === "public") return null;
+    if (access === "public" && (!bookingRoute || bookingRoute === "booking-page")) return null;
     const token = await getToken({
       req,
       secret,
       secureCookie: process.env.NEXTAUTH_URL?.startsWith("https://"),
     });
     const userId = Number(token?.sub || token?.id);
+    if (!token && access === "public") return null;
     if (Number.isSafeInteger(userId) && userId > 0) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
