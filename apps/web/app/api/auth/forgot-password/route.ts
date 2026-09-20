@@ -1,41 +1,30 @@
-import { passwordResetRequest } from "@calcom/features/auth/lib/passwordResetRequest";
-import { checkRateLimitAndThrowError } from "@calcom/lib/checkRateLimitAndThrowError";
-import { emailSchema } from "@calcom/lib/emailSchema";
-import getIP from "@calcom/lib/getIP";
-import { piiHasher } from "@calcom/lib/server/PiiHasher";
-import prisma from "@calcom/prisma";
-import { defaultResponderForAppDir } from "app/api/defaultResponderForAppDir";
-import { parseRequestData } from "app/api/parseRequestData";
+import { requestStudioPasswordRecovery } from "@calcom/features/auth/lib/studioPasswordRecovery";
+import {
+  guardStudioAccountRequest,
+  readStudioAccountBody,
+  studioAccountResponse,
+} from "@lib/studioAccountRequest";
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { z } from "zod";
 
-async function handler(req: NextRequest) {
-  const body = await parseRequestData(req);
-  const email = emailSchema.transform((val) => val.toLowerCase()).safeParse(body?.email);
-
-  if (!email.success) {
-    return NextResponse.json({ message: "email is required" }, { status: 400 });
-  }
-
-  const ip = getIP(req) ?? email.data;
-
-  await checkRateLimitAndThrowError({
-    rateLimitingType: "core",
-    identifier: `forgotPassword:${piiHasher.hash(ip)}`,
-  });
-
+export async function POST(req: NextRequest) {
   try {
-    const user = await prisma.user.findUnique({
-      where: { email: email.data },
-      select: { name: true, email: true, locale: true },
-    });
-    // Don't leak info about whether the user exists
-    if (user) passwordResetRequest(user).catch(console.error);
-    return NextResponse.json({ message: "password_reset_email_sent" }, { status: 201 });
-  } catch (reason) {
-    console.error(reason);
-    return NextResponse.json({ message: "Unable to create password reset request" }, { status: 500 });
+    const denied = await guardStudioAccountRequest(req, "recovery-ip");
+    if (denied) return denied;
+    const parsed = z
+      .object({
+        email: z
+          .string()
+          .trim()
+          .email()
+          .max(254)
+          .transform((v) => v.toLowerCase()),
+      })
+      .safeParse(await readStudioAccountBody(req));
+    if (!parsed.success) return studioAccountResponse("bad_request_error", 400);
+    await requestStudioPasswordRecovery(parsed.data.email);
+    return studioAccountResponse("password_reset_email_sent", 202);
+  } catch {
+    return studioAccountResponse("unexpected_error_try_again", 503);
   }
 }
-
-export const POST = defaultResponderForAppDir(handler);

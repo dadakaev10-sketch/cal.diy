@@ -7,17 +7,37 @@ vi.mock("@calcom/prisma", () => ({
   default: { user: { findUnique: mocks.user }, $queryRaw: mocks.query, $executeRaw: mocks.execute },
 }));
 
+import { studioPasswordStamp } from "@calcom/features/auth/lib/studioAccountSecurity";
 import { studioAccessGate, studioRouteAccess } from "./studioAccessGate";
 
 beforeEach(() => {
   vi.resetAllMocks();
   vi.stubEnv("STUDIO_ACCESS_GATE_ENABLED", "true");
   vi.stubEnv("NEXTAUTH_SECRET", "test-secret");
+  vi.stubEnv("STUDIO_REGISTRATION_ENABLED", "false");
   mocks.token.mockResolvedValue(null);
   mocks.query.mockResolvedValue([{ attempts: 1 }]);
 });
 
 describe("studio access boundary", () => {
+  it("opens only explicitly enabled registration routes and methods", () => {
+    expect(studioRouteAccess("/api/studio-registration/request", "POST")).toBe("private");
+    vi.stubEnv("STUDIO_REGISTRATION_ENABLED", "true");
+    expect(studioRouteAccess("/api/studio-registration/request", "POST")).toBe("public");
+    expect(studioRouteAccess("/api/studio-registration/complete", "POST")).toBe("public");
+    expect(studioRouteAccess("/register/verify", "GET")).toBe("public");
+    expect(studioRouteAccess("/api/studio-registration/admin", "POST")).toBe("private");
+    expect(studioRouteAccess("/api/studio-registration/complete", "GET")).toBe("private");
+    expect(studioRouteAccess("/register/verify", "POST")).toBe("private");
+  });
+  it("rejects password stamps from previous passwords and pre-rollout sessions", async () => {
+    mocks.user.mockResolvedValue({ id: 7, locked: false, password: { hash: "new-hash" } });
+    for (const stamp of [undefined, studioPasswordStamp("old-hash", "test-secret")]) {
+      mocks.token.mockResolvedValue({ sub: "7", studioPasswordStamp: stamp });
+      expect((await studioAccessGate(new NextRequest("https://test.local/api/private")))?.status).toBe(401);
+    }
+  });
+
   it.each([
     "/",
     "/auth/login",
@@ -59,8 +79,11 @@ describe("studio access boundary", () => {
     );
   });
   it("accepts only existing unlocked users", async () => {
-    mocks.token.mockResolvedValue({ sub: "7" });
-    mocks.user.mockResolvedValue({ id: 7, locked: false });
+    mocks.token.mockResolvedValue({
+      sub: "7",
+      studioPasswordStamp: studioPasswordStamp("hash", "test-secret"),
+    });
+    mocks.user.mockResolvedValue({ id: 7, locked: false, password: { hash: "hash" } });
     expect(await studioAccessGate(new NextRequest("https://test.local/event-types"))).toBeNull();
     mocks.user.mockResolvedValue({ id: 7, locked: true });
     expect((await studioAccessGate(new NextRequest("https://test.local/event-types")))?.status).toBe(307);

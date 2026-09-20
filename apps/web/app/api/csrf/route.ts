@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { NextResponse } from "next/server";
-
 import { WEBAPP_URL } from "@calcom/lib/constants";
+import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -16,7 +15,7 @@ export async function GET(req: Request) {
   }
 
   const token = randomBytes(32).toString("hex");
-  const res = NextResponse.json({ csrfToken: token });
+  const res = NextResponse.json({ csrfToken: token }, { headers: { "Cache-Control": "no-store" } });
 
   res.cookies.set("calcom.csrf_token", token, {
     httpOnly: true,

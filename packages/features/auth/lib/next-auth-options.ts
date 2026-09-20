@@ -265,7 +265,14 @@ export async function authorizeCredentials(
   };
 
   const role = validateRole(user.role);
-  const baseUser = AdapterUserPresenter.fromCalUser(user, role, hasActiveTeams);
+  const secret = process.env.NEXTAUTH_SECRET;
+  const { studioPasswordStamp } = await import("./studioAccountSecurity");
+  const baseUser = {
+    ...AdapterUserPresenter.fromCalUser(user, role, hasActiveTeams),
+    ...(process.env.STUDIO_ACCESS_GATE_ENABLED === "true" && secret
+      ? { studioPasswordStamp: studioPasswordStamp(user.password.hash, secret) }
+      : {}),
+  };
 
   if (role === "INACTIVE_ADMIN") {
     const passwordValid = isPasswordValid(credentials.password, false, true);
@@ -428,6 +435,12 @@ export const getOptions = ({
       account,
     }) {
       log.debug("callbacks:jwt", safeStringify({ token, user, account, trigger, session }));
+      if (account?.type === "credentials" && user && process.env.STUDIO_ACCESS_GATE_ENABLED === "true") {
+        if (!("studioPasswordStamp" in user) || typeof user.studioPasswordStamp !== "string") {
+          throw new Error(ErrorCode.InternalServerError);
+        }
+        token.studioPasswordStamp = user.studioPasswordStamp;
+      }
       // The data available in 'session' depends on what data was supplied in update method call of session
       if (trigger === "update") {
         return {

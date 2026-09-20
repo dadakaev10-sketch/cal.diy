@@ -1,11 +1,12 @@
 import { createHmac } from "node:crypto";
 import process from "node:process";
+import { studioPasswordStamp } from "@calcom/features/auth/lib/studioAccountSecurity";
 import prisma from "@calcom/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const publicPages = new Set(["/", "/auth/login", "/auth/error", "/auth/logout", "/register"]);
+const publicPages = new Set(["/", "/auth/login", "/auth/error", "/auth/logout", "/register", "/recover"]);
 const publicAssets = new Set([
   "/api/logo",
   "/favicon.ico",
@@ -34,6 +35,21 @@ export function studioRouteAccess(path: string, method: string) {
   const normalized = path.length > 1 ? path.replace(/\/+$/, "") : path;
   if (["/auth/setup", "/api/auth/setup", "/api/auth/signup"].includes(normalized)) return "disabled";
   if (normalized === "/signup") return "register";
+  if (process.env.STUDIO_REGISTRATION_ENABLED === "true") {
+    if (["GET", "HEAD"].includes(method) && normalized === "/register/verify") return "public";
+    if (
+      method === "POST" &&
+      ["/api/studio-registration/request", "/api/studio-registration/complete"].includes(normalized)
+    )
+      return "public";
+  }
+  if (["/api/auth/forgot-password", "/api/auth/reset-password"].includes(normalized) && method === "POST")
+    return "public";
+  if (
+    ["GET", "HEAD"].includes(method) &&
+    (normalized === "/api/csrf" || /^\/recover\/[a-f0-9]{64}$/.test(normalized))
+  )
+    return "public";
   if (authEndpoints.has(normalized) && ["GET", "POST", "HEAD"].includes(method)) return "public";
   if (
     ["GET", "HEAD"].includes(method) &&
@@ -47,6 +63,9 @@ export function studioRouteAccess(path: string, method: string) {
 export async function studioAccessGate(req: NextRequest) {
   if (process.env.STUDIO_ACCESS_GATE_ENABLED !== "true") return null;
   const path = req.nextUrl.pathname.replace(/\/+$/, "") || "/";
+  if (["GET", "HEAD"].includes(req.method) && path === "/auth/forgot-password") {
+    return NextResponse.redirect(new URL("/recover", req.url));
+  }
   const access = studioRouteAccess(path, req.method);
   if (access === "disabled") return NextResponse.json({ error: "Not available" }, { status: 404 });
   if (access === "register") return NextResponse.redirect(new URL("/register", req.url));
@@ -87,9 +106,15 @@ export async function studioAccessGate(req: NextRequest) {
     if (Number.isSafeInteger(userId) && userId > 0) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, locked: true },
+        select: { id: true, locked: true, password: { select: { hash: true } } },
       });
-      if (user && !user.locked) return null;
+      if (
+        user &&
+        !user.locked &&
+        user.password &&
+        token?.studioPasswordStamp === studioPasswordStamp(user.password.hash, secret)
+      )
+        return null;
     }
   } catch {
     return NextResponse.json(
