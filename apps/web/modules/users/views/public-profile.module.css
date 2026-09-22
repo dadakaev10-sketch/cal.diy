@@ -1,0 +1,46 @@
+.page {
+  min-height: 100dvh;
+  background: var(--profile-background);
+  color: #26342f;
+}
+.card {
+  background: #fff;
+  border-color: var(--profile-soft);
+  box-shadow: 0 8px 32px #26342f08;
+}
+.hero {
+  background: linear-gradient(160deg, var(--profile-soft), #ffffff 75%);
+}
+.page :global(.text-default),
+.page :global(.text-emphasis) {
+  color: #26342f;
+}
+.page :global(.text-subtle),
+.page :global(.text-muted) {
+  color: #52615b;
+}
+.page :global(.bg-subtle),
+.page :global(.bg-muted) {
+  background: var(--profile-soft);
+}
+.page .avatar {
+  border: 4px solid #fff;
+  box-shadow: 0 4px 20px #26342f1a;
+  background: var(--profile-soft);
+  color: var(--profile-accent);
+}
+.page .avatar img {
+  object-fit: cover;
+}
+.page .event:hover {
+  background: #fff;
+  border-color: var(--profile-accent);
+  box-shadow: 0 8px 24px #26342f10;
+}
+.page .event:focus-visible {
+  outline-color: var(--profile-accent);
+}
+.page .arrow,
+.page .bio a {
+  color: var(--profile-accent);
+}

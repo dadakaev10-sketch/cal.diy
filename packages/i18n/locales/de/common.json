@@ -4739,5 +4739,17 @@
   "paypal_step_7": "Danach sollte alles eingerichtet sein.",
   "dashboard": "Dashboard",
   "paypal_webhook_reminder": "Unsere Integration erstellt einen spezifischen Webhook in Ihrem PayPal-Konto, den wir verwenden, um Transaktionen an unser System zurückzumelden. Wenn Sie diesen Webhook löschen, können wir keine Rückmeldungen mehr senden und Sie sollten die App deinstallieren und erneut installieren, damit dies ordnungsgemäß funktioniert. Die Deinstallation der App löscht nicht Ihre aktuelle Preis-/Währungskonfiguration für Ereignistypen, aber Sie können keine Buchungen mehr empfangen.",
-  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Fügen Sie Ihre neuen Code-Zeilen über dieser hinzu ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑"
+  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Fügen Sie Ihre neuen Code-Zeilen über dieser hinzu ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+  "public_palette_title": "Öffentliche Buchungsseite",
+  "public_palette_description": "Wähle eine helle Farbpalette für dein öffentliches Profil und deine Buchungsbuttons. Die Ansicht in deinem Konto bleibt unverändert.",
+  "public_palette_sage": "Salbei",
+  "public_palette_ocean": "Ozean",
+  "public_palette_rose": "Rosé",
+  "public_palette_lavender": "Lavendel",
+  "public_palette_sand": "Sand",
+  "public_palette_teal": "Türkis",
+  "public_profile_edit": "Foto und Beschreibung bearbeiten",
+  "public_profile_preview": "Öffentliche Seite ansehen",
+  "public_profile_bio": "Öffentliche Profilbeschreibung",
+  "public_profile_bio_help": "Stelle dich oder dein Unternehmen kurz vor. Dieser Text erscheint unter deinem Foto auf deinem öffentlichen Buchungsprofil."
 }

@@ -1,4 +1,3 @@
-import { encode } from "node:querystring";
 import { getUsernameList } from "@calcom/features/eventtypes/lib/defaultEvents";
 import { getEventTypesPublic } from "@calcom/features/eventtypes/lib/getEventTypesPublic";
 import { getBrandingForUser } from "@calcom/features/profile/lib/getBranding";
@@ -163,21 +162,6 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (cont
   }
 
   const eventTypes = await getEventTypesPublic(user.id);
-
-  // if profile only has one public event-type, redirect to it
-  if (eventTypes.length === 1 && context.query.redirect !== "false") {
-    // Redirect but don't change the URL
-    const urlDestination = `/${user.profile.username}/${eventTypes[0].slug}`;
-    const { query } = context;
-    const urlQuery = new URLSearchParams(encode(query));
-
-    return {
-      redirect: {
-        permanent: false,
-        destination: `${encodeURI(urlDestination)}?${urlQuery}`,
-      },
-    };
-  }
 
   const safeBio = markdownToSafeHTML(user.bio) || "";
 

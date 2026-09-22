@@ -1,5 +1,6 @@
 "use client";
 
+import process from "node:process";
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import { Dialog } from "@calcom/features/components/controlled-dialog";
 import SettingsHeader from "@calcom/features/settings/appDir/SettingsHeader";
@@ -694,7 +695,8 @@ const ProfileForm = ({
           </div>
         </div>
         <div className="mt-6">
-          <Label>{t("about")}</Label>
+          <Label>{t("public_profile_bio")}</Label>
+          <p className="text-subtle mb-3 text-sm">{t("public_profile_bio_help")}</p>
           <Editor
             getText={() => md.render(formMethods.getValues("bio") || "")}
             setText={(value: string) => {

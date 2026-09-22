@@ -14,18 +14,22 @@ import { OrgBanner } from "@calcom/ui/components/organization-banner";
 import { UnpublishedEntity } from "@calcom/ui/components/unpublished-entity";
 import { EventTypeDescriptionLazy as EventTypeDescription } from "@calcom/web/modules/event-types/components";
 import EmptyPage from "@calcom/web/modules/event-types/components/EmptyPage";
+import { getPublicPagePalette } from "@lib/publicPagePalette";
 import type { getServerSideProps } from "@server/lib/[user]/getServerSideProps";
 import classNames from "classnames";
 import type { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { Toaster } from "sonner";
+import styles from "./public-profile.module.css";
 
 export type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 export function UserPage(props: PageProps) {
   const { users, profile, eventTypes, entity } = props;
 
   const [user] = users; //To be used when we only have a single user, not dynamic group
-  useTheme(profile.theme);
+  const palette = getPublicPagePalette(profile.brandColor);
+  useTheme("light");
 
   const isBioEmpty = !user.bio || !user.bio.replace("<p><br></p>", "").length;
 
@@ -54,14 +58,33 @@ export function UserPage(props: PageProps) {
 
   return (
     <>
-      <div className={classNames(shouldAlignCentrally ? "mx-auto" : "", isEmbed ? "max-w-3xl" : "")}>
+      <div
+        data-testid="public-profile"
+        data-palette={palette.id}
+        style={
+          {
+            "--profile-background": palette.background,
+            "--profile-soft": palette.soft,
+            "--profile-accent": palette.accent,
+          } as CSSProperties
+        }
+        className={classNames(
+          styles.page,
+          shouldAlignCentrally ? "mx-auto" : "",
+          isEmbed ? "max-w-3xl" : ""
+        )}>
         <main
           className={classNames(
             shouldAlignCentrally ? "mx-auto" : "",
             isEmbed ? "border-booker border-booker-width  bg-default rounded-md" : "",
             "w-full max-w-2xl px-4 py-8 sm:py-14"
           )}>
-          <div className="border-subtle bg-default text-default mb-6 overflow-hidden rounded-2xl border shadow-sm">
+          <div
+            className={classNames(
+              styles.card,
+              styles.hero,
+              "text-default mb-6 overflow-hidden rounded-2xl border"
+            )}>
             {isOrg && user.profile.organization?.bannerUrl && (
               <OrgBanner
                 alt={user.profile.organization.name ?? "Organization banner"}
@@ -82,7 +105,15 @@ export function UserPage(props: PageProps) {
                   name: profile.name,
                   username: profile.username,
                 }}
-                className={isOrg && user.profile.organization?.bannerUrl ? "-mt-14" : ""}
+                fallback={
+                  <span className="text-3xl font-semibold">
+                    {profile.name.trim().slice(0, 1).toUpperCase()}
+                  </span>
+                }
+                className={classNames(
+                  styles.avatar,
+                  isOrg && user.profile.organization?.bannerUrl ? "-mt-14" : ""
+                )}
               />
               <h1
                 className={classNames(
@@ -108,7 +139,11 @@ export function UserPage(props: PageProps) {
                 <>
                   {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via safeBio */}
                   <div
-                    className="text-default max-w-md wrap-break-word text-sm leading-relaxed [&_a]:text-blue-500 [&_a]:underline [&_a]:hover:text-blue-600"
+                    data-testid="public-profile-bio"
+                    className={classNames(
+                      styles.bio,
+                      "text-default max-w-md wrap-break-word text-sm leading-relaxed [&_a]:underline"
+                    )}
                     dangerouslySetInnerHTML={{ __html: props.safeBio }}
                   />
                 </>
@@ -132,11 +167,18 @@ export function UserPage(props: PageProps) {
                     eventType: type,
                   });
                 }}
-                className="bg-default border-subtle dark:bg-cal-muted dark:hover:bg-subtle hover:bg-cal-muted group relative rounded-xl border shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emphasis"
+                className={classNames(
+                  styles.card,
+                  styles.event,
+                  "group relative rounded-xl border transition-all focus-visible:outline-2 focus-visible:outline-offset-4"
+                )}
                 data-testid="event-type-link">
                 <Icon
                   name="arrow-right"
-                  className="text-emphasis absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                  className={classNames(
+                    styles.arrow,
+                    "absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                  )}
                 />
                 {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
                 <div className="block w-full py-6 pl-6 pr-14">
