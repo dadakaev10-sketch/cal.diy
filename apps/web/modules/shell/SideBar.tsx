@@ -7,7 +7,6 @@ import { Avatar } from "@calcom/ui/components/avatar";
 import { Credits } from "@calcom/ui/components/credits";
 import { ButtonOrLink } from "@calcom/ui/components/dropdown";
 import { Icon } from "@calcom/ui/components/icon";
-import { Logo } from "@calcom/ui/components/logo";
 import { SkeletonText } from "@calcom/ui/components/skeleton";
 import { Tooltip } from "@calcom/ui/components/tooltip";
 import { ArrowLeftIcon, ArrowRightIcon } from "@coss/ui/icons";
@@ -16,6 +15,7 @@ import type { User as UserAuth } from "next-auth";
 import { useSession } from "next-auth/react";
 import { KBarTrigger } from "./Kbar";
 import { Navigation } from "./navigation/Navigation";
+import { StudioLogo } from "./StudioLogo";
 import { useBottomNavItems } from "./useBottomNavItems";
 import { ProfileDropdown } from "./user-dropdown/ProfileDropdown";
 import { UserDropdown } from "./user-dropdown/UserDropdown";
@@ -115,7 +115,7 @@ export function SideBar({ bannersHeight, user }: SideBarProps) {
           </header>
           {/* logo icon for tablet */}
           <Link href="/event-types" className="text-center md:inline lg:hidden">
-            <Logo small icon />
+            <StudioLogo icon />
           </Link>
           <Navigation />
         </div>
