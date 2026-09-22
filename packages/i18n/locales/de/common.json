@@ -1157,6 +1157,7 @@
   "change_avatar": "Profilbild ändern",
   "upload_avatar": "Avatar hochladen",
   "language": "Sprache",
+  "timezone_vienna": "Wien",
   "timezone": "Zeitzone",
   "first_day_of_week": "Erster Tag der Woche",
   "repeats_up_to_one": "Wiederholt sich bis zu {{count}} mal",

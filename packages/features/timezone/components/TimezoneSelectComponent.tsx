@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "@calcom/lib/hooks/useLocale";
 import type { Timezones } from "@calcom/lib/timezone";
 import { addTimezonesToDropdown, filterBySearchText, handleOptionLabel } from "@calcom/lib/timezone";
 import classNames from "@calcom/ui/classNames";
@@ -32,6 +33,7 @@ export function TimezoneSelectComponent({
   isWebTimezoneSelect = true,
   ...props
 }: TimezoneSelectComponentProps) {
+  const { t } = useLocale();
   const data = useMemo(() => props.data || [], [props.data]);
 
   /*
@@ -82,8 +84,12 @@ export function TimezoneSelectComponent({
   );
 
   const formatOption = useCallback(
-    (option: unknown) => <p className="truncate">{(option as ITimezoneOption).value.replace(/_/g, " ")}</p>,
-    []
+    (option: unknown, { context }: { context: "menu" | "value" }) => {
+      const timezone = (option as ITimezoneOption).value;
+      const label = timezone === "Europe/Vienna" ? t("timezone_vienna") : timezone.replace(/_/g, " ");
+      return <p className="truncate">{context === "value" ? `${t("timezone")}: ${label}` : label}</p>;
+    },
+    [t]
   );
 
   const getLabel = useCallback(

@@ -1,7 +1,7 @@
 import { Timezone as PlatformTimezoneSelect } from "@calcom/atoms/timezone";
 import { useBookerStoreContext } from "@calcom/features/bookings/Booker/BookerStoreProvider";
-import { useBookerTime } from "@calcom/features/bookings/Booker/hooks/useBookerTime";
 import { fadeInUp } from "@calcom/features/bookings/Booker/config";
+import { useBookerTime } from "@calcom/features/bookings/Booker/hooks/useBookerTime";
 import type { Timezone } from "@calcom/features/bookings/Booker/types";
 import { FromToTime } from "@calcom/features/bookings/Booker/utils/dates";
 import { useTimePreferences } from "@calcom/features/bookings/lib";
@@ -223,7 +223,10 @@ export const EventMeta = ({
               contentClassName="relative max-w-[90%]"
               icon="globe">
               {bookerState === "booking" ? (
-                <>{timezone}</>
+                <>
+                  {t("timezone")}:{" "}
+                  {timezone === "Europe/Vienna" ? t("timezone_vienna") : timezone?.replace(/_/g, " ")}
+                </>
               ) : (
                 <span
                   className={`current-timezone before:bg-subtle min-w-32 -mt-[2px] flex h-6 max-w-full items-center justify-start before:absolute before:inset-0 before:bottom-[-3px] before:left-[-30px] before:top-[-3px] before:w-[calc(100%+35px)] before:rounded-md before:py-3 before:opacity-0 before:transition-opacity ${

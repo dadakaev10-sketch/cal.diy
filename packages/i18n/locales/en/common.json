@@ -1186,6 +1186,7 @@
   "app_icon": "{{app}} app icon",
   "two_factor_auth_qr_code": "Two-factor authentication QR code",
   "language": "Language",
+  "timezone_vienna": "Vienna",
   "timezone": "Timezone",
   "first_day_of_week": "First day of week",
   "repeats_up_to_one": "Repeats up to {{count}} time",
