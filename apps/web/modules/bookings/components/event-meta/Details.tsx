@@ -129,7 +129,7 @@ export const EventMetaBlock = ({
  * <EventDetails event={event} blocks={[EventDetailBlocks.LOCATION, MyCustomBlock]} />
  */
 export const EventDetails = ({ event, blocks = defaultEventDetailsBlocks }: EventDetailsProps) => {
-  const { t } = useLocale();
+  const { t, i18n } = useLocale();
   const rescheduleUid = useBookerStore((state) => state.rescheduleUid);
 
   return (
@@ -175,6 +175,19 @@ export const EventDetails = ({ event, blocks = defaultEventDetailsBlocks }: Even
 
           case EventDetailBlocks.PRICE: {
             const paymentAppData = getPaymentAppData(event);
+            const displayPrice = event.metadata?.serviceDisplayPrice;
+            if (!paymentAppData.enabled && displayPrice?.enabled) {
+              return (
+                <EventMetaBlock key={block} icon="tags">
+                  <span data-testid="service-display-price">
+                    {new Intl.NumberFormat(i18n.language || "de", {
+                      style: "currency",
+                      currency: displayPrice.currency,
+                    }).format(displayPrice.amountMinor / 100)}
+                  </span>
+                </EventMetaBlock>
+              );
+            }
             if (event.price <= 0 || paymentAppData.price <= 0) return null;
 
             return (

@@ -4751,5 +4751,9 @@
   "public_profile_edit": "Foto und Beschreibung bearbeiten",
   "public_profile_preview": "Öffentliche Seite ansehen",
   "public_profile_bio": "Öffentliche Profilbeschreibung",
-  "public_profile_bio_help": "Stelle dich oder dein Unternehmen kurz vor. Dieser Text erscheint unter deinem Foto auf deinem öffentlichen Buchungsprofil."
+  "public_profile_bio_help": "Stelle dich oder dein Unternehmen kurz vor. Dieser Text erscheint unter deinem Foto auf deinem öffentlichen Buchungsprofil.",
+  "service_display_price_title": "Preis öffentlich anzeigen",
+  "service_display_price_help": "Zeige einen Preis direkt auf der Terminkarte deiner Dienstleistung.",
+  "service_display_price_amount": "Preis",
+  "service_display_price_payment_note": "Dies ist eine Preisangabe, keine Onlinezahlung. Bei aktivierter Onlinezahlung wird stattdessen deren Preis angezeigt."
 }

@@ -1,17 +1,16 @@
-import { useMemo } from "react";
-
 import { getPaymentAppData } from "@calcom/app-store/_utils/payments/getPaymentAppData";
 import { eventTypeMetaDataSchemaWithTypedApps } from "@calcom/app-store/zod-utils";
 import { Price } from "@calcom/features/bookings/components/event-meta/Price";
-import { PriceIcon } from "@calcom/web/modules/bookings/components/event-meta/PriceIcon";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { parseRecurringEvent } from "@calcom/lib/isRecurringEvent";
 import { markdownToSafeHTML } from "@calcom/lib/markdownToSafeHTML";
 import type { baseEventTypeSelect } from "@calcom/prisma";
-import type { Prisma, EventType } from "@calcom/prisma/client";
+import type { EventType, Prisma } from "@calcom/prisma/client";
 import { SchedulingType } from "@calcom/prisma/enums";
 import classNames from "@calcom/ui/classNames";
 import { Badge } from "@calcom/ui/components/badge";
+import { PriceIcon } from "@calcom/web/modules/bookings/components/event-meta/PriceIcon";
+import { useMemo } from "react";
 
 export type EventTypeDescriptionProps = {
   eventType: Pick<
@@ -64,7 +63,7 @@ export const EventTypeDescription = ({
             }}
           />
         )}
-        <ul className="mt-2 flex flex-wrap gap-x-2 gap-y-1">
+        <ul className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
           {metadata?.multipleDuration ? (
             metadata.multipleDuration.map((dur, idx) => (
               <li key={idx}>
@@ -97,6 +96,21 @@ export const EventTypeDescription = ({
               </Badge>
             </li>
           )}
+          {!paymentAppData.enabled && metadata?.serviceDisplayPrice?.enabled && (
+            <li data-testid="service-display-price">
+              <span
+                className="inline-flex items-center rounded-md px-2.5 py-1 text-sm font-semibold"
+                style={{
+                  background: "var(--profile-soft, #edf4ef)",
+                  color: "var(--profile-accent, #356859)",
+                }}>
+                {new Intl.NumberFormat(i18n.language || "de", {
+                  style: "currency",
+                  currency: metadata.serviceDisplayPrice.currency,
+                }).format(metadata.serviceDisplayPrice.amountMinor / 100)}
+              </span>
+            </li>
+          )}
           {paymentAppData.enabled && (
             <li>
               <Badge
@@ -122,7 +136,7 @@ export const EventTypeDescription = ({
             </li>
           )}
           {/* TODO: Maybe add a tool tip to this? */}
-          {eventType.requiresConfirmation || (recurringEvent?.count) ? (
+          {eventType.requiresConfirmation || recurringEvent?.count ? (
             <li className="block xl:hidden">
               <Badge variant="gray" startIcon="plus">
                 <p>{[eventType.requiresConfirmation, recurringEvent?.count].filter(Boolean).length}</p>

@@ -4908,5 +4908,9 @@
   "public_profile_edit": "Edit photo and description",
   "public_profile_preview": "Preview public page",
   "public_profile_bio": "Public profile description",
-  "public_profile_bio_help": "Introduce yourself or your business. This text appears below your photo on your public booking profile."
+  "public_profile_bio_help": "Introduce yourself or your business. This text appears below your photo on your public booking profile.",
+  "service_display_price_title": "Show a public price",
+  "service_display_price_help": "Display a price on the public card for this service.",
+  "service_display_price_amount": "Price",
+  "service_display_price_payment_note": "This displays a price without collecting payment. If online payment is enabled, its price is shown instead."
 }

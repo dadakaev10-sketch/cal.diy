@@ -32,6 +32,7 @@ import { useState } from "react";
 import type { Control, FormState, UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import { Controller, useFormContext } from "react-hook-form";
 import type { MultiValue } from "react-select";
+import { ServiceDisplayPriceSettings } from "./ServiceDisplayPriceSettings";
 
 export type EventSetupTabCustomClassNames = {
   wrapper?: string;
@@ -103,7 +104,11 @@ export const EventSetupTab = (
 
   const isManagedEventType = false;
   const isChildrenManagedEventType = false;
-  const shouldLockDisableProps = (_field: string) => ({ disabled: false, LockedIcon: false as const, isLocked: false });
+  const shouldLockDisableProps = (_field: string) => ({
+    disabled: false,
+    LockedIcon: false as const,
+    isLocked: false,
+  });
   const shouldLockIndicator = (_field: string) => false;
 
   const lengthLockedProps = shouldLockDisableProps("length");
@@ -194,6 +199,7 @@ export const EventSetupTab = (
             })}
           />
         </div>
+        {!isPlatform && <ServiceDisplayPriceSettings />}
         <div
           className={classNames(
             "rounded-lg border border-subtle p-6",
