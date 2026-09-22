@@ -4,6 +4,15 @@ import { describe, expect, it } from "vitest";
 import { studioPublicBookingRoute as route } from "./studioPublicBooking";
 
 describe("public customer booking boundary", () => {
+  it("serves uploaded public avatars without opening avatar administration", () => {
+    const path = "/api/avatar/689513a2-5dfa-4a43-8b2a-e2c798254c18.png";
+    expect(route(path, "GET")).toBe("booking-read");
+    expect(route(path, "HEAD")).toBe("booking-read");
+    expect(route(path, "POST")).toBeNull();
+    expect(route("/api/avatar", "GET")).toBeNull();
+    expect(route(`${path}/private`, "GET")).toBeNull();
+    expect(route("/api/avatar/not-a-uuid.png", "GET")).toBeNull();
+  });
   it.each([
     "/dadakaev",
     "/dadakaev/beratung",

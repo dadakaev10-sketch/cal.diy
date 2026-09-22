@@ -74,6 +74,8 @@ export function studioPublicBookingRoute(path: string, method: string) {
     return null;
   }
   if (!["GET", "HEAD"].includes(method)) return null;
+  if (/^\/api\/avatar\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.png$/i.test(path))
+    return "booking-read";
   if (["/api/user/avatar", "/_next/image"].includes(path)) return "booking-read";
   if (/^\/(booking|booking-successful|reschedule|cancel|success)\/[a-zA-Z0-9_-]{16,64}(\/embed)?$/.test(path))
     return "booking-page";
