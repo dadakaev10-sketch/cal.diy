@@ -12,6 +12,7 @@ import type {
 import z, { ZodNullable, ZodObject, ZodOptional } from "zod";
 import type { Prisma } from "./client";
 import { EventTypeCustomInputType } from "./enums";
+import { serviceCatalogSchema } from "./serviceCatalog";
 import { serviceDisplayPriceSchema } from "./serviceDisplayPrice";
 
 /** @see https://github.com/colinhacks/zod/issues/3155#issuecomment-2060045794 */
@@ -146,6 +147,7 @@ export const RequiresConfirmationThresholdUnits: z.ZodType<UnitTypeLongPlural> =
 
 const _eventTypeMetaDataSchemaWithoutApps = z.object({
   serviceDisplayPrice: serviceDisplayPriceSchema.optional(),
+  serviceCategoryId: z.string().uuid().nullable().optional(),
   smartContractAddress: z.string().optional(),
   blockchainId: z.number().optional(),
   multipleDuration: z.number().array().optional(),
@@ -380,6 +382,7 @@ const schemaDefaultConferencingApp = z.object({
 
 export const userMetadata = z
   .object({
+    serviceCatalog: serviceCatalogSchema.optional(),
     proPaidForByTeamId: z.number().optional(),
     stripeCustomerId: z.string().optional(),
     vitalSettings: vitalSettingsUpdateSchema.optional(),
