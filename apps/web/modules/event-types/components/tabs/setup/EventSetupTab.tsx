@@ -32,6 +32,7 @@ import { useState } from "react";
 import type { Control, FormState, UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import { Controller, useFormContext } from "react-hook-form";
 import type { MultiValue } from "react-select";
+import { ServiceCategorySettings } from "./ServiceCategorySettings";
 import { ServiceDisplayPriceSettings } from "./ServiceDisplayPriceSettings";
 
 export type EventSetupTabCustomClassNames = {
@@ -199,6 +200,7 @@ export const EventSetupTab = (
             })}
           />
         </div>
+        {!isPlatform && !team && <ServiceCategorySettings ownerId={eventType.userId} />}
         {!isPlatform && <ServiceDisplayPriceSettings />}
         <div
           className={classNames(

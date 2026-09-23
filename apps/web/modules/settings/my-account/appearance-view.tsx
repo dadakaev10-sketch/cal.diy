@@ -24,6 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import { BookerLayoutSelector } from "~/settings/components/BookerLayoutSelector";
 import { PublicPagePaletteSettings } from "./PublicPagePaletteSettings";
+import { ServiceCatalogSettings } from "./ServiceCatalogSettings";
 
 const useBrandColors = (
   currentTheme: string | null,
@@ -189,6 +190,7 @@ const AppearanceView = ({
 
       {isApartOfOrganization ? null : (
         <>
+          <ServiceCatalogSettings metadata={user.metadata} />
           <PublicPagePaletteSettings
             key={user.brandColor}
             brandColor={user.brandColor}
@@ -203,7 +205,9 @@ const AppearanceView = ({
                 showToast(t(layoutError), "error");
                 return;
               } else {
-                mutation.mutate(values);
+                mutation.mutate({
+                  metadata: { defaultBookerLayouts: values.metadata?.defaultBookerLayouts },
+                });
               }
             }}>
             <BookerLayoutSelector
