@@ -6,6 +6,7 @@ import {
   useEmbedStyles,
   useIsEmbed,
 } from "@calcom/embed-core/embed-iframe";
+import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { useRouterQuery } from "@calcom/lib/hooks/useRouterQuery";
 import useTheme from "@calcom/lib/hooks/useTheme";
 import { UserAvatar } from "@calcom/ui/components/avatar";
@@ -21,11 +22,14 @@ import type { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Toaster } from "sonner";
+import { PublicServiceCatalog } from "./PublicServiceCatalog";
 import styles from "./public-profile.module.css";
 
 export type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 export function UserPage(props: PageProps) {
   const { users, profile, eventTypes, entity } = props;
+  const { t } = useLocale();
+  const categorized = props.serviceCatalog?.enabled ?? false;
 
   const [user] = users; //To be used when we only have a single user, not dynamic group
   const palette = getPublicPagePalette(profile.brandColor);
@@ -44,6 +48,62 @@ export function UserPage(props: PageProps) {
     redirect: _redirect,
     ...query
   } = useRouterQuery();
+
+  const renderEvent = (type: PageProps["eventTypes"][number]) => (
+    <Link
+      key={type.id}
+      style={{ display: "flex", ...eventTypeListItemEmbedStyles }}
+      prefetch={false}
+      href={{
+        pathname: `/${user.profile.username}/${type.slug}`,
+        query,
+      }}
+      passHref
+      onClick={async () => {
+        sdkActionManager?.fire("eventTypeSelected", {
+          eventType: type,
+        });
+      }}
+      className={classNames(
+        styles.card,
+        styles.event,
+        "group relative rounded-xl border transition-all focus-visible:outline-2 focus-visible:outline-offset-4"
+      )}
+      data-testid="event-type-link">
+      {!categorized && (
+        <Icon
+          name="arrow-right"
+          className={classNames(
+            styles.arrow,
+            "absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+          )}
+        />
+      )}
+      {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
+      <div
+        className={
+          categorized
+            ? "flex w-full flex-col gap-4 p-5 sm:flex-row sm:items-center"
+            : "block w-full py-6 pl-6 pr-14"
+        }>
+        <div className="min-w-0 flex-1">
+          {categorized ? (
+            <h3 className="text-default text-base font-semibold">{type.title}</h3>
+          ) : (
+            <h2 className="text-default text-base font-semibold">{type.title}</h2>
+          )}
+          <EventTypeDescription eventType={type} isPublic={true} shortenDescription />
+        </div>
+        {categorized && (
+          <span
+            className="inline-flex shrink-0 self-start rounded-lg px-4 py-2 text-sm font-semibold sm:self-center"
+            style={{ background: "var(--profile-soft)", color: "var(--profile-accent)" }}>
+            {t("service_category_choose")}
+          </span>
+        )}
+      </div>
+    </Link>
+  );
 
   if (entity.considerUnpublished) {
     return (
@@ -77,7 +137,8 @@ export function UserPage(props: PageProps) {
           className={classNames(
             shouldAlignCentrally ? "mx-auto" : "",
             isEmbed ? "border-booker border-booker-width  bg-default rounded-md" : "",
-            "w-full max-w-2xl px-4 py-8 sm:py-14"
+            "w-full px-4 py-8 sm:py-14",
+            categorized ? "max-w-5xl" : "max-w-2xl"
           )}>
           <div
             className={classNames(
@@ -152,43 +213,15 @@ export function UserPage(props: PageProps) {
           </div>
 
           <div className="grid gap-3" data-testid="event-types">
-            {eventTypes.map((type) => (
-              <Link
-                key={type.id}
-                style={{ display: "flex", ...eventTypeListItemEmbedStyles }}
-                prefetch={false}
-                href={{
-                  pathname: `/${user.profile.username}/${type.slug}`,
-                  query,
-                }}
-                passHref
-                onClick={async () => {
-                  sdkActionManager?.fire("eventTypeSelected", {
-                    eventType: type,
-                  });
-                }}
-                className={classNames(
-                  styles.card,
-                  styles.event,
-                  "group relative rounded-xl border transition-all focus-visible:outline-2 focus-visible:outline-offset-4"
-                )}
-                data-testid="event-type-link">
-                <Icon
-                  name="arrow-right"
-                  className={classNames(
-                    styles.arrow,
-                    "absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 opacity-60 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-                  )}
-                />
-                {/* Don't prefetch till the time we drop the amount of javascript in [user][type] page which is impacting score for [user] page */}
-                <div className="block w-full py-6 pl-6 pr-14">
-                  <div className="flex flex-wrap items-center">
-                    <h2 className="text-default pr-2 text-base font-semibold">{type.title}</h2>
-                  </div>
-                  <EventTypeDescription eventType={type} isPublic={true} shortenDescription />
-                </div>
-              </Link>
-            ))}
+            {categorized && props.serviceCatalog ? (
+              <PublicServiceCatalog
+                catalog={props.serviceCatalog}
+                eventTypes={eventTypes}
+                renderEvent={renderEvent}
+              />
+            ) : (
+              eventTypes.map(renderEvent)
+            )}
           </div>
 
           {isEventListEmpty && <EmptyPage name={profile.name || "User"} />}
