@@ -12,6 +12,7 @@ import type {
 import z, { ZodNullable, ZodObject, ZodOptional } from "zod";
 import type { Prisma } from "./client";
 import { EventTypeCustomInputType } from "./enums";
+import { landingPageSchema } from "./landingPage";
 import { serviceCatalogSchema } from "./serviceCatalog";
 import { serviceDisplayPriceSchema } from "./serviceDisplayPrice";
 
@@ -383,6 +384,7 @@ const schemaDefaultConferencingApp = z.object({
 export const userMetadata = z
   .object({
     serviceCatalog: serviceCatalogSchema.optional(),
+    landingPage: landingPageSchema.optional(),
     proPaidForByTeamId: z.number().optional(),
     stripeCustomerId: z.string().optional(),
     vitalSettings: vitalSettingsUpdateSchema.optional(),

@@ -1,10 +1,12 @@
 import { FULL_NAME_LENGTH_MAX_LIMIT } from "@calcom/lib/constants";
 import { timeZoneSchema } from "@calcom/lib/dayjs/timeZone.schema";
+import { landingPageSchema } from "@calcom/prisma/landingPage";
 import { serviceCatalogSchema } from "@calcom/prisma/serviceCatalog";
 import { bookerLayouts, userMetadata } from "@calcom/prisma/zod-utils";
 import { z } from "zod";
 
 export type TUpdateUserMetadataAllowedKeys = {
+  landingPage?: z.infer<typeof landingPageSchema>;
   serviceCatalog?: z.infer<typeof serviceCatalogSchema>;
   sessionTimeout?: number;
   defaultBookerLayouts?: z.infer<typeof bookerLayouts>;
@@ -12,6 +14,7 @@ export type TUpdateUserMetadataAllowedKeys = {
 
 export const updateUserMetadataAllowedKeys: z.ZodType<TUpdateUserMetadataAllowedKeys> = z.object({
   serviceCatalog: serviceCatalogSchema.optional(),
+  landingPage: landingPageSchema.optional(),
   sessionTimeout: z.number().optional(), // Minutes
   defaultBookerLayouts: bookerLayouts.optional(),
 });
