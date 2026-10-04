@@ -12,7 +12,11 @@ export type TUpdateUserMetadataAllowedKeys = {
   defaultBookerLayouts?: z.infer<typeof bookerLayouts>;
 };
 
-export const updateUserMetadataAllowedKeys: z.ZodType<TUpdateUserMetadataAllowedKeys> = z.object({
+export const updateUserMetadataAllowedKeys: z.ZodType<
+  TUpdateUserMetadataAllowedKeys,
+  z.ZodTypeDef,
+  Omit<TUpdateUserMetadataAllowedKeys, "landingPage"> & { landingPage?: z.input<typeof landingPageSchema> }
+> = z.object({
   serviceCatalog: serviceCatalogSchema.optional(),
   landingPage: landingPageSchema.optional(),
   sessionTimeout: z.number().optional(), // Minutes
@@ -39,7 +43,7 @@ export type TUpdateProfileInputSchemaInput = {
   completedOnboarding?: boolean;
   locale?: string;
   timeFormat?: number;
-  metadata?: z.infer<typeof userMetadata>;
+  metadata?: z.input<typeof userMetadata>;
   travelSchedules?: {
     id?: number;
     timeZone: string;
