@@ -23,6 +23,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import { BookerLayoutSelector } from "~/settings/components/BookerLayoutSelector";
+import { LandingPageSettings } from "./LandingPageSettings";
 import { PublicPagePaletteSettings } from "./PublicPagePaletteSettings";
 import { ServiceCatalogSettings } from "./ServiceCatalogSettings";
 
@@ -190,6 +191,7 @@ const AppearanceView = ({
 
       {isApartOfOrganization ? null : (
         <>
+          <LandingPageSettings user={user} />
           <ServiceCatalogSettings metadata={user.metadata} />
           <PublicPagePaletteSettings
             key={user.brandColor}
