@@ -36,3 +36,20 @@
   .action { max-width: 360px; margin: auto; }
   .landing[data-layout="cover"] .action { margin: 0; }
 }
+.socials { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+.socials a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--profile-background); color: var(--profile-accent); }
+.socials a:hover { background: var(--profile-soft); }
+.socials a:focus-visible { outline: 3px solid var(--profile-accent); outline-offset: 3px; }
+.sections { display: grid; gap: 20px; margin-top: 28px; }
+.card { text-align: left; border: 1px solid var(--profile-soft); border-radius: 18px; padding: 22px; background: #fff; box-shadow: 0 8px 24px #26342f09; }
+.cardHeading { display: flex; align-items: flex-start; gap: 16px; }
+.cardHeading > div { min-width: 0; }
+.card h2, .textSection h2 { font-size: 18px; font-weight: 600; line-height: 1.4; }
+.card p, .textSection p { margin-top: 8px; font-size: 14px; line-height: 1.7; color: #52615b; white-space: pre-line; }
+.thumbnail { flex-shrink: 0; width: 64px; height: 64px; object-fit: cover; border-radius: 10px; }
+.price { margin-top: 18px; color: var(--profile-accent); font-size: 18px; font-weight: 600; }
+.card .action { margin: 20px 0 0 !important; max-width: none; }
+.textSection { padding: 12px 4px; text-align: left; }
+.landing[data-layout="creator"] { background: var(--profile-background); }
+.landing[data-layout="creator"] .avatar { width: 128px; height: 128px; margin: 0 auto 24px; box-shadow: 0 12px 30px #26342f14; }
+.landing[data-layout="creator"] .eyebrow { display: none; }

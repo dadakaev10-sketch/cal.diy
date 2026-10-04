@@ -142,7 +142,7 @@ export function UserPage(props: PageProps) {
             shouldAlignCentrally ? "mx-auto" : "",
             isEmbed ? "border-booker border-booker-width  bg-default rounded-md" : "",
             "w-full px-4 py-8 sm:py-14",
-            categorized || (showLanding && props.landingPage?.layout === "cover") ? "max-w-5xl" : "max-w-2xl"
+            (showLanding ? props.landingPage?.layout === "cover" : categorized) ? "max-w-5xl" : "max-w-2xl"
           )}>
           {showLanding && props.landingPage ? (
             <PublicLandingPage
@@ -150,13 +150,13 @@ export function UserPage(props: PageProps) {
               name={profile.name}
               avatarUrl={profile.image}
               bio={props.markdownStrippedBio}
-              bookingAction={
+              bookingAction={(label) => (
                 <Link
                   href={{ pathname: `/${user.profile.username}`, query: { ...query, view: "services" } }}
                   prefetch={false}>
-                  {t("landing_book")}
+                  {label}
                 </Link>
-              }
+              )}
             />
           ) : (
             <>
