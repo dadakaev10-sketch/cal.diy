@@ -11,6 +11,7 @@ import { stripMarkdown } from "@calcom/lib/stripMarkdown";
 import { prisma } from "@calcom/prisma";
 import type { EventType, User } from "@calcom/prisma/client";
 import { RedirectType } from "@calcom/prisma/enums";
+import { type LandingPage, publicLandingPage } from "@calcom/prisma/landingPage";
 import type { ServiceCatalog } from "@calcom/prisma/serviceCatalog";
 import type { EventTypeMetaDataSchema } from "@calcom/prisma/zod-utils";
 import type { UserProfile } from "@calcom/types/UserProfile";
@@ -23,6 +24,7 @@ import type { z } from "zod";
 const log = logger.getSubLogger({ prefix: ["[[pages/[user]]]"] });
 type UserPageProps = {
   serviceCatalog?: ServiceCatalog;
+  landingPage?: LandingPage | null;
   profile: {
     name: string;
     image: string;
@@ -189,6 +191,7 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (cont
       },
       eventTypes,
       serviceCatalog: publicServiceCatalog(user.metadata, eventTypes),
+      landingPage: publicLandingPage(user.metadata),
       safeBio,
       profile,
       // Dynamic group has no theme preference right now. It uses system theme.

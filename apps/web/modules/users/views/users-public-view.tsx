@@ -22,6 +22,7 @@ import type { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Toaster } from "sonner";
+import { PublicLandingPage } from "./PublicLandingPage";
 import { PublicServiceCatalog } from "./PublicServiceCatalog";
 import styles from "./public-profile.module.css";
 
@@ -46,8 +47,11 @@ export function UserPage(props: PageProps) {
     user: _user,
     orgSlug: _orgSlug,
     redirect: _redirect,
+    view: pageView,
     ...query
   } = useRouterQuery();
+
+  const showLanding = !isEmbed && props.landingPage?.mode === "landing" && pageView !== "services";
 
   const renderEvent = (type: PageProps["eventTypes"][number]) => (
     <Link
@@ -138,93 +142,119 @@ export function UserPage(props: PageProps) {
             shouldAlignCentrally ? "mx-auto" : "",
             isEmbed ? "border-booker border-booker-width  bg-default rounded-md" : "",
             "w-full px-4 py-8 sm:py-14",
-            categorized ? "max-w-5xl" : "max-w-2xl"
+            categorized || (showLanding && props.landingPage?.layout === "cover") ? "max-w-5xl" : "max-w-2xl"
           )}>
-          <div
-            className={classNames(
-              styles.card,
-              styles.hero,
-              "text-default mb-6 overflow-hidden rounded-2xl border"
-            )}>
-            {isOrg && user.profile.organization?.bannerUrl && (
-              <OrgBanner
-                alt={user.profile.organization.name ?? "Organization banner"}
-                imageSrc={user.profile.organization.bannerUrl}
-                className="p-1 border border-subtle rounded-xl w-full object-cover"
-              />
-            )}
-            <div
-              className={classNames(
-                "flex flex-col px-6 py-8 sm:px-8 sm:py-10",
-                shouldAlignCentrally ? "items-center text-center" : "items-start text-left"
-              )}>
-              <UserAvatar
-                size="xl"
-                user={{
-                  avatarUrl: user.avatarUrl,
-                  profile: user.profile,
-                  name: profile.name,
-                  username: profile.username,
-                }}
-                fallback={
-                  <span className="text-3xl font-semibold">
-                    {profile.name.trim().slice(0, 1).toUpperCase()}
-                  </span>
-                }
-                className={classNames(
-                  styles.avatar,
-                  isOrg && user.profile.organization?.bannerUrl ? "-mt-14" : ""
-                )}
-              />
-              <h1
-                className={classNames(
-                  "font-cal text-emphasis mb-2 text-2xl tracking-tight",
-                  isOrg && user.profile.organization?.bannerUrl ? "" : "mt-4"
-                )}
-                data-testid="name-title">
-                {profile.name}
-                {!isOrg && user.verified && (
-                  <Icon
-                    name="badge-check"
-                    className="mx-1 -mt-1 inline h-6 w-6 fill-blue-500 text-white dark:text-black"
-                  />
-                )}
-                {isOrg && (
-                  <Icon
-                    name="badge-check"
-                    className="mx-1 -mt-1 inline h-6 w-6 fill-yellow-500 text-white dark:text-black"
-                  />
-                )}
-              </h1>
-              {!isBioEmpty && (
-                <>
-                  {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via safeBio */}
-                  <div
-                    data-testid="public-profile-bio"
-                    className={classNames(
-                      styles.bio,
-                      "text-default max-w-md wrap-break-word text-sm leading-relaxed [&_a]:underline"
-                    )}
-                    dangerouslySetInnerHTML={{ __html: props.safeBio }}
-                  />
-                </>
+          {showLanding && props.landingPage ? (
+            <PublicLandingPage
+              page={props.landingPage}
+              name={profile.name}
+              avatarUrl={profile.image}
+              bio={props.markdownStrippedBio}
+              bookingAction={
+                <Link
+                  href={{ pathname: `/${user.profile.username}`, query: { ...query, view: "services" } }}
+                  prefetch={false}>
+                  {t("landing_book")}
+                </Link>
+              }
+            />
+          ) : (
+            <>
+              {!isEmbed && props.landingPage && (
+                <Link
+                  className="mb-5 inline-block text-sm underline"
+                  href={{ pathname: `/${user.profile.username}`, query }}
+                  prefetch={false}>
+                  {t("landing_back")}
+                </Link>
               )}
-            </div>
-          </div>
+              <div
+                className={classNames(
+                  styles.card,
+                  styles.hero,
+                  "text-default mb-6 overflow-hidden rounded-2xl border"
+                )}>
+                {isOrg && user.profile.organization?.bannerUrl && (
+                  <OrgBanner
+                    alt={user.profile.organization.name ?? "Organization banner"}
+                    imageSrc={user.profile.organization.bannerUrl}
+                    className="p-1 border border-subtle rounded-xl w-full object-cover"
+                  />
+                )}
+                <div
+                  className={classNames(
+                    "flex flex-col px-6 py-8 sm:px-8 sm:py-10",
+                    shouldAlignCentrally ? "items-center text-center" : "items-start text-left"
+                  )}>
+                  <UserAvatar
+                    size="xl"
+                    user={{
+                      avatarUrl: user.avatarUrl,
+                      profile: user.profile,
+                      name: profile.name,
+                      username: profile.username,
+                    }}
+                    fallback={
+                      <span className="text-3xl font-semibold">
+                        {profile.name.trim().slice(0, 1).toUpperCase()}
+                      </span>
+                    }
+                    className={classNames(
+                      styles.avatar,
+                      isOrg && user.profile.organization?.bannerUrl ? "-mt-14" : ""
+                    )}
+                  />
+                  <h1
+                    className={classNames(
+                      "font-cal text-emphasis mb-2 text-2xl tracking-tight",
+                      isOrg && user.profile.organization?.bannerUrl ? "" : "mt-4"
+                    )}
+                    data-testid="name-title">
+                    {profile.name}
+                    {!isOrg && user.verified && (
+                      <Icon
+                        name="badge-check"
+                        className="mx-1 -mt-1 inline h-6 w-6 fill-blue-500 text-white dark:text-black"
+                      />
+                    )}
+                    {isOrg && (
+                      <Icon
+                        name="badge-check"
+                        className="mx-1 -mt-1 inline h-6 w-6 fill-yellow-500 text-white dark:text-black"
+                      />
+                    )}
+                  </h1>
+                  {!isBioEmpty && (
+                    <>
+                      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via safeBio */}
+                      <div
+                        data-testid="public-profile-bio"
+                        className={classNames(
+                          styles.bio,
+                          "text-default max-w-md wrap-break-word text-sm leading-relaxed [&_a]:underline"
+                        )}
+                        dangerouslySetInnerHTML={{ __html: props.safeBio }}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
 
-          <div className="grid gap-3" data-testid="event-types">
-            {categorized && props.serviceCatalog ? (
-              <PublicServiceCatalog
-                catalog={props.serviceCatalog}
-                eventTypes={eventTypes}
-                renderEvent={renderEvent}
-              />
-            ) : (
-              eventTypes.map(renderEvent)
-            )}
-          </div>
+              <div className="grid gap-3" data-testid="event-types">
+                {categorized && props.serviceCatalog ? (
+                  <PublicServiceCatalog
+                    catalog={props.serviceCatalog}
+                    eventTypes={eventTypes}
+                    renderEvent={renderEvent}
+                  />
+                ) : (
+                  eventTypes.map(renderEvent)
+                )}
+              </div>
 
-          {isEventListEmpty && <EmptyPage name={profile.name || "User"} />}
+              {isEventListEmpty && <EmptyPage name={profile.name || "User"} />}
+            </>
+          )}
         </main>
         <Toaster position="bottom-right" />
       </div>
