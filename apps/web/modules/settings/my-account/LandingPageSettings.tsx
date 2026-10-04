@@ -11,6 +11,7 @@ import { getPublicPagePalette } from "@lib/publicPagePalette";
 import { revalidateSettingsAppearance } from "app/(use-page-wrapper)/settings/(settings-layout)/my-account/appearance/actions";
 import Link from "next/link";
 import { type CSSProperties, useState } from "react";
+import { LandingSectionsSettings } from "./LandingSectionsSettings";
 
 const inputClass = "border-default bg-default text-default mt-1 w-full rounded-md border px-3 py-2 text-sm";
 export function LandingPageSettings({
@@ -100,8 +101,18 @@ export function LandingPageSettings({
               <select
                 className={inputClass}
                 value={page.layout}
-                onChange={(e) => change({ layout: e.target.value === "cover" ? "cover" : "portrait" })}>
+                onChange={(e) =>
+                  change({
+                    layout:
+                      e.target.value === "cover"
+                        ? "cover"
+                        : e.target.value === "creator"
+                          ? "creator"
+                          : "portrait",
+                  })
+                }>
                 <option value="portrait">{t("landing_layout_portrait")}</option>
+                <option value="creator">{t("landing_layout_creator")}</option>
                 <option value="cover">{t("landing_layout_cover")}</option>
               </select>
             </label>
@@ -202,6 +213,7 @@ export function LandingPageSettings({
                 {t("landing_link_add")}
               </Button>
             </div>
+            <LandingSectionsSettings page={page} change={change} />
             <details className="border-subtle rounded-xl border p-4" open>
               <summary className="cursor-pointer text-sm font-medium">{t("landing_preview")}</summary>
               <div
@@ -215,15 +227,20 @@ export function LandingPageSettings({
                 }>
                 <PublicLandingPage
                   preview
-                  page={{ ...page, links: parsed.success ? parsed.data.links : [] }}
+                  page={{
+                    ...page,
+                    links: parsed.success ? parsed.data.links : [],
+                    socialLinks: parsed.success ? parsed.data.socialLinks : [],
+                    sections: parsed.success ? parsed.data.sections : [],
+                  }}
                   name={user.name || user.username || ""}
                   avatarUrl={getUserAvatarUrl({ avatarUrl: user.avatarUrl })}
                   bio={user.bio}
-                  bookingAction={
+                  bookingAction={(label) => (
                     <button type="button" disabled>
-                      {t("landing_book")}
+                      {label}
                     </button>
-                  }
+                  )}
                 />
               </div>
               <p className="text-subtle mt-3 text-xs">{t("landing_preview_help")}</p>
