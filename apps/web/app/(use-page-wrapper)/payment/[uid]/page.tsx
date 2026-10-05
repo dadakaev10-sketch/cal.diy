@@ -1,95 +1,63 @@
-import { APP_NAME } from "@calcom/lib/constants";
-import { buildLegacyCtx } from "@lib/buildLegacyCtx";
+import process from "node:process";
+import { bookingStripeData, verifyBookingIntent } from "@calcom/app-store/stripepayment/lib/bookingPayment";
+import stripe from "@calcom/app-store/stripepayment/lib/server";
+import prisma from "@calcom/prisma";
 import type { PageProps } from "app/_types";
-import { _generateMetadata } from "app/_utils";
-import { withAppDirSsr } from "app/WithAppDirSsr";
-import { cookies, headers } from "next/headers";
-import PaymentPage from "./PaymentPage";
+import { notFound } from "next/navigation";
+import { z } from "zod";
+import StripeBookingPayment from "./StripeBookingPayment";
 
-type PaymentPageProps = {
-  payment: {
-    id: number;
-    success: boolean;
-    refunded: boolean;
-    amount: number;
-    currency: string;
-    paymentOption: string | null;
-    data: Record<string, unknown>;
-    appId?: string | null;
-  };
-  clientSecret?: string | null;
-  booking: {
-    id: number;
-    uid: string;
-    title: string;
-    startTime: string;
-    endTime: string;
-    status: string;
-    paid: boolean;
-    description?: string | null;
-    location?: string | null;
-  };
-  eventType: {
-    id: number;
-    title: string;
-    length: number;
-    price: number;
-    currency: string;
-    metadata: Record<string, unknown> | null;
-    successRedirectUrl?: string | null;
-    forwardParamsSuccessRedirect?: boolean | null;
-    recurringEvent?: unknown;
-  };
-  profile: { theme?: string | null; hideBranding?: boolean };
-  user?: { name?: string | null; username?: string | null } | null;
-};
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Payment | DADAKAEV CAL", robots: { index: false, follow: false } };
 
-export const generateMetadata = async ({ params, searchParams }: PageProps) => {
-  const props = await getData(
-    buildLegacyCtx(await headers(), await cookies(), await params, await searchParams)
-  );
-  const eventName = props.booking.title;
-  return await _generateMetadata(
-    (t) => `${t("payment")} | ${eventName} | ${APP_NAME}`,
-    () => "",
-    undefined,
-    undefined,
-    `/payment/${(await params).uid}`
-  );
-};
-
-const getData = withAppDirSsr<PaymentPageProps>(async () => ({
-  props: {
-    payment: {
-      id: 0,
-      success: false,
-      refunded: false,
-      amount: 0,
-      currency: "usd",
-      paymentOption: null,
-      data: {},
-      appId: null,
+export default async function Page({ params }: PageProps) {
+  if (!process.env.STRIPE_PRIVATE_KEY?.startsWith("sk_test_")) notFound();
+  const { uid } = await params;
+  if (!z.string().uuid().safeParse(uid).success || typeof uid !== "string") notFound();
+  const payment = await prisma.payment.findUnique({
+    where: { uid },
+    select: {
+      externalId: true,
+      bookingId: true,
+      appId: true,
+      amount: true,
+      currency: true,
+      success: true,
+      refunded: true,
+      paymentOption: true,
+      data: true,
+      booking: { select: { uid: true, title: true, startTime: true, status: true, paid: true } },
     },
-    booking: {
-      id: 0,
-      uid: "",
-      title: "",
-      startTime: "",
-      endTime: "",
-      status: "",
-      paid: false,
-      location: null,
-    },
-    eventType: { id: 0, title: "", length: 0, price: 0, currency: "usd", metadata: null },
-    profile: { theme: null, hideBranding: false },
-  },
-}));
-
-const ServerPage = async ({ params, searchParams }: PageProps) => {
-  const props = await getData(
-    buildLegacyCtx(await headers(), await cookies(), await params, await searchParams)
+  });
+  if (!payment?.booking || payment.appId !== "stripe" || payment.paymentOption !== "ON_BOOKING") notFound();
+  const parsed = bookingStripeData.safeParse(payment.data);
+  if (!parsed.success) notFound();
+  const unavailable =
+    payment.refunded ||
+    !["ACCEPTED", "PENDING"].includes(payment.booking.status) ||
+    payment.booking.startTime <= new Date();
+  let clientSecret: string | null = null;
+  let processing = false;
+  if (!unavailable && !payment.success) {
+    const intent = await stripe.paymentIntents.retrieve(payment.externalId, {
+      stripeAccount: parsed.data.stripeAccount,
+    });
+    verifyBookingIntent(intent, payment, process.env.STRIPE_PRIVATE_KEY?.startsWith("sk_live_") === true);
+    processing = ["succeeded", "processing"].includes(intent.status);
+    if (intent.status !== "canceled" && !processing) clientSecret = intent.client_secret;
+  }
+  return (
+    <StripeBookingPayment
+      title={payment.booking.title}
+      amount={payment.amount}
+      currency={payment.currency}
+      paid={payment.success && payment.booking.paid && !payment.refunded}
+      processing={processing}
+      unavailable={unavailable || (!payment.success && !processing && !clientSecret)}
+      bookingUid={payment.booking.uid}
+      clientSecret={clientSecret}
+      publicKey={parsed.data.stripe_publishable_key}
+      account={parsed.data.stripeAccount}
+    />
   );
-
-  return <PaymentPage {...props} />;
-};
-export default ServerPage;
+}

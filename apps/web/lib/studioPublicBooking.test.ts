@@ -4,6 +4,14 @@ import { describe, expect, it } from "vitest";
 import { studioPublicBookingRoute as route } from "./studioPublicBooking";
 
 describe("public customer booking boundary", () => {
+  it("opens only UUID payment pages for customer reads", () => {
+    const path = "/payment/689513a2-5dfa-4a43-8b2a-e2c798254c18";
+    expect(route(path, "GET")).toBe("booking-page");
+    expect(route(path, "HEAD")).toBe("booking-page");
+    expect(route(path, "POST")).toBeNull();
+    expect(route(`${path}/admin`, "GET")).toBeNull();
+    expect(route("/payment/not-a-uuid", "GET")).toBeNull();
+  });
   it("serves uploaded public avatars without opening avatar administration", () => {
     const path = "/api/avatar/689513a2-5dfa-4a43-8b2a-e2c798254c18.png";
     expect(route(path, "GET")).toBe("booking-read");

@@ -1,4 +1,11 @@
 {
+  "stripe_booking_payment_error": "Die Zahlung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+  "stripe_booking_pay": "Jetzt bezahlen",
+  "stripe_booking_sandbox": "Testmodus: keine echte Zahlung. Verwende ausschließlich Stripe-Testzahlungsdaten.",
+  "stripe_booking_paid": "Zahlung eingegangen. In deinen Buchungsdetails siehst du, ob noch eine Bestätigung des Unternehmens erforderlich ist.",
+  "stripe_booking_view": "Buchung ansehen",
+  "stripe_booking_unavailable": "Diese Zahlung ist nicht mehr verfügbar. Bitte kontaktiere das Unternehmen.",
+  "stripe_booking_processing": "Deine Zahlung wird geprüft. Bitte bezahle nicht erneut. Falls diese Meldung bestehen bleibt, kontaktiere das Unternehmen.",
   "service_catalog_discard": "Änderungen verwerfen",
   "service_catalog_title": "Leistungskategorien",
   "service_catalog_help": "Ordne deine Leistungen in Kategorien und optional Unterkategorien. Die Zuordnung erfolgt beim Bearbeiten einer Leistung.",

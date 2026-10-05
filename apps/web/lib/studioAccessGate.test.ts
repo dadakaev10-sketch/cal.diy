@@ -21,6 +21,12 @@ beforeEach(() => {
 });
 
 describe("studio access boundary", () => {
+  it("allows only the signed webhook POST endpoint without a browser session", async () => {
+    const url = "https://test.local/api/integrations/stripepayment/webhook";
+    expect(await studioAccessGate(new NextRequest(url, { method: "POST" }))).toBeNull();
+    expect((await studioAccessGate(new NextRequest(url)))?.status).toBe(401);
+    expect((await studioAccessGate(new NextRequest(`${url}/admin`, { method: "POST" })))?.status).toBe(401);
+  });
   it("allows guest booking pages and fails closed on booking mutation abuse", async () => {
     expect(await studioAccessGate(new NextRequest("https://test.local/dadakaev"))).toBeNull();
     const request = (origin: string) =>

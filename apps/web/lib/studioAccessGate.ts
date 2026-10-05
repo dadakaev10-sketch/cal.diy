@@ -72,6 +72,7 @@ export async function studioAccessGate(req: NextRequest) {
   if (["GET", "HEAD"].includes(req.method) && path === "/auth/forgot-password") {
     return NextResponse.redirect(new URL("/recover", req.url));
   }
+  if (path === "/api/integrations/stripepayment/webhook" && req.method === "POST") return null;
   const access = studioRouteAccess(path, req.method);
   if (access === "disabled") return NextResponse.json({ error: "Not available" }, { status: 404 });
   if (access === "register") return NextResponse.redirect(new URL("/register", req.url));

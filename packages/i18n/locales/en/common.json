@@ -1,4 +1,11 @@
 {
+  "stripe_booking_payment_error": "Payment could not be completed. Please try again.",
+  "stripe_booking_pay": "Pay now",
+  "stripe_booking_sandbox": "Test mode: no real payment. Use Stripe test payment details only.",
+  "stripe_booking_paid": "Payment received. Your booking details show whether organizer approval is still required.",
+  "stripe_booking_view": "View booking",
+  "stripe_booking_unavailable": "This payment is no longer available. Please contact the business.",
+  "stripe_booking_processing": "Your payment is being verified. Please do not pay again. If this message persists, contact the business.",
   "service_catalog_discard": "Discard changes",
   "service_catalog_title": "Service categories",
   "service_catalog_help": "Organize services into categories and optional subcategories. Assign a category when editing a service.",
