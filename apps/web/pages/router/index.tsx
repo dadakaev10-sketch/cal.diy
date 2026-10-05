@@ -1,7 +1,6 @@
+"use client";
+
 import { APP_NAME } from "@calcom/lib/constants";
-
-("use client");
-
 import { markdownToSafeHTML } from "@calcom/lib/markdownToSafeHTML";
 import PageWrapper from "@components/PageWrapper";
 import Head from "next/head";
