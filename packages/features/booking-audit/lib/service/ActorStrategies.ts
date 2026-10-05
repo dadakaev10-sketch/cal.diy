@@ -1,6 +1,6 @@
+import { getAppNameFromSlug } from "../getAppNameFromSlug";
 import type { AuditActorType } from "../repository/IAuditActorRepository";
 import type { BookingAuditWithActor } from "../repository/IBookingAuditRepository";
-import { getAppNameFromSlug } from "../getAppNameFromSlug";
 import type { DataRequirements, EnrichmentDataStore } from "./EnrichmentDataStore";
 
 type ActorEnrichmentResult = {
@@ -74,7 +74,7 @@ export const ACTOR_STRATEGIES: Record<AuditActorType, ActorStrategy> = {
   },
   SYSTEM: {
     getRequirements: () => ({}),
-    enrich: () => ({ displayName: "Cal.diy", displayEmail: null, displayAvatar: null }),
+    enrich: () => ({ displayName: "DADAKAEV CAL", displayEmail: null, displayAvatar: null }),
   },
   GUEST: {
     getRequirements: () => ({}),
