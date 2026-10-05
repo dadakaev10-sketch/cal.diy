@@ -1,5 +1,4 @@
 import logger from "@calcom/lib/logger";
-
 import { FEISHU_HOST } from "../common";
 import { getAppAccessToken } from "./AppAccessToken";
 
@@ -7,12 +6,12 @@ const log = logger.getSubLogger({ prefix: [`[[FeishuTenantCredential]`] });
 
 const msg = {
   en_us: {
-    title: "Welcome to Cal.diy!",
+    title: "Welcome to DADAKAEV CAL!",
     content: [
       [
         {
           tag: "text",
-          text: "Cal.diy is an open source scheduling infrastructure.",
+          text: "DADAKAEV CAL is an open source scheduling infrastructure.",
         },
       ],
       [
