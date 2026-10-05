@@ -1,14 +1,13 @@
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Toaster } from "sonner";
-
 import AppNotInstalledMessage from "@calcom/app-store/_components/AppNotInstalledMessage";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { trpc } from "@calcom/trpc/react";
 import { Button } from "@calcom/ui/components/button";
 import { TextField } from "@calcom/ui/components/form";
-import { CircleAlertIcon } from "@coss/ui/icons";
 import { showToast } from "@calcom/ui/components/toast";
+import { CircleAlertIcon } from "@coss/ui/icons";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Toaster } from "sonner";
 
 export default function PayPalSetup() {
   const [newClientId, setNewClientId] = useState("");
@@ -85,9 +84,9 @@ export default function PayPalSetup() {
             <div>
               <p className="text-lgf text-default mt-5 font-bold">Getting started with the PayPal app</p>
               <p className="text-default font-semi mt-2">
-                Cal.diy offers PayPal as one of its payment gateways. You can use your own PayPal
-                Business account to receive payments from your customers by setting a price and currency
-                for each of your event types.
+                DADAKAEV CAL offers PayPal as one of its payment gateways. You can use your own PayPal
+                Business account to receive payments from your customers by setting a price and currency for
+                each of your event types.
               </p>
 
               <p className="text-lgf text-default mt-5 inline-flex font-bold">
