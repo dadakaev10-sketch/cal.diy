@@ -1,3 +1,13 @@
+## Stripe standard restored — 2026-10-06
+
+The separate studio-owned Stripe sandbox experiment has been retired at the owner's request.
+Use the upstream Stripe app at `/apps/stripe`; its Connect configuration is still required.
+The custom settings page, server actions, checkout service, and webhook endpoint have been removed.
+Existing MerchantStripe models and applied migrations are retained only to preserve historical test data;
+no active application code reads or writes these records. Do not drop them or destroy the archived
+credential encryption key as part of this rollback. Earlier sandbox sections below are historical.
+This rollback does not activate live payments, migrate credentials, or change the upstream Stripe flow.
+
 # DADAKAEV central scheduling platform
 
 ## Agreed direction

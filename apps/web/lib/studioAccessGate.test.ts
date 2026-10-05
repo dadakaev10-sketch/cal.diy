@@ -76,7 +76,7 @@ describe("studio access boundary", () => {
   });
   it.each([
     "/event-types",
-    "/settings/my-account/studio-payments",
+    "/apps/stripe",
     "/teams",
   ])("redirects anonymous page %s to app login", async (path) => {
     const result = await studioAccessGate(new NextRequest(`https://test.local${path}`));
@@ -86,7 +86,7 @@ describe("studio access boundary", () => {
   });
   it.each([
     "/api/trpc/viewer.me",
-    "/api/stripe/studio-test/abc",
+    "/api/integrations/stripepayment/add",
   ])("returns JSON instead of browser challenge for %s", async (path) => {
     const result = await studioAccessGate(new NextRequest(`https://test.local${path}`));
     expect(result?.status).toBe(401);
