@@ -222,6 +222,12 @@ describe("handlePaymentSuccess", () => {
       })
     ).rejects.toThrow(); // Function throws HttpCode 200 at the end
 
+    expect(prisma.booking.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: mockBookingId, status: { in: [BookingStatus.PENDING, BookingStatus.ACCEPTED] } },
+      })
+    );
+
     // Verify webhooks were fetched
     expect(getWebhooks).toHaveBeenCalledWith({
       userId: mockBooking.userId,

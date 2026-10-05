@@ -245,6 +245,7 @@ export async function handleConfirmation(args: {
     const updatedBooking = await prisma.booking.update({
       where: {
         id: bookingId,
+        ...(paid ? { status: { in: [BookingStatus.PENDING, BookingStatus.ACCEPTED] } } : {}),
       },
       data: {
         status: BookingStatus.ACCEPTED,

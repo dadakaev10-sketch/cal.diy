@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import getInstalledAppPath from "../../_utils/getInstalledAppPath";
 import createOAuthAppCredential from "../../_utils/oauth/createOAuthAppCredential";
 import { decodeOAuthState } from "../../_utils/oauth/decodeOAuthState";
+import { getStripeAppKeys } from "../lib/getStripeAppKeys";
 import type { StripeData } from "../lib/server";
 import stripe from "../lib/server";
 
@@ -29,7 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     code: code?.toString(),
   });
 
-  const data: StripeData = { ...response, default_currency: "" };
+  const { public_key } = await getStripeAppKeys();
+  const data: StripeData = { ...response, stripe_publishable_key: public_key, default_currency: "" };
   if (response.stripe_user_id) {
     const account = await stripe.accounts.retrieve(response.stripe_user_id);
     data.default_currency = account.default_currency;

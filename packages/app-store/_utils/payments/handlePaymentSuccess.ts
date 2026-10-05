@@ -105,6 +105,7 @@ export async function handlePaymentSuccess(params: {
   const bookingUpdate = prisma.booking.update({
     where: {
       id: booking.id,
+      status: { in: [BookingStatus.PENDING, BookingStatus.ACCEPTED] },
     },
     data: bookingData,
     select: {
