@@ -1,15 +1,13 @@
-import type { NextApiRequest } from "next";
-
 import { WEBAPP_URL } from "@calcom/lib/constants";
 import prisma from "@calcom/prisma";
-
+import type { NextApiRequest } from "next";
 import type {
-  NewCanvas,
+  InputComponent,
   ListComponent,
   ListItem,
+  NewCanvas,
   SpacerComponent,
   TextComponent,
-  InputComponent,
 } from "../../lib";
 import { isValidCalURL } from "../../lib/isValidCalURL";
 
@@ -24,13 +22,13 @@ export async function handleLinkStep(req: NextApiRequest): Promise<NewCanvas | s
   const input: InputComponent = {
     type: "input",
     id: "submit_booking_url",
-    label: "Enter your Cal.diy link",
+    label: "Enter your DADAKAEV CAL link",
     placeholder: "https://cal.com/valentinchmara/30min",
     save_state: "unsaved",
     action: {
       type: "submit",
     },
-    aria_label: "Enter your Cal.diy link",
+    aria_label: "Enter your DADAKAEV CAL link",
   };
 
   const defaultCanvasData: NewCanvas = {
@@ -117,7 +115,7 @@ export async function handleLinkStep(req: NextApiRequest): Promise<NewCanvas | s
 
   const text: TextComponent = {
     type: "text",
-    text: "Or choose another Cal.diy link:",
+    text: "Or choose another DADAKAEV CAL link:",
     style: "muted",
     align: "left",
   };

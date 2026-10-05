@@ -1,6 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
 import { WEBAPP_URL } from "@calcom/lib/constants";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -20,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const parsedUrl = new URL(url);
         const hostname = parsedUrl.hostname.toLowerCase();
-        
+
         if (hostname === "cal.com" || hostname.endsWith(".cal.com")) {
           origin = parsedUrl.origin;
           calLink = parsedUrl.pathname + parsedUrl.search;
@@ -42,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Cal.diy</title>
+          <title>DADAKAEV CAL</title>
           <meta charset="UTF-8" />
           <script src="https://s3.amazonaws.com/intercom-sheets.com/messenger-sheet-library.latest.js"></script>
         </head>
