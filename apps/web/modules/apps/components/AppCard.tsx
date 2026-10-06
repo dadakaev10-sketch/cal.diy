@@ -1,12 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import posthog from "posthog-js";
-
-import { InstallAppButton } from "@calcom/app-store/InstallAppButton";
 import { isRedirectApp } from "@calcom/app-store/_utils/redirectApps";
 import useAddAppMutation from "@calcom/app-store/_utils/useAddAppMutation";
+import { InstallAppButton } from "@calcom/app-store/InstallAppButton";
 import { doesAppSupportTeamInstall, isConferencing } from "@calcom/app-store/utils";
 import type { UserAdminTeams } from "@calcom/features/users/repositories/UserRepository";
 import { AppOnboardingSteps } from "@calcom/lib/apps/appOnboardingSteps";
@@ -18,9 +14,12 @@ import type { AppFrontendPayload as App } from "@calcom/types/App";
 import type { CredentialFrontendPayload as Credential } from "@calcom/types/Credential";
 import classNames from "@calcom/ui/classNames";
 import { Badge } from "@calcom/ui/components/badge";
-import { Button } from "@calcom/ui/components/button";
 import type { ButtonProps } from "@calcom/ui/components/button";
+import { Button } from "@calcom/ui/components/button";
 import { showToast } from "@calcom/ui/components/toast";
+import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
+import { useEffect, useState } from "react";
 
 interface AppCardProps {
   app: App;
@@ -128,7 +127,9 @@ export function AppCard({ app, credentials, searchText, userAdminTeams }: AppCar
             <span className="pl-1 text-subtle">{props.reviews} reviews</span>
           </div> */}
       <p className="text-default mt-2 text-sm line-clamp-3">
-        {markdownToSafeHTML(app.description).replace(/<[^>]+>/g, "")}
+        {app.slug === "stripe"
+          ? t("stripe_app_development_description")
+          : markdownToSafeHTML(app.description).replace(/<[^>]+>/g, "")}
       </p>
 
       <div className="mt-auto flex max-w-full flex-row justify-between gap-2">
@@ -219,6 +220,7 @@ export function AppCard({ app, credentials, searchText, userAdminTeams }: AppCar
             )}
       </div>
       <div className="max-w-44 absolute right-0 mr-4 flex flex-wrap justify-end gap-1">
+        {app.slug === "stripe" && <Badge variant="orange">{t("stripe_app_development")}</Badge>}
         {appAdded > 0 && !isRedirectApp(app.slug) ? (
           <Badge variant="green">{t("installed", { count: appAdded })}</Badge>
         ) : null}

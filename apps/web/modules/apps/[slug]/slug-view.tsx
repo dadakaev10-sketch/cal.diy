@@ -1,16 +1,13 @@
 "use client";
 
-import Link from "next/link";
-
 import { IS_PRODUCTION } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { markdownToSafeHTML } from "@calcom/lib/markdownToSafeHTML";
 import { showToast } from "@calcom/ui/components/toast";
-
+import App from "@components/apps/App";
 import type { AppDataProps } from "@lib/apps/[slug]/getStaticProps";
 import useRouterQuery from "@lib/hooks/useRouterQuery";
-
-import App from "@components/apps/App";
+import Link from "next/link";
 
 function SingleAppPage(props: AppDataProps) {
   const { error, setQuery: setError } = useRouterQuery("error");
@@ -41,7 +38,7 @@ function SingleAppPage(props: AppDataProps) {
   return (
     <App
       name={data.name}
-      description={data.description}
+      description={data.slug === "stripe" ? t("stripe_app_development_description") : data.description}
       isGlobal={data.isGlobal}
       slug={data.slug}
       variant={data.variant}

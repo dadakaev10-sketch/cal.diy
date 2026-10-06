@@ -1,4 +1,6 @@
 {
+  "stripe_app_development": "В разработке",
+  "stripe_app_development_description": "В разработке: платежи Stripe пока доступны только в тестовом режиме. Пока не используйте для реальных платежей клиентов.",
   "home_nav_features": "Возможности",
   "home_nav_how": "Как это работает",
   "home_nav_studios": "Для студий",

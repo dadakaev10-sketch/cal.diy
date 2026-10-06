@@ -1,4 +1,6 @@
 {
+  "stripe_app_development": "In development",
+  "stripe_app_development_description": "In development: Stripe payments are currently available in test mode only. Do not use for real customer payments yet.",
   "stripe_booking_payment_error": "Payment could not be completed. Please try again.",
   "stripe_booking_pay": "Pay now",
   "stripe_booking_sandbox": "Test mode: no real payment. Use Stripe test payment details only.",
