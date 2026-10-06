@@ -62,7 +62,11 @@ function SingleAppPage(props: AppDataProps) {
       //   privacy="https://zoom.us/privacy"
       body={
         <>
-          {}
+          {data.slug === "stripe" && (
+            <p className="bg-attention text-attention mb-4 rounded-md p-4" role="note">
+              {t("stripe_app_development_description")}
+            </p>
+          )}
           {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is sanitized via markdownToSafeHTML */}
           <div dangerouslySetInnerHTML={{ __html: markdownToSafeHTML(source.content) }} />
         </>
