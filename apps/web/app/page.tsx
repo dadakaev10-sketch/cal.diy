@@ -5,18 +5,19 @@ import { buildLegacyRequest } from "@lib/buildLegacyCtx";
 import { cookies, headers } from "next/headers";
 import StudioHome from "../modules/studio-home/StudioHome";
 
-export const metadata = {
-  title: "DADAKAEV CAL · Terminplanung für Studios",
-  description:
-    "Ein klarer Platz für deine Leistungen, deine Zeiten und deine Termine. Entdecke DADAKAEV CAL für Studios und Salons.",
-};
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ lang?: string }> }) {
+  const lang = (await searchParams).lang;
+  const t = await getTranslation(lang === "en" || lang === "ru" ? lang : "de", "common");
+  return { title: `DADAKAEV CAL · ${t("home_footer")}`, description: t("home_description") };
+}
 
 export const viewport = { width: "device-width", initialScale: 1, maximumScale: 5, userScalable: true };
 
 const RedirectPage = async ({ searchParams }: { searchParams: Promise<{ lang?: string }> }) => {
   const session = await getServerSession({ req: buildLegacyRequest(await headers(), await cookies()) });
 
-  const language = (await searchParams).lang === "en" ? "en" : "de";
+  const lang = (await searchParams).lang;
+  const language = lang === "en" || lang === "ru" ? lang : "de";
   const t = await getTranslation(language, "common");
   return (
     <StudioHome

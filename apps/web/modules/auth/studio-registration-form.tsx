@@ -11,7 +11,7 @@ export default function StudioRegistrationForm({
   labels,
 }: {
   mode: "request" | "complete" | "admin";
-  locale: "de" | "en";
+  locale: "de" | "en" | "ru";
   token?: string;
   studioName?: string | null;
   labels: Record<string, string>;

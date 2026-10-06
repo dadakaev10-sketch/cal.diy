@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ act
           .email()
           .max(254)
           .transform((v) => v.toLowerCase()),
-        locale: z.enum(["de", "en"]),
+        locale: z.enum(["de", "en", "ru"]),
         studioName: z.string().trim().min(2).max(100).optional(),
       })
       .safeParse(body);

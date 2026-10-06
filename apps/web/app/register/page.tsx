@@ -18,14 +18,14 @@ export default async function RegisterPage({
   searchParams: Promise<{ lang?: string; recovery?: string }>;
 }) {
   const params = await searchParams;
-  const language = params.lang === "en" ? "en" : "de";
+  const language = params.lang === "en" || params.lang === "ru" ? params.lang : "de";
   if (params.recovery === "1") redirect("/recover");
   const enabled = process.env.STUDIO_REGISTRATION_ENABLED === "true";
   const t = await getTranslation(language, "common");
   return (
     <main className={styles.shell} lang={language}>
       <section className={styles.card}>
-        <a className={styles.brand} href="/">
+        <a className={styles.brand} href={`/?lang=${language}`}>
           DADAKAEV <strong>CAL</strong>
         </a>
         <p className={styles.eyebrow}>{t("studio_account_access")}</p>
@@ -41,12 +41,28 @@ export default async function RegisterPage({
         <a className={enabled ? styles.secondary : styles.primary} href="/auth/login">
           {t("home_login")}
         </a>
-        <a className={styles.secondary} href="/">
+        <a className={styles.secondary} href={`/?lang=${language}`}>
           {t("studio_back_home")}
         </a>
-        <a className={styles.language} href={`/register?lang=${language === "de" ? "en" : "de"}`}>
-          {language === "de" ? "English" : "Deutsch"}
-        </a>
+        <nav aria-label={t("home_language")}>
+          {(
+            [
+              ["de", "Deutsch"],
+              ["en", "English"],
+              ["ru", "Русский"],
+            ] as const
+          ).map(([code, label]) => (
+            <a
+              key={code}
+              className={styles.language}
+              href={`/register?lang=${code}`}
+              lang={code}
+              aria-current={language === code ? "page" : undefined}
+              style={{ marginInlineEnd: 16 }}>
+              {label}
+            </a>
+          ))}
+        </nav>
       </section>
     </main>
   );

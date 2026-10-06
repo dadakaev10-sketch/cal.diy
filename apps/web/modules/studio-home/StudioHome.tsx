@@ -8,7 +8,7 @@ export default function StudioHome({
   registrationEnabled = false,
 }: {
   t: TFunction;
-  language: "de" | "en";
+  language: "de" | "en" | "ru";
   signedIn?: boolean;
   registrationEnabled?: boolean;
 }) {
@@ -31,9 +31,25 @@ export default function StudioHome({
           <a href="#how">{t("home_nav_how")}</a>
         </nav>
         <div className={styles.headerActions}>
-          <a href={language === "de" ? "/?lang=en" : "/?lang=de"} aria-label={t("home_language")}>
-            {language === "de" ? "EN" : "DE"}
-          </a>
+          <nav className={styles.languages} aria-label={t("home_language")}>
+            {(
+              [
+                ["de", "Deutsch"],
+                ["en", "English"],
+                ["ru", "Русский"],
+              ] as const
+            ).map(([code, label]) => (
+              <a
+                key={code}
+                href={`/?lang=${code}`}
+                hrefLang={code}
+                lang={code}
+                aria-label={label}
+                aria-current={language === code ? "page" : undefined}>
+                {code.toUpperCase()}
+              </a>
+            ))}
+          </nav>
           <a href={signedIn ? "/event-types" : "/auth/login"}>
             {t(signedIn ? "studio_open_dashboard" : "home_login")}
           </a>
