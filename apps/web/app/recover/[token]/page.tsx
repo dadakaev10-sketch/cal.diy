@@ -7,7 +7,7 @@ import { studioRegistrationKeys } from "../../../modules/auth/studio-registratio
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Passwort zurücksetzen | DADAKAEV CAL",
+  title: "Passwort zurücksetzen | Fixmit",
   robots: { index: false, follow: false },
   referrer: "no-referrer" as const,
 };
@@ -31,7 +31,7 @@ export default async function Page({
     <main className={styles.shell} lang={locale}>
       <section className={styles.card}>
         <a className={styles.brand} href="/">
-          DADAKAEV <strong>CAL</strong>
+          <strong>Fixmit</strong>
         </a>
         <h1>{t(request ? "reset_password" : "request_is_expired")}</h1>
         {request ? (

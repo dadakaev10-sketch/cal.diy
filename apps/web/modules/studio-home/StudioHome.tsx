@@ -18,12 +18,12 @@ export default function StudioHome({
         {t("home_skip")}
       </a>
       <header className={styles.header}>
-        <a href="#top" className={styles.brand} aria-label="DADAKAEV CAL">
+        <a href="#top" className={styles.brand} aria-label="Fixmit">
           <span className={styles.mark} aria-hidden="true">
-            c<span>.</span>
+            f<span>.</span>
           </span>
           <span>
-            DADAKAEV <strong>CAL</strong>
+            <strong>Fixmit</strong>
           </span>
         </a>
         <nav className={styles.nav} aria-label={t("home_nav_features")}>
@@ -90,7 +90,7 @@ export default function StudioHome({
               <span className={styles.previewDots} aria-hidden="true">
                 ● ● ●
               </span>
-              <span>cal.apps.dadakaev.tech / studio-morgen</span>
+              <span>fixmit.com / studio-morgen</span>
               <span aria-hidden="true">↗</span>
             </div>
             <div className={styles.booking}>
@@ -214,7 +214,7 @@ export default function StudioHome({
       </main>
       <footer className={styles.footer}>
         <div>
-          <strong>DADAKAEV CAL</strong>
+          <strong>Fixmit</strong>
           <p>{t("home_footer")}</p>
         </div>
         <a href="#top">{t("home_back_top")} ↑</a>

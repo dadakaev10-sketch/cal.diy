@@ -18,11 +18,11 @@ describe("studio account email templates", () => {
         verificationEmailCode: "123456",
       };
       const html = renderToStaticMarkup(VerifyEmailByCode(props));
-      expect(html).toContain("DADAKAEV CAL");
+      expect(html).toContain("Fixmit");
       expect(html).not.toContain("/emails/logo.png");
       expect(html).not.toContain("Cal.diy");
       const hidden = renderToStaticMarkup(VerifyEmailByCode({ ...props, hideLogo: true }));
-      expect(hidden).not.toContain("DADAKAEV CAL");
+      expect(hidden).not.toContain("Fixmit");
     });
     it(`renders branded ${lng} confirmation and recovery without remote assets`, async () => {
       const i18n = createInstance();
@@ -31,14 +31,14 @@ describe("studio account email templates", () => {
         resources: { de: { translation: de }, en: { translation: en } },
         interpolation: { escapeValue: false },
       });
-      const link = "https://cal.apps.dadakaev.tech/auth/verify-email?token=example&email=test%40example.test";
+      const link = "https://fixmit.com/auth/verify-email?token=example&email=test%40example.test";
       const user = { name: "<img src=x onerror=alert(1)>", email: "test@example.test" };
       for (const component of [
         ForgotPasswordEmail({ language: i18n.t, user, resetLink: link }),
         VerifyAccountEmail({ language: i18n.t, user, verificationEmailLink: link }),
       ]) {
         const html = renderToStaticMarkup(component);
-        expect(html).toContain("DADAKAEV CAL");
+        expect(html).toContain("Fixmit");
         expect(html).toContain("#245c49");
         expect(html).toContain('role="presentation"');
         expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");

@@ -6,12 +6,10 @@
   "logo": "icon-dark.svg",
   "url": "https://www.chatbase.co/guide/cal",
   "variant": "other",
-  "categories": [
-    "other"
-  ],
+  "categories": ["other"],
   "publisher": "Chatbase",
   "email": "sandra@chatbase.co",
-  "description": "Add DADAKAEV CAL to your Chatbase AI Chatbot and accept bookings right inside chat.",
+  "description": "Add Fixmit to your Chatbase AI Chatbot and accept bookings right inside chat.",
   "isTemplate": false,
   "__createdUsingCli": true,
   "__template": "link-as-an-app",

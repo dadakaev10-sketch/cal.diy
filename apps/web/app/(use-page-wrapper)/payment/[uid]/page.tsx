@@ -8,7 +8,7 @@ import { z } from "zod";
 import StripeBookingPayment from "./StripeBookingPayment";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Payment | DADAKAEV CAL", robots: { index: false, follow: false } };
+export const metadata = { title: "Payment | Fixmit", robots: { index: false, follow: false } };
 
 export default async function Page({ params }: PageProps) {
   if (!process.env.STRIPE_PRIVATE_KEY?.startsWith("sk_test_")) notFound();

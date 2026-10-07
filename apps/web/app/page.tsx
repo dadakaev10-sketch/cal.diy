@@ -8,7 +8,7 @@ import StudioHome from "../modules/studio-home/StudioHome";
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ lang?: string }> }) {
   const lang = (await searchParams).lang;
   const t = await getTranslation(lang === "en" || lang === "ru" ? lang : "de", "common");
-  return { title: `DADAKAEV CAL · ${t("home_footer")}`, description: t("home_description") };
+  return { title: `Fixmit · ${t("home_footer")}`, description: t("home_description") };
 }
 
 export const viewport = { width: "device-width", initialScale: 1, maximumScale: 5, userScalable: true };

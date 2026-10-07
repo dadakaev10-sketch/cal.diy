@@ -9,7 +9,7 @@
   "categories": ["payment"],
   "publisher": "Alby",
   "email": "support@getalby.com",
-  "description": "Your Bitcoin & Nostr companion for the web. Use Alby to charge Satoshi for your DADAKAEV CAL meetings.\r",
+  "description": "Your Bitcoin & Nostr companion for the web. Use Alby to charge Satoshi for your Fixmit meetings.\r",
   "extendsFeature": "EventType",
   "isTemplate": false,
   "__createdUsingCli": true,

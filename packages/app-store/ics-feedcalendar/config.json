@@ -9,7 +9,7 @@
   "categories": ["calendar"],
   "publisher": "Cal.com, Inc.",
   "email": "help@cal.com",
-  "description": "Import events from an ICS Feed into DADAKAEV CAL.",
+  "description": "Import events from an ICS Feed into Fixmit.",
   "isTemplate": false,
   "__createdUsingCli": true
 }

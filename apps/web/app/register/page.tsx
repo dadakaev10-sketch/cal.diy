@@ -8,7 +8,7 @@ import { studioRegistrationKeys } from "../../modules/auth/studio-registration-l
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Studio registration | DADAKAEV CAL",
+  title: "Studio registration | Fixmit",
   robots: { index: false, follow: false },
 };
 
@@ -26,7 +26,7 @@ export default async function RegisterPage({
     <main className={styles.shell} lang={language}>
       <section className={styles.card}>
         <a className={styles.brand} href={`/?lang=${language}`}>
-          DADAKAEV <strong>CAL</strong>
+          <strong>Fixmit</strong>
         </a>
         <p className={styles.eyebrow}>{t("studio_account_access")}</p>
         <h1>{t("home_register")}</h1>

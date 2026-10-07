@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       <!DOCTYPE html>
       <html>
         <head>
-          <title>DADAKAEV CAL</title>
+          <title>Fixmit</title>
           <meta charset="UTF-8" />
           <script src="https://s3.amazonaws.com/intercom-sheets.com/messenger-sheet-library.latest.js"></script>
         </head>

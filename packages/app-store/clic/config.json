@@ -6,12 +6,10 @@
   "logo": "icon.svg",
   "url": "https://clicis.vercel.app",
   "variant": "automation",
-  "categories": [
-    "automation"
-  ],
+  "categories": ["automation"],
   "publisher": "Chris Pacheco",
   "email": "chrispacheco430@gmail.com",
-  "description": "Create, List and Interact with Your DADAKAEV CAL links and connections easily.\r\r",
+  "description": "Create, List and Interact with Your Fixmit links and connections easily.\r\r",
   "isTemplate": false,
   "__createdUsingCli": true,
   "__template": "link-as-an-app",

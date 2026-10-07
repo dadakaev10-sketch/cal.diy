@@ -181,7 +181,7 @@ export default function Login({
           {/* Logo */}
           <div className="mb-2 text-center">
             <h1 className="text-xl font-semibold tracking-tight">
-              <a href="/">DADAKAEV CAL</a>
+              <a href="/">Fixmit</a>
             </h1>
           </div>
 

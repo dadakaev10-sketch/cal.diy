@@ -1,3 +1,4 @@
+import process from "node:process";
 import AppNotInstalledMessage from "@calcom/app-store/_components/AppNotInstalledMessage";
 import { albyCredentialKeysSchema } from "@calcom/app-store/alby/lib/albyCredentialKeysSchema";
 import type { IAlbySetupProps } from "@calcom/app-store/alby/pages/setup/_getServerSideProps";
@@ -101,7 +102,7 @@ function AlbySetupPage(props: IAlbySetupProps) {
     const webhookEndpoint = await client.createWebhookEndpoint({
       filter_types: ["invoice.incoming.settled"],
       url: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/integrations/alby/webhook`,
-      description: "DADAKAEV CAL",
+      description: "Fixmit",
     });
 
     saveKeysMutation.mutate({

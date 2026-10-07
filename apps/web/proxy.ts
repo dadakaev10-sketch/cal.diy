@@ -1,5 +1,6 @@
 import process from "node:process";
 import { getCspHeader, getCspNonce } from "@lib/csp";
+import { fixmitCanonicalUrl } from "@lib/fixmitCanonicalUrl";
 import { studioAccessGate } from "@lib/studioAccessGate";
 import { get } from "@vercel/edge-config";
 import type { NextRequest } from "next/server";
@@ -67,6 +68,8 @@ const shouldEnforceCsp = (url: URL) => {
 };
 
 const proxy = async (req: NextRequest): Promise<NextResponse<unknown>> => {
+  const canonical = fixmitCanonicalUrl(req.url, req.method, process.env.NEXT_PUBLIC_WEBAPP_URL);
+  if (canonical) return NextResponse.redirect(canonical, 308);
   const accessResponse = await studioAccessGate(req);
   if (accessResponse) return accessResponse;
   const url = req.nextUrl;

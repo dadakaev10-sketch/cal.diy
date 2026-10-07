@@ -79,7 +79,7 @@ export default function StripeBookingPayment(props: {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-16 text-slate-900">
       <section className="mx-auto max-w-lg space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold">DADAKAEV CAL</p>
+        <p className="text-sm font-semibold">Fixmit</p>
         <h1 className="text-2xl font-semibold">{props.title}</h1>
         <p className="text-xl">
           {formatter.format(convertFromSmallestToPresentableCurrencyUnit(props.amount, props.currency))}

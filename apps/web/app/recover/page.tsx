@@ -4,7 +4,7 @@ import StudioRecoveryForm from "../../modules/auth/studio-recovery-form";
 import { studioRegistrationKeys } from "../../modules/auth/studio-registration-labels";
 
 export const metadata = {
-  title: "Passwort zurücksetzen | DADAKAEV CAL",
+  title: "Passwort zurücksetzen | Fixmit",
   robots: { index: false, follow: false },
 };
 export default async function Page({ searchParams }: { searchParams: Promise<{ lang?: string }> }) {
@@ -14,7 +14,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ l
     <main className={styles.shell} lang={locale}>
       <section className={styles.card}>
         <a className={styles.brand} href="/">
-          DADAKAEV <strong>CAL</strong>
+          <strong>Fixmit</strong>
         </a>
         <h1>{t("forgot_password")}</h1>
         <StudioRecoveryForm

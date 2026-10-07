@@ -46,7 +46,7 @@ export function StudioAccountEmail(props: {
                           letterSpacing: "2px",
                           fontWeight: 700,
                         }}>
-                        DADAKAEV <span style={{ color: "#658677", fontWeight: 400 }}>CAL</span>
+                        Fixmit
                       </td>
                     </tr>
                     <tr>
@@ -141,12 +141,10 @@ export function StudioAccountEmail(props: {
                       <td
                         align="center"
                         style={{ padding: "24px 8px", fontSize: 12, lineHeight: "20px", color: "#697c71" }}>
-                        DADAKAEV CAL
+                        Fixmit
                         <br />
-                        <a
-                          href="https://cal.apps.dadakaev.tech"
-                          style={{ color: "#697c71", textDecoration: "none" }}>
-                          cal.apps.dadakaev.tech
+                        <a href="https://fixmit.com" style={{ color: "#697c71", textDecoration: "none" }}>
+                          fixmit.com
                         </a>
                       </td>
                     </tr>

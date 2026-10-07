@@ -84,9 +84,9 @@ export default function PayPalSetup() {
             <div>
               <p className="text-lgf text-default mt-5 font-bold">Getting started with the PayPal app</p>
               <p className="text-default font-semi mt-2">
-                DADAKAEV CAL offers PayPal as one of its payment gateways. You can use your own PayPal
-                Business account to receive payments from your customers by setting a price and currency for
-                each of your event types.
+                Fixmit offers PayPal as one of its payment gateways. You can use your own PayPal Business
+                account to receive payments from your customers by setting a price and currency for each of
+                your event types.
               </p>
 
               <p className="text-lgf text-default mt-5 inline-flex font-bold">

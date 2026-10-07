@@ -10,7 +10,7 @@ import { studioRegistrationKeys } from "../../modules/auth/studio-registration-l
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Studio administration | DADAKAEV CAL",
+  title: "Studio administration | Fixmit",
   robots: { index: false, follow: false },
 };
 
@@ -25,7 +25,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ l
     <main className={styles.shell} lang={locale}>
       <section className={styles.card}>
         <a className={styles.brand} href="/settings/admin/users">
-          DADAKAEV <strong>CAL</strong>
+          <strong>Fixmit</strong>
         </a>
         <h1>{t("studio_admin_create")}</h1>
         <p>{t("studio_admin_intro")}</p>

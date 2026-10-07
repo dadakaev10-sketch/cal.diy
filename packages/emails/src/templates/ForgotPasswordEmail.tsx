@@ -12,7 +12,7 @@ export const ForgotPasswordEmail = (
   props: PasswordReset & Partial<React.ComponentProps<typeof BaseEmailHtml>>
 ) => (
   <StudioAccountEmail
-    subject={props.language("reset_password_subject", { appName: "DADAKAEV CAL" })}
+    subject={props.language("reset_password_subject", { appName: "Fixmit" })}
     heading={props.language("change_password")}
     preview={props.language("someone_requested_password_reset")}
     action={{ label: props.language("change_password"), href: props.resetLink }}

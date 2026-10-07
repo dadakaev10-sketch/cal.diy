@@ -17,7 +17,7 @@ Follow-ups write themselves and next steps are captured instantly. Every meeting
 
 ## How It Works
 
-1. Install Lyra from the DADAKAEV CAL App Store
-2. Sign in with your Lyra account to authorize DADAKAEV CAL
+1. Install Lyra from the Fixmit App Store
+2. Sign in with your Lyra account to authorize Fixmit
 3. Select Lyra as your conferencing option for event types
 4. When bookings are made, Lyra meeting links are automatically generated

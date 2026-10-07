@@ -6,12 +6,12 @@ const log = logger.getSubLogger({ prefix: [`[[FeishuTenantCredential]`] });
 
 const msg = {
   en_us: {
-    title: "Welcome to DADAKAEV CAL!",
+    title: "Welcome to Fixmit!",
     content: [
       [
         {
           tag: "text",
-          text: "DADAKAEV CAL is an open source scheduling infrastructure.",
+          text: "Fixmit is an open source scheduling infrastructure.",
         },
       ],
       [

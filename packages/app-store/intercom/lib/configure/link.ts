@@ -22,13 +22,13 @@ export async function handleLinkStep(req: NextApiRequest): Promise<NewCanvas | s
   const input: InputComponent = {
     type: "input",
     id: "submit_booking_url",
-    label: "Enter your DADAKAEV CAL link",
+    label: "Enter your Fixmit link",
     placeholder: "https://cal.com/valentinchmara/30min",
     save_state: "unsaved",
     action: {
       type: "submit",
     },
-    aria_label: "Enter your DADAKAEV CAL link",
+    aria_label: "Enter your Fixmit link",
   };
 
   const defaultCanvasData: NewCanvas = {
@@ -115,7 +115,7 @@ export async function handleLinkStep(req: NextApiRequest): Promise<NewCanvas | s
 
   const text: TextComponent = {
     type: "text",
-    text: "Or choose another DADAKAEV CAL link:",
+    text: "Or choose another Fixmit link:",
     style: "muted",
     align: "left",
   };
