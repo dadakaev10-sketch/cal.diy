@@ -20,7 +20,22 @@ export default function StudioHome({
       <header className={styles.header}>
         <a href="#top" className={styles.brand} aria-label="Fixmit">
           <span className={styles.mark} aria-hidden="true">
-            f<span>.</span>
+            <svg width="27" height="27" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+              <path
+                d="m58 130 47 47 93-98"
+                stroke="currentColor"
+                strokeWidth="30"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="m150 79 48 0 0 48"
+                stroke="#97D7B2"
+                strokeWidth="22"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </span>
           <span>
             <strong>Fixmit</strong>
