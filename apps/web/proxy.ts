@@ -68,7 +68,12 @@ const shouldEnforceCsp = (url: URL) => {
 };
 
 const proxy = async (req: NextRequest): Promise<NextResponse<unknown>> => {
-  const canonical = fixmitCanonicalUrl(req.url, req.method, process.env.NEXT_PUBLIC_WEBAPP_URL);
+  const canonical = fixmitCanonicalUrl(
+    req.url,
+    req.method,
+    process.env.NEXT_PUBLIC_WEBAPP_URL,
+    req.headers.get("host")
+  );
   if (canonical) return NextResponse.redirect(canonical, 308);
   const accessResponse = await studioAccessGate(req);
   if (accessResponse) return accessResponse;

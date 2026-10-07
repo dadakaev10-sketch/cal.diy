@@ -2,6 +2,22 @@ import { describe, expect, it } from "vitest";
 import { fixmitCanonicalUrl } from "./fixmitCanonicalUrl";
 
 describe("Fixmit domain migration", () => {
+  it("uses the public Host header behind the standalone reverse proxy", () => {
+    expect(
+      fixmitCanonicalUrl(
+        "http://0.0.0.0:3000/dadakaev?lang=de",
+        "GET",
+        "https://fixmit.com",
+        "www.fixmit.com"
+      )?.href
+    ).toBe("https://fixmit.com/dadakaev?lang=de");
+    expect(
+      fixmitCanonicalUrl("http://0.0.0.0:3000/dadakaev", "GET", "https://fixmit.com", "fixmit.com")
+    ).toBeNull();
+    expect(
+      fixmitCanonicalUrl("http://0.0.0.0:3000/dadakaev", "GET", "https://fixmit.com", "evil.example")
+    ).toBeNull();
+  });
   it.each([
     "cal.apps.dadakaev.tech",
     "www.fixmit.com",
