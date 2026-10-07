@@ -14,6 +14,10 @@ import { studioPublicBookingRoute } from "./studioPublicBooking";
 const publicPages = new Set(["/", "/auth/login", "/auth/error", "/auth/logout", "/register", "/recover"]);
 const publicAssets = new Set([
   "/api/logo",
+  "/emails/checkCircle@2x.png",
+  "/emails/xCircle@2x.png",
+  "/emails/calendarCircle@2x.png",
+  "/emails/teamCircle@2x.png",
   "/favicon.ico",
   "/icons/sprite.svg",
   "/site.webmanifest",

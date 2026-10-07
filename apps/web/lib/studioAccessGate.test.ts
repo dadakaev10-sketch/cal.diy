@@ -64,6 +64,18 @@ describe("studio access boundary", () => {
   });
 
   it.each([
+    "checkCircle",
+    "xCircle",
+    "calendarCircle",
+    "teamCircle",
+  ])("serves the %s email status image anonymously without allowing writes", async (icon) => {
+    const url = `https://test.local/emails/${icon}@2x.png`;
+    expect(await studioAccessGate(new NextRequest(url))).toBeNull();
+    expect(await studioAccessGate(new NextRequest(url, { method: "HEAD" }))).toBeNull();
+    expect((await studioAccessGate(new NextRequest(url, { method: "POST" })))?.status).toBe(401);
+    expect(studioRouteAccess(`/emails/${icon}@2x.png/private`, "GET")).toBe("private");
+  });
+  it.each([
     "/",
     "/auth/login",
     "/register",

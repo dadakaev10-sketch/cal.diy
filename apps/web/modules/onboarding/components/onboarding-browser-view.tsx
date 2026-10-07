@@ -139,7 +139,7 @@ export const OnboardingBrowserView = ({
                     {name || t("your_name")}
                   </h2>
                   <p
-                    className={classNames("text-sm leading-normal", {
+                    className={classNames("whitespace-pre-line break-words text-sm leading-normal", {
                       "text-default": bio,
                       "text-subtle italic": !bio,
                     })}>

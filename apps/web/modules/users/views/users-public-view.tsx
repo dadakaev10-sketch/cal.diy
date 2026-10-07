@@ -231,7 +231,7 @@ export function UserPage(props: PageProps) {
                         data-testid="public-profile-bio"
                         className={classNames(
                           styles.bio,
-                          "text-default max-w-md wrap-break-word text-sm leading-relaxed [&_a]:underline"
+                          "text-default max-w-md whitespace-pre-line wrap-break-word text-sm leading-relaxed [&_a]:underline"
                         )}
                         dangerouslySetInnerHTML={{ __html: props.safeBio }}
                       />

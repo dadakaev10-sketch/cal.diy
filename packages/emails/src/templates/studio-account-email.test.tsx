@@ -5,9 +5,25 @@ import de from "../../../i18n/locales/de/common.json";
 import en from "../../../i18n/locales/en/common.json";
 import { ForgotPasswordEmail } from "./ForgotPasswordEmail";
 import { VerifyAccountEmail } from "./VerifyAccountEmail";
+import { VerifyEmailByCode } from "./VerifyEmailByCode";
 
 describe("studio account email templates", () => {
   for (const lng of ["de", "en"]) {
+    it(`renders the ${lng} verification-code email with the configured footer`, async () => {
+      const i18n = createInstance();
+      await i18n.init({ lng, resources: { de: { translation: de }, en: { translation: en } } });
+      const props = {
+        language: i18n.t,
+        user: { name: "Test", email: "test@example.test" },
+        verificationEmailCode: "123456",
+      };
+      const html = renderToStaticMarkup(VerifyEmailByCode(props));
+      expect(html).toContain("DADAKAEV CAL");
+      expect(html).not.toContain("/emails/logo.png");
+      expect(html).not.toContain("Cal.diy");
+      const hidden = renderToStaticMarkup(VerifyEmailByCode({ ...props, hideLogo: true }));
+      expect(hidden).not.toContain("DADAKAEV CAL");
+    });
     it(`renders branded ${lng} confirmation and recovery without remote assets`, async () => {
       const i18n = createInstance();
       await i18n.init({
