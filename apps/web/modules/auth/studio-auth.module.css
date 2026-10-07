@@ -125,3 +125,77 @@
   margin: 0;
   font-size: 13px;
 }
+
+/* Public account forms keep their light palette even when the dashboard uses dark mode. */
+.shell,
+.login {
+  color-scheme: light;
+  --cal-bg: #fff;
+  --cal-bg-subtle: #f5f7f4;
+  --cal-text-emphasis: #173d36;
+  --cal-text: #263f37;
+  --cal-text-subtle: #52665d;
+  --cal-text-muted: #52665d;
+  --cal-border-subtle: #c9d6ce;
+  --background: #fff;
+  --foreground: #173d36;
+  --primary: #173d36;
+  --primary-foreground: #fff;
+  --secondary: #eef3ef;
+  --secondary-foreground: #173d36;
+  --muted-foreground: #52665d;
+  --input: #9aafa2;
+  --ring: #43816a;
+  --destructive-foreground: #a51d2d;
+}
+.loginCard {
+  background: #fff;
+  color: #173d36;
+  border-color: #c9d6ce;
+}
+.loginCard label,
+.card h1,
+.card label {
+  color: #173d36;
+}
+.loginCard a {
+  color: #173d36;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.loginCard [data-slot="input-control"],
+.loginCard [data-slot="input-group"] {
+  background: #fff;
+  border-color: #9aafa2;
+  color: #173d36;
+}
+.loginCard input:not([type="hidden"]) {
+  min-height: 44px;
+  color: #173d36;
+  background: transparent;
+  font-size: 16px;
+}
+.loginCard button[type="submit"] {
+  min-height: 44px;
+  background: #173d36;
+  color: #fff;
+  border-color: #173d36;
+  font-weight: 600;
+}
+.loginCard button[type="submit"]:hover {
+  background: #26564a;
+}
+.loginFooter {
+  padding: 12px;
+  border-radius: 14px;
+  background: #f5f7f4;
+}
+.loginFooter .primary {
+  color: #fff;
+}
+.loginFooter .secondary {
+  color: #173d36;
+  margin-top: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

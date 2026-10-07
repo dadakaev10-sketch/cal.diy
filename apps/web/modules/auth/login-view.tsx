@@ -177,11 +177,14 @@ export default function Login({
 
       <div className="relative z-10 flex w-full max-w-md flex-col items-center">
         {/* Main Card */}
-        <div className="w-full rounded-xl border border-subtle bg-default p-10 shadow-sm">
+        <div
+          className={`${styles.loginCard} w-full rounded-xl border border-subtle bg-default p-10 shadow-sm`}>
           {/* Logo */}
           <div className="mb-2 text-center">
             <h1 className="text-xl font-semibold tracking-tight">
-              <a href="/">Fixmit</a>
+              <a href="/" className="inline-flex">
+                <img src="/api/logo?brand=fixmit" alt="Fixmit" width={210} height={70} />
+              </a>
             </h1>
           </div>
 
@@ -366,13 +369,14 @@ export default function Login({
 
         {/* Footer Links */}
         {!twoFactorRequired && (
-          <div className="mt-6 flex items-center justify-center gap-4 text-center">
+          <div
+            className={`${styles.loginFooter} mt-6 flex flex-wrap items-center justify-center gap-4 text-center`}>
             {showSignupLink && (
-              <Link href="/register" className="text-sm font-medium text-emphasis hover:underline">
+              <Link href="/register" className={styles.primary}>
                 {t("home_register")}
               </Link>
             )}
-            <a href="/" className="text-sm text-subtle hover:underline">
+            <a href="/" className={styles.secondary}>
               {t("studio_back_home")}
             </a>
           </div>

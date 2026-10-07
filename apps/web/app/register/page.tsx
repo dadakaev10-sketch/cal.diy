@@ -26,7 +26,7 @@ export default async function RegisterPage({
     <main className={styles.shell} lang={language}>
       <section className={styles.card}>
         <a className={styles.brand} href={`/?lang=${language}`}>
-          <strong>Fixmit</strong>
+          <img src="/api/logo?brand=fixmit" alt="Fixmit" width={210} height={70} />
         </a>
         <p className={styles.eyebrow}>{t("studio_account_access")}</p>
         <h1>{t("home_register")}</h1>
