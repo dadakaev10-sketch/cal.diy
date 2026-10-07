@@ -19,27 +19,13 @@ export default function StudioHome({
       </a>
       <header className={styles.header}>
         <a href="#top" className={styles.brand} aria-label="Fixmit">
-          <span className={styles.mark} aria-hidden="true">
-            <svg width="27" height="27" viewBox="0 0 256 256" fill="none" aria-hidden="true">
-              <path
-                d="m58 130 47 47 93-98"
-                stroke="currentColor"
-                strokeWidth="30"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="m150 79 48 0 0 48"
-                stroke="#97D7B2"
-                strokeWidth="22"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          <span>
-            <strong>Fixmit</strong>
-          </span>
+          <img
+            src="/api/logo?brand=fixmit"
+            alt="Fixmit"
+            width={180}
+            height={60}
+            style={{ objectFit: "contain" }}
+          />
         </a>
         <nav className={styles.nav} aria-label={t("home_nav_features")}>
           <a href="#features">{t("home_nav_features")}</a>
