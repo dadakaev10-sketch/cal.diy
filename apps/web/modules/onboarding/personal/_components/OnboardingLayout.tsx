@@ -1,11 +1,10 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import type { ReactNode } from "react";
-
+import { APP_NAME } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { Button } from "@calcom/ui/components/button";
-import { Logo } from "@calcom/ui/components/logo";
+import { signOut } from "next-auth/react";
+import type { ReactNode } from "react";
 
 type OnboardingLayoutProps = {
   userEmail: string;
@@ -24,7 +23,7 @@ export const OnboardingLayout = ({ userEmail, currentStep, children }: Onboardin
     <div className="bg-default flex min-h-screen w-full flex-col items-start overflow-clip rounded-xl">
       {/* Header */}
       <div className="flex w-full items-center justify-between px-6 py-4">
-        <Logo className="h-5 w-auto" />
+        <span className="text-emphasis text-lg font-semibold tracking-wide">{APP_NAME}</span>
 
         {/* Progress dots - centered */}
         <div className="absolute left-1/2 flex -translate-x-1/2 items-center justify-center gap-1">
