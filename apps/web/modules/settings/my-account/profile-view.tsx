@@ -12,6 +12,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { md } from "@calcom/lib/markdownIt";
 import turndown from "@calcom/lib/turndownService";
 import { IdentityProvider } from "@calcom/prisma/enums";
+import { readStudioAddress, studioAddressSchema } from "@calcom/prisma/zod-utils";
 import type { RouterOutputs } from "@calcom/trpc/react";
 import { trpc } from "@calcom/trpc/react";
 import type { AppRouter } from "@calcom/trpc/types/server/routers/_app";
@@ -60,6 +61,7 @@ export type FormValues = {
   name: string;
   email: string;
   bio: string;
+  metadata: { defaultInPersonAddress: string };
   secondaryEmails: Email[];
 };
 type Props = {
@@ -233,6 +235,7 @@ const ProfileView = ({ user }: Props) => {
     name: user.name || "",
     email: userEmail,
     bio: user.bio || "",
+    metadata: { defaultInPersonAddress: readStudioAddress(user.metadata) },
     // We add the primary email as the first item in the list
     secondaryEmails: [
       {
@@ -526,6 +529,7 @@ const ProfileForm = ({
       }),
     email: emailSchema.toLowerCase(),
     bio: z.string(),
+    metadata: z.object({ defaultInPersonAddress: studioAddressSchema }),
     secondaryEmails: z.array(
       z.object({
         id: z.number(),
@@ -709,6 +713,15 @@ const ProfileForm = ({
             setFirstRender={setFirstRender}
             height="120px"
           />
+        </div>
+        <div className="mt-6">
+          <TextField
+            label={t("studio_address")}
+            placeholder={t("studio_address_placeholder")}
+            maxLength={500}
+            {...formMethods.register("metadata.defaultInPersonAddress")}
+          />
+          <p className="text-subtle mt-2 text-sm">{t("studio_address_help")}</p>
         </div>
         {usersAttributes && usersAttributes?.length > 0 && (
           <div className="mt-6 flex flex-col">

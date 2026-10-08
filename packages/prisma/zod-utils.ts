@@ -381,8 +381,16 @@ const schemaDefaultConferencingApp = z.object({
   appLink: z.string().optional(),
 });
 
+export const studioAddressSchema = z.string().trim().max(500);
+
+export function readStudioAddress(metadata: unknown): string {
+  const result = z.object({ defaultInPersonAddress: studioAddressSchema.optional() }).safeParse(metadata);
+  return result.success ? result.data.defaultInPersonAddress || "" : "";
+}
+
 export const userMetadata = z
   .object({
+    defaultInPersonAddress: studioAddressSchema.optional(),
     serviceCatalog: serviceCatalogSchema.optional(),
     landingPage: landingPageSchema.optional(),
     proPaidForByTeamId: z.number().optional(),

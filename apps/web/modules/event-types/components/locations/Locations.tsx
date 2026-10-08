@@ -1,31 +1,37 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { ErrorMessage } from "@hookform/error-message";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useFieldArray } from "react-hook-form";
-import type { UseFormGetValues, UseFormSetValue, Control, FormState } from "react-hook-form";
-
 import type { EventLocationType } from "@calcom/app-store/locations";
 import { getLocationByType, MeetLocationType } from "@calcom/app-store/locations";
 import { useIsPlatform } from "@calcom/atoms/hooks/useIsPlatform";
 import type { LocationCustomClassNames } from "@calcom/features/eventtypes/components/locations/types";
-import type { LocationFormValues, EventTypeSetupProps } from "@calcom/features/eventtypes/lib/types";
+import type { EventTypeSetupProps, LocationFormValues } from "@calcom/features/eventtypes/lib/types";
 import CheckboxField from "@calcom/features/form/components/CheckboxField";
-import type { SingleValueLocationOption } from "@calcom/features/form/components/LocationSelect";
+import type {
+  GroupOptionType,
+  SingleValueLocationOption,
+} from "@calcom/features/form/components/LocationSelect";
 import LocationSelect from "@calcom/features/form/components/LocationSelect";
 import ServerTrans from "@calcom/lib/components/ServerTrans";
 import { WEBAPP_URL } from "@calcom/lib/constants";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
+import { readStudioAddress } from "@calcom/prisma/zod-utils";
+import { trpc } from "@calcom/trpc/react";
 import classNames from "@calcom/ui/classNames";
 import { Button } from "@calcom/ui/components/button";
-import { CheckIcon, CornerDownRightIcon, XIcon } from "@coss/ui/icons";
 import { showToast } from "@calcom/ui/components/toast";
-
+import { CheckIcon, CornerDownRightIcon, XIcon } from "@coss/ui/icons";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { ErrorMessage } from "@hookform/error-message";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { Control, FormState, UseFormGetValues, UseFormSetValue } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import CalVideoSettings from "./CalVideoSettings";
 import DefaultLocationSettings from "./DefaultLocationSettings";
 import LocationInput from "./LocationInput";
+import { buildStudioLocationOptions, getStudioLocationAddress } from "./studioAddress";
 
-export type TEventTypeLocation = Pick<EventTypeSetupProps["eventType"], "locations" | "calVideoSettings">;
+export type TEventTypeLocation = Pick<EventTypeSetupProps["eventType"], "locations" | "calVideoSettings"> & {
+  userId?: number | null;
+};
 export type TLocationOptions = Pick<EventTypeSetupProps, "locationOptions">["locationOptions"];
 export type TDestinationCalendar = { integration: string } | null;
 export type TPrefillLocation = { credentialId?: number; type: string };
@@ -47,9 +53,23 @@ type LocationsProps = {
   customClassNames?: LocationCustomClassNames;
 };
 
-const getLocationFromType = (type: EventLocationType["type"], locationOptions: TLocationOptions) => {
+const getLocationFromType = (
+  type: EventLocationType["type"],
+  locationOptions: GroupOptionType[],
+  address?: string
+) => {
   for (const locationOption of locationOptions) {
-    const option = locationOption.options.find((option) => option.value === type);
+    const option = locationOption.options.find(
+      (option) =>
+        option.value === type &&
+        !option.disabled &&
+        (type !== "inPerson" ||
+          (option.address
+            ? option.address === address
+            : !locationOption.options.some(
+                (saved) => saved.value === type && saved.address && saved.address === address
+              )))
+    );
     if (option) {
       return option;
     }
@@ -97,6 +117,9 @@ const Locations: React.FC<LocationsProps> = ({
   ...props
 }) => {
   const { t } = useLocale();
+  const { data: profile } = trpc.viewer.me.get.useQuery();
+  const studioAddress =
+    !team?.id && profile && profile.id === eventType.userId ? readStudioAddress(profile.metadata) : "";
   const {
     fields: locationFields,
     append,
@@ -108,7 +131,7 @@ const Locations: React.FC<LocationsProps> = ({
   });
 
   const locationOptions = props.locationOptions.map((locationOption) => {
-    const options = locationOption.options.filter((option) => {
+    const options = buildStudioLocationOptions(locationOption.options, studioAddress, t).filter((option) => {
       // Skip "Organizer's Default App" for non-team members
       return !team?.id ? option.label !== t("organizer_default_conferencing_app") : true;
     });
@@ -174,16 +197,22 @@ const Locations: React.FC<LocationsProps> = ({
 
           const isCalVideo = field.type === "integrations:daily";
 
-          const option = getLocationFromType(field.type, locationOptions);
+          const option = getLocationFromType(
+            field.type,
+            locationOptions,
+            getValues("locations")[index]?.address
+          );
           return (
             <li key={field.id}>
               <div className="flex w-full items-center">
                 <LocationSelect
                   name={`locations[${index}].type`}
+                  getOptionValue={(option) => `${option.value}:${option.label}`}
+                  isOptionDisabled={(option) => !!option.disabled}
                   placeholder={t("select")}
                   options={locationOptions}
                   isDisabled={disableLocationProp}
-                  defaultValue={option}
+                  value={option || null}
                   isSearchable={false}
                   className={classNames(
                     "block min-w-0 flex-1 rounded-sm text-sm",
@@ -210,6 +239,7 @@ const Locations: React.FC<LocationsProps> = ({
                       if (canAddLocation) {
                         updateLocationField(index, {
                           type: newLocationType,
+                          ...getStudioLocationAddress(e),
                           ...(e.credentialId && {
                             credentialId: e.credentialId,
                             teamName: e.teamName ?? undefined,
@@ -324,6 +354,8 @@ const Locations: React.FC<LocationsProps> = ({
           <div className="flex">
             <LocationSelect
               defaultMenuIsOpen={showEmptyLocationSelect}
+              getOptionValue={(option) => `${option.value}:${option.label}`}
+              isOptionDisabled={(option) => !!option.disabled}
               placeholder={t("select")}
               options={locationOptions}
               value={selectedNewOption}
@@ -352,6 +384,7 @@ const Locations: React.FC<LocationsProps> = ({
                   if (canAppendLocation) {
                     append({
                       type: newLocationType,
+                      ...getStudioLocationAddress(e),
                       ...(e.credentialId && {
                         credentialId: e.credentialId,
                         teamName: e.teamName ?? undefined,
@@ -415,6 +448,13 @@ const Locations: React.FC<LocationsProps> = ({
           </li>
         )}
       </ul>
+      {!team?.id && profile && profile.id === eventType.userId && !studioAddress && (
+        <p className="text-subtle mt-2 text-sm">
+          <Link href="/settings/my-account/profile" target="_blank" rel="noreferrer" className="underline">
+            {t("studio_address_add")}
+          </Link>
+        </p>
+      )}
       {props.showAppStoreLink && !isPlatform && (
         <p className="text-default mt-2 text-sm">
           <ServerTrans

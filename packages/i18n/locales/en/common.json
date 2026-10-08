@@ -1,4 +1,10 @@
 {
+  "studio_address": "Studio / business address",
+  "studio_address_placeholder": "Street, number, postal code, city",
+  "studio_address_help": "Used when you choose “In person (saved address)”. You can enter a different address for individual services. Changes here do not alter addresses already saved on services.",
+  "studio_address_add": "Save your studio address in your profile",
+  "in_person_saved_address": "In person (saved address)",
+  "in_person_enter_address": "In person (enter an address)",
   "stripe_app_development": "In development",
   "stripe_app_development_description": "In development: Stripe payments are currently available in test mode only. Do not use for real customer payments yet.",
   "stripe_booking_payment_error": "Payment could not be completed. Please try again.",
