@@ -1,10 +1,9 @@
-import { describe, it, expect } from "vitest";
-
 import type { App } from "@calcom/types/App";
 import type { CredentialForCalendarService } from "@calcom/types/Credential";
-
-import { sanitizeAppForViewer } from "./utils";
+import { describe, expect, it } from "vitest";
 import type { CredentialDataWithTeamName, LocationOption } from "./utils";
+import { getLocationValueForDB } from "./locations";
+import getApps, { getAppFromLocationValue, getAppFromSlug, sanitizeAppForViewer } from "./utils";
 
 describe("sanitizeAppForViewer", () => {
   it("should remove key, credential, and credentials properties", () => {
@@ -137,5 +136,26 @@ describe("sanitizeAppForViewer", () => {
     expect(sanitized.rating).toBe(4.5);
     expect(sanitized.reviews).toBe(1000);
     expect(sanitized.appData).toBeDefined();
+  });
+});
+
+describe("retired conferencing provider", () => {
+  it("cannot be discovered or installed through the app registry", () => {
+    expect(getApps([]).some((app) => app.slug === "daily-video")).toBe(false);
+    expect(getAppFromSlug("daily-video")).toBeUndefined();
+    expect(getAppFromLocationValue("integrations:daily")).toBeUndefined();
+    expect(getAppFromSlug("google-meet")).toBeDefined();
+  });
+});
+
+describe("booking without a location", () => {
+  it("does not turn an empty location into a video meeting", () => {
+    expect(getLocationValueForDB("", [])).toEqual({ bookingLocation: "", conferenceCredentialId: undefined });
+  });
+  it("preserves an explicitly configured in-person address", () => {
+    expect(getLocationValueForDB("inPerson", [{ type: "inPerson", address: "Wien" }])).toEqual({
+      bookingLocation: "Wien",
+      conferenceCredentialId: undefined,
+    });
   });
 });

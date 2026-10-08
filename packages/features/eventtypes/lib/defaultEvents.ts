@@ -1,4 +1,4 @@
-import { DailyLocationType } from "@calcom/app-store/constants";
+import type { LocationObject } from "@calcom/app-store/locations";
 import { eventTypeMetaDataSchemaWithTypedApps } from "@calcom/app-store/zod-utils";
 import slugify from "@calcom/lib/slugify";
 import type { Prisma, SelectedCalendar } from "@calcom/prisma/client";
@@ -70,7 +70,7 @@ const commons = {
   periodDays: null,
   slotInterval: null,
   offsetStart: 0,
-  locations: [{ type: DailyLocationType }],
+  locations: [] as LocationObject[],
   customInputs,
   disableGuests: true,
   minimumBookingNotice: 120,
@@ -210,10 +210,7 @@ export const getUsernameList = (users: string | string[] | undefined): string[] 
   // Multiple users can come in case of a team round-robin booking and in that case dynamic link won't be a user.
   // So, even though this code handles even if individual user is dynamic link, that isn't a possibility right now.
   users = arrayCast(users);
-  const allUsers = users
-    .map((user) => user.replace(/( |%20|%2b)/gi, "+").split("+"))
-    .flat()
-    .filter(Boolean);
+  const allUsers = users.flatMap((user) => user.replace(/( |%20|%2b)/gi, "+").split("+")).filter(Boolean);
   return Array.prototype.concat(...allUsers.map((userSlug) => slugify(userSlug)));
 };
 

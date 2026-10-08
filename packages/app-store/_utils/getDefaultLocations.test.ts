@@ -1,10 +1,7 @@
 import prismaMock from "@calcom/testing/lib/__mocks__/prisma";
-
 import { getGoogleMeetCredential, TestData } from "@calcom/testing/lib/bookingScenario/bookingScenario";
-
 import { describe, expect, it } from "vitest";
-
-import { DailyLocationType, MeetLocationType } from "../locations";
+import { MeetLocationType } from "../locations";
 import { getDefaultLocations } from "./getDefaultLocations";
 
 type User = {
@@ -26,7 +23,7 @@ type User = {
         refresh_token?: string;
         scope: string;
       };
-    }
+    },
   ];
 };
 describe("getDefaultLocation ", async () => {
@@ -50,7 +47,7 @@ describe("getDefaultLocation ", async () => {
       type: MeetLocationType,
     });
   });
-  it("should return calvideo when default conferencing app is not set", async () => {
+  it("should leave location unset even when the retired provider has keys", async () => {
     const user: User = {
       id: 101,
       email: "test@example.com",
@@ -65,11 +62,29 @@ describe("getDefaultLocation ", async () => {
       },
     });
     const res = await getDefaultLocations(user);
-    expect(res[0]).toEqual(
-      expect.objectContaining({
-        type: DailyLocationType,
+    expect(res).toEqual([]);
+  });
+  it("should ignore a retired default provider", async () => {
+    expect(
+      await getDefaultLocations({
+        id: 101,
+        email: "test@example.com",
+        metadata: {
+          defaultConferencingApp: { appSlug: "daily-video", appLink: "" },
+        },
       })
-    );
+    ).toEqual([]);
+  });
+  it("should not replace an unavailable provider with another provider", async () => {
+    const user: User = {
+      id: 101,
+      email: "test@example.com",
+      metadata: {
+        defaultConferencingApp: { appSlug: "unavailable-provider", appLink: "" },
+      },
+    };
+    await mockUser(user);
+    expect(await getDefaultLocations(user)).toEqual([]);
   });
 });
 
