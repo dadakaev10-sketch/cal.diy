@@ -4,7 +4,7 @@ import { ServiceCategorySymbol } from "@calcom/features/eventtypes/components/Se
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { isCategoryEmoji, isServiceCategoryIcon, serviceCategoryIcons } from "@calcom/prisma/serviceCatalog";
 import { Button } from "@calcom/ui/components/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@calcom/ui/components/popover/Popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@calcom/ui/components/popover";
 import { useId, useState } from "react";
 
 const emojiGroups = [
