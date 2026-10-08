@@ -1,8 +1,24 @@
-FROM --platform=$BUILDPLATFORM node:20 AS builder
+# syntax=docker/dockerfile:1
+FROM --platform=$BUILDPLATFORM node:20 AS dependency-inputs
+WORKDIR /calcom
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
+COPY apps ./apps
+COPY packages ./packages
+COPY example-apps ./example-apps
+COPY scripts/docker-dependency-inputs.cjs ./scripts/docker-dependency-inputs.cjs
+RUN node scripts/docker-dependency-inputs.cjs /dependencies
 
+FROM --platform=$BUILDPLATFORM node:20 AS dependencies
 WORKDIR /calcom
 RUN corepack enable
+COPY --from=dependency-inputs /dependencies/ ./
+COPY .yarn ./.yarn
+COPY .yarnrc.yml ./
+RUN --mount=type=cache,id=fixmit-yarn,target=/calcom/.yarn/cache,sharing=locked \
+    YARN_HTTP_TIMEOUT=1200000 yarn install --immutable
 
+FROM dependencies AS builder
 ## If we want to read any ENV variable from .env file, we need to first accept and pass it as an argument to the Dockerfile
 ARG NEXT_PUBLIC_LICENSE_CONSENT
 ARG NEXT_PUBLIC_WEBSITE_TERMS_URL
@@ -46,16 +62,13 @@ COPY .yarn ./.yarn
 COPY apps/web ./apps/web
 COPY apps/api/v2 ./apps/api/v2
 COPY packages ./packages
-
-RUN yarn config set httpTimeout 1200000
-RUN npx turbo prune --scope=@calcom/web --scope=@calcom/trpc --docker
-RUN yarn install
-# Build and make embed servable from web/public/embed folder
+RUN yarn turbo run post-install --force
 RUN yarn workspace @calcom/trpc run build
 RUN yarn --cwd packages/embeds/embed-core workspace @calcom/embed-core run build
 RUN yarn --cwd apps/web workspace @calcom/web run copy-app-store-static
-RUN yarn --cwd apps/web workspace @calcom/web run build
-RUN rm -rf node_modules/.cache .yarn/cache apps/web/.next/cache
+RUN --mount=type=cache,id=fixmit-next,target=/calcom/apps/web/.next/cache,sharing=locked \
+    yarn --cwd apps/web workspace @calcom/web run build
+RUN rm -rf node_modules/.cache .yarn/cache
 
 FROM node:20 AS builder-two
 

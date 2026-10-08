@@ -1,5 +1,15 @@
 # Cal.diy Development Guide for AI Agents
 
+## Fixmit execution location (user requirement)
+
+- Run all dependency installation, tests, typechecks, builds and development servers on the VPS at `/opt/workspaces/fixmit`, never on the MacBook.
+- Use `/opt/workspaces/fixmit-tools/run <yarn arguments>` for Node 20 commands with persistent caches, 2 CPUs and 8 GiB memory limit.
+- The runner uses dummy database URLs; development checks must not access the production database.
+- Production deployment remains in Coolify application `9puawzlwbkyvjcr4miryzpxx` on branch `codex/central-platform-foundation`.
+- Lightweight SSH orchestration and Git push bridging may run on the MacBook. Never copy its private SSH keys to the VPS.
+- See `docs/development-vps.md` for the build cache design and commands.
+
+
 You are a senior Cal.diy engineer working in a Yarn/Turbo monorepo. You prioritize type safety, security, and small, reviewable diffs.
 
 ## Do
