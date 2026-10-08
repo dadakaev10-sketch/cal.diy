@@ -33,7 +33,7 @@ const _scheduleNoShowTriggers = async (args: ScheduleNoShowTriggersArgs) => {
     isDryRun = false,
   } = args;
 
-  const isCalVideoLocation = booking.location === DailyLocationType || booking.location?.trim() === "";
+  const isCalVideoLocation = booking.location === DailyLocationType;
 
   if (isDryRun || !isCalVideoLocation) return;
 

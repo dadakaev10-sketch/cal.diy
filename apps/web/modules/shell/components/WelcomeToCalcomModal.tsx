@@ -15,7 +15,6 @@ const features = [
   "accept_payments_via_stripe",
   "html_react_embed",
   "cal_ai_phone_agent",
-  "cal_video",
 ];
 
 export function WelcomeToCalcomModal() {

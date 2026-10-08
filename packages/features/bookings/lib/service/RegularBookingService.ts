@@ -1189,18 +1189,18 @@ async function handler(
 
     if (defaultApp?.appSlug) {
       const app = getAppFromSlug(defaultApp.appSlug);
-      locationBodyString = app?.appData?.location?.type || locationBodyString;
+      locationBodyString = app?.appData?.location?.type || "";
 
       const mainHostCalendar = eventType.destinationCalendar || organizerUser.destinationCalendar;
 
       if (locationBodyString === MeetLocationType && mainHostCalendar?.integration !== "google_calendar") {
-        locationBodyString = "integrations:daily";
+        locationBodyString = "";
         organizerOrFirstDynamicGroupMemberDefaultLocationUrl = undefined;
       } else if (isManagedEventType || isTeamEventType) {
         organizerOrFirstDynamicGroupMemberDefaultLocationUrl = defaultApp?.appLink;
       }
     } else {
-      locationBodyString = "integrations:daily";
+      locationBodyString = "";
     }
   }
 
