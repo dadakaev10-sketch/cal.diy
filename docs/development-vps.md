@@ -33,3 +33,8 @@ prune these caches after deployments.
 
 Git pushes may use the existing MacBook checkout as a lightweight credential
 bridge. The VPS clone needs no transferred personal private key.
+
+The final runtime inherits the prepared runtime stage directly. Do not flatten
+all of `/calcom` into another COPY layer: that makes a small website or icon
+change recopy and re-export the full dependency tree. Keeping dependency and
+web output layers separate allows unchanged runtime libraries to be reused.
