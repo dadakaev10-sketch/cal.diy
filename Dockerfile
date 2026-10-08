@@ -18,7 +18,7 @@ COPY .yarnrc.yml ./
 RUN --mount=type=cache,id=fixmit-yarn,target=/calcom/.yarn/cache,sharing=locked \
     YARN_HTTP_TIMEOUT=1200000 yarn install --immutable
 
-FROM dependencies AS builder
+FROM dependencies AS prebuild
 ## If we want to read any ENV variable from .env file, we need to first accept and pass it as an argument to the Dockerfile
 ARG NEXT_PUBLIC_LICENSE_CONSENT
 ARG NEXT_PUBLIC_WEBSITE_TERMS_URL
@@ -59,12 +59,16 @@ ENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \
 
 COPY package.json yarn.lock .yarnrc.yml playwright.config.ts turbo.json i18n.json ./
 COPY .yarn ./.yarn
-COPY apps/web ./apps/web
+COPY --from=dependency-inputs /build-sources/apps/web ./apps/web
 COPY apps/api/v2 ./apps/api/v2
 COPY packages ./packages
 RUN yarn turbo run post-install --force
 RUN yarn workspace @calcom/trpc run build
 RUN yarn --cwd packages/embeds/embed-core workspace @calcom/embed-core run build
+FROM prebuild AS builder
+COPY apps/web/next.config.ts ./apps/web/next.config.ts
+COPY apps/web/app/favicon.ico ./apps/web/app/favicon.ico
+COPY apps/web/public ./apps/web/public
 RUN yarn --cwd apps/web workspace @calcom/web run copy-app-store-static
 RUN --mount=type=cache,id=fixmit-next,target=/calcom/apps/web/.next/cache,sharing=locked \
     yarn --cwd apps/web workspace @calcom/web run build

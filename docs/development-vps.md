@@ -17,10 +17,13 @@ Production credentials must not be copied into the development checkout.
 
 Production builds and rollout use the existing Coolify application. The Dockerfile
 separates package manifests and dependency installation from source compilation.
+Branding assets, favicon and Next configuration are copied after the workspace
+prebuild stage, so changes to those files preserve workspace compilation layers.
 Only a package manifest, Yarn lockfile/configuration or runtime change invalidates
 the dependency layer. Native dependency install scripts run normally; workspace
 code generation runs after source files are present. Yarn download and Next.js
-compiler caches persist through BuildKit cache mounts. Workspace generation runs explicitly on every source build because the upstream
+compiler caches persist through BuildKit cache mounts. The installed Next 16.2
+version explicitly enables `turbopackFileSystemCacheForBuild`. Workspace generation runs explicitly on every source build because the upstream
 post-install task does not declare all generated outputs for safe cache restoration. Next.js still validates and bundles changed application
 code; cached builds do not guarantee every change deploys instantly.
 

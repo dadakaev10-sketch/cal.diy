@@ -21,3 +21,15 @@ const manifest = JSON.parse(fs.readFileSync("package.json", "utf8"));
 delete manifest.scripts.postinstall;
 fs.writeFileSync(path.join(output, "package.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 fs.copyFileSync("yarn.lock", path.join(output, "yarn.lock"));
+
+// Branding assets and Next configuration do not affect workspace compilation.
+fs.cpSync("apps/web", "/build-sources/apps/web", {
+  recursive: true,
+  filter(source) {
+    return !(
+      source === "apps/web/public" ||
+      source === "apps/web/app/favicon.ico" ||
+      source === "apps/web/next.config.ts"
+    );
+  },
+});
