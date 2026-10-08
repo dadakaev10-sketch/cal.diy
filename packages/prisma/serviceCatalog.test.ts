@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readServiceCatalog, serviceCatalogSchema } from "./serviceCatalog";
+import { readServiceCatalog, serviceCatalogSchema, serviceCategorySymbolSchema } from "./serviceCatalog";
 import { EventTypeMetaDataSchema } from "./zod-utils";
 
 const root = {
@@ -41,5 +41,31 @@ describe("service catalog", () => {
   it("preserves category assignment with price metadata and allows clearing", () => {
     expect(EventTypeMetaDataSchema.parse({ serviceCategoryId: root.id })?.serviceCategoryId).toBe(root.id);
     expect(EventTypeMetaDataSchema.parse({ serviceCategoryId: null })?.serviceCategoryId).toBeNull();
+  });
+});
+
+describe("category symbols", () => {
+  it.each([
+    "sparkles",
+    "paintbrush",
+    "💆🏽‍♀️",
+    "👨‍👩‍👧‍👦",
+    "🇦🇹",
+    "1️⃣",
+    "✨",
+  ])("round-trips %s through the persisted catalog", (icon) => {
+    const parsed = serviceCatalogSchema.parse({ enabled: true, categories: [{ ...root, icon }] });
+    expect(readServiceCatalog({ serviceCatalog: parsed }).categories[0].icon).toBe(icon);
+  });
+  it.each([
+    "",
+    "hello",
+    "😀😀",
+    "😀text",
+    "<script>",
+    "unknown-icon",
+    "🇦",
+  ])("rejects invalid symbol %s", (symbol) => {
+    expect(serviceCategorySymbolSchema.safeParse(symbol).success).toBe(false);
   });
 });

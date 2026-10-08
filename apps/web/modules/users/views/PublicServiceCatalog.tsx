@@ -1,3 +1,4 @@
+import { ServiceCategorySymbol } from "@calcom/features/eventtypes/components/ServiceCategorySymbol";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import type { ServiceCatalog } from "@calcom/prisma/serviceCatalog";
 import { Icon } from "@calcom/ui/components/icon";
@@ -50,7 +51,7 @@ export function PublicServiceCatalog({
               setSelected(group.category?.id ?? "other");
               setSubcategory("all");
             }}>
-            <Icon name={group.category?.icon ?? "grid-3x3"} className="h-6 w-6" />
+            <ServiceCategorySymbol symbol={group.category?.icon ?? "grid-3x3"} />
             <span>
               {group.category?.name ?? t("service_category_other")}{" "}
               <span className={styles.count}>({group.events.length})</span>
@@ -70,6 +71,10 @@ export function PublicServiceCatalog({
                 type="button"
                 aria-pressed={subcategory === child.id}
                 onClick={() => setSubcategory(child.id)}>
+                <ServiceCategorySymbol
+                  symbol={child.icon}
+                  className="mr-2 inline-block h-5 w-5 align-middle"
+                />
                 {child.name}{" "}
                 <span className={styles.count}>
                   ({active?.events.filter((event) => event.metadata?.serviceCategoryId === child.id).length})

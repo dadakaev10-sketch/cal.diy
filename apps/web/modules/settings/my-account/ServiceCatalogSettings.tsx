@@ -6,7 +6,6 @@ import {
   type ServiceCatalog,
   type ServiceCategory,
   serviceCatalogSchema,
-  serviceCategoryIcons,
 } from "@calcom/prisma/serviceCatalog";
 import { trpc } from "@calcom/trpc/react";
 import { Button } from "@calcom/ui/components/button";
@@ -14,6 +13,7 @@ import { Icon } from "@calcom/ui/components/icon";
 import { showToast } from "@calcom/ui/components/toast";
 import { revalidateSettingsAppearance } from "app/(use-page-wrapper)/settings/(settings-layout)/my-account/appearance/actions";
 import { useState } from "react";
+import { ServiceCategorySymbolPicker } from "./ServiceCategorySymbolPicker";
 
 const inputClass = "border-default bg-default text-default w-full rounded-md border px-3 py-2 text-sm";
 
@@ -106,24 +106,11 @@ export function ServiceCatalogSettings({ metadata }: { metadata: unknown }) {
                 </label>
               </div>
               <div className="mt-3 flex flex-wrap items-end gap-2">
-                <label className="min-w-0 flex-1 text-sm">
-                  {t("service_category_icon")}
-                  <select
-                    className={`${inputClass} mt-1`}
-                    value={category.icon}
-                    onChange={(e) =>
-                      change(category.id, {
-                        icon: serviceCategoryIcons.find((icon) => icon === e.target.value) ?? "grid-3x3",
-                      })
-                    }>
-                    {serviceCategoryIcons.map((icon) => (
-                      <option key={icon} value={icon}>
-                        {t(`service_category_icon_${icon}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <Icon name={category.icon} className="mb-2 h-5 w-5" />
+                <ServiceCategorySymbolPicker
+                  value={category.icon}
+                  onChange={(icon) => change(category.id, { icon })}
+                  disabled={mutation.isPending}
+                />
                 <Button
                   type="button"
                   color="secondary"
