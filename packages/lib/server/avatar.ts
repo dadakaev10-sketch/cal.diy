@@ -1,7 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
-
+import { createHash } from "node:crypto";
 import { prisma } from "@calcom/prisma";
-
+import { v4 as uuidv4 } from "uuid";
 import { convertSvgToPng } from "./imageUtils";
 
 export const uploadAvatar = async ({ userId, avatar: data }: { userId: number; avatar: string }) => {
@@ -41,7 +40,9 @@ export const uploadAvatar = async ({ userId, avatar: data }: { userId: number; a
     },
   });
 
-  return `/api/avatar/${objectKey}.png`;
+  // Keep existing links valid while bypassing cached versions after a new crop or upload.
+  const version = createHash("sha256").update(processedData).digest("hex").slice(0, 16);
+  return `/api/avatar/${objectKey}.png?v=${version}`;
 };
 
 export const uploadLogo = async ({

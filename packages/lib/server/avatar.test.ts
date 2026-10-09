@@ -38,7 +38,7 @@ describe("uploadAvatar", () => {
     const result = await uploadAvatar({ userId: 1, avatar: "image-data" });
 
     expect(mockUuidv4).toHaveBeenCalled();
-    expect(result).toBe("/api/avatar/generated-uuid-1234.png");
+    expect(result).toMatch(/^\/api\/avatar\/generated-uuid-1234\.png\?v=[a-f0-9]{16}$/);
   });
 
   it("reuses existing objectKey and does NOT call uuidv4", async () => {
@@ -47,7 +47,7 @@ describe("uploadAvatar", () => {
     const result = await uploadAvatar({ userId: 1, avatar: "image-data" });
 
     expect(mockUuidv4).not.toHaveBeenCalled();
-    expect(result).toBe("/api/avatar/existing-key-5678.png");
+    expect(result).toMatch(/^\/api\/avatar\/existing-key-5678\.png\?v=[a-f0-9]{16}$/);
   });
 
   it("includes objectKey in create clause but NOT in update clause", async () => {
@@ -68,7 +68,7 @@ describe("uploadAvatar", () => {
 
     const result = await uploadAvatar({ userId: 5, avatar: "data" });
 
-    expect(result).toBe("/api/avatar/my-key.png");
+    expect(result).toMatch(/^\/api\/avatar\/my-key\.png\?v=[a-f0-9]{16}$/);
   });
 
   it("uses correct compound unique key for lookup and upsert", async () => {
@@ -114,6 +114,20 @@ describe("uploadAvatar", () => {
       expect.objectContaining({
         create: expect.objectContaining({ isBanner: false }),
       })
+    );
+  });
+  it("changes the image URL after recropping without breaking the existing object key", async () => {
+    mockFindUnique.mockResolvedValue({ objectKey: "existing-key" });
+    const before = await uploadAvatar({ userId: 1, avatar: "first-crop" });
+    const after = await uploadAvatar({ userId: 1, avatar: "second-crop" });
+    const repeated = await uploadAvatar({ userId: 1, avatar: "second-crop" });
+    expect(after).not.toBe(before);
+    expect(repeated).toBe(after);
+    expect(new URL(after, "https://fixmit.com").pathname).toBe(
+      new URL(before, "https://fixmit.com").pathname
+    );
+    expect(mockUpsert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ update: { data: "processed_second-crop" } })
     );
   });
 });
