@@ -1,0 +1,36 @@
+# Fixmit
+
+> Fixmit is a web-based appointment scheduling app with a customizable public profile and booking page for studios, salons, coaches and independent service businesses.
+
+Official website: https://fixmit.com/
+
+## Official product pages
+
+- [Deutsch](https://fixmit.com/?lang=de): Online-Terminbuchung und eigene Buchungsseite für Studios, Salons und Selbstständige.
+- [English](https://fixmit.com/?lang=en): Online appointment booking and a customizable booking page for service businesses.
+- [Русский](https://fixmit.com/?lang=ru): Онлайн-запись и собственная страница для студий, салонов и частных специалистов.
+- [Sitemap](https://fixmit.com/sitemap.xml): Public marketing page URLs and language alternatives.
+
+## What Fixmit does
+
+Businesses create a profile, describe their services and define available appointment times. Customers use the business's booking link to choose a service and an available time.
+
+- Set availability, working hours, breaks and days off.
+- Present services with descriptions, duration, categories and optional displayed prices.
+- Customize a public profile with a picture, description and colors.
+- Share a booking page on a website or social media profile.
+- Use the homepage and dashboard in German, English or Russian.
+- Write profile text and service descriptions in the customers' language; these business-authored texts are not automatically translated.
+
+## Payments and scope
+
+Appointments can be offered with payment in person. Displaying a service price does not collect an online payment. The Stripe integration for online payments is still in development.
+
+This document does not specify subscription prices, free-plan entitlements, service-level guarantees or payment availability. Refer to the current official product pages for published information. Sample businesses and calendars shown on the homepage are demonstrations, not customer testimonials or live availability.
+
+## Getting started
+
+- [Registrieren / Register](https://fixmit.com/register): Create a business profile.
+- [Anmelden / Sign in](https://fixmit.com/auth/login): Access an existing account.
+
+This file is a concise public reference. The linked product pages provide the current user-facing information. Customer accounts and booking records are not part of this reference.

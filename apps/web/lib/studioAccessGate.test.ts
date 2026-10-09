@@ -23,6 +23,7 @@ beforeEach(() => {
 describe("studio access boundary", () => {
   it.each([
     "/robots.txt",
+    "/llms.txt",
     "/sitemap.xml",
     "/fixmit/logo-white-background.png",
   ])("serves crawl resources %s without exposing writes", async (path) => {
