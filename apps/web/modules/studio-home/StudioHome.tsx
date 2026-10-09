@@ -1,5 +1,6 @@
 import type { TFunction } from "i18next";
 import styles from "./home.module.css";
+import { FAQ_ITEMS } from "./seo";
 
 export default function StudioHome({
   t,
@@ -193,10 +194,10 @@ export default function StudioHome({
             ))}
           </ul>
         </section>
-        <section className={styles.faq}>
+        <section className={styles.faq} id="faq">
           <h2>{t("home_faq_title")}</h2>
           <div>
-            {[1, 2, 3].map((n) => (
+            {FAQ_ITEMS.map((n) => (
               <details key={n}>
                 <summary>{t(`home_faq_${n}`)}</summary>
                 <p>{t(`home_faq_${n}_text`)}</p>
@@ -208,8 +209,8 @@ export default function StudioHome({
           <p className={styles.eyebrow}>{t("home_register")}</p>
           <h2>{t("home_join_title")}</h2>
           <p>{t("home_join_text")}</p>
-          <a className={styles.button} href="/auth/login">
-            {t("home_login")} <span aria-hidden="true">↗</span>
+          <a className={styles.button} href={`/register?lang=${language}`}>
+            {t("home_register")} <span aria-hidden="true">↗</span>
           </a>
         </section>
       </main>
