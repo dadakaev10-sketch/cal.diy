@@ -80,6 +80,12 @@ const proxy = async (req: NextRequest): Promise<NextResponse<unknown>> => {
   const url = req.nextUrl;
   const reqWithEnrichedHeaders = enrichRequestWithHeaders({ req });
   const requestHeaders = new Headers(reqWithEnrichedHeaders.headers);
+  // Derive the public page language here: layouts do not receive searchParams.
+  requestHeaders.delete("x-fixmit-home-language");
+  if (url.pathname === "/") {
+    const language = url.searchParams.get("lang");
+    requestHeaders.set("x-fixmit-home-language", language === "en" || language === "ru" ? language : "de");
+  }
 
   if (url.pathname.startsWith("/api/auth/signup")) {
     const isSignupDisabled = await safeGet<boolean>("isSignupDisabled");

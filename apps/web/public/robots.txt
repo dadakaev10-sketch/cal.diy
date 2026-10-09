@@ -1,10 +1,16 @@
 User-agent: *
 Disallow: /sandbox
-Disallow: /api
-Disallow: /settings
-Disallow: /settings/my-account
+Disallow: /api/
+Disallow: /settings/
+Disallow: /event-types
+Disallow: /bookings
+Disallow: /availability
+Disallow: /apps/installed
+Disallow: /admin
+Disallow: /onboarding
 
-# Specifically allow access to OG Image api, otherwise eg Twitter won't render these images.
+Allow: /api/logo
 Allow: /api/social/og/image
-# Specifically allow access to api/app-store to allow search engines to fetch assets
 Allow: /api/app-store/
+
+Sitemap: https://fixmit.com/sitemap.xml

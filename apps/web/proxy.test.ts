@@ -6,8 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // We'll test the wrapped proxy as it would be used in production
-import proxy from "./proxy";
-import { config } from "./proxy";
+import proxy, { config } from "./proxy";
 
 // Mock dependencies at module level
 vi.mock("@vercel/edge-config", () => ({
@@ -354,6 +353,23 @@ describe("Middleware Integration Tests", () => {
   });
 
   describe("Header sanitization", () => {
+    it.each([
+      ["/?lang=de", "de"],
+      ["/?lang=en", "en"],
+      ["/?lang=ru", "ru"],
+      ["/", "de"],
+      ["/?lang=fr", "de"],
+      ["/event-types", null],
+    ])("derives a trusted homepage language for %s", async (path, expected) => {
+      const spy = vi.spyOn(NextResponse, "next");
+      await callProxy(
+        createTestRequest({ url: `${WEBAPP_URL}${path}`, headers: { "x-fixmit-home-language": "ru" } })
+      );
+      const init = (spy as unknown as Mock).mock.calls.at(-1)?.[0] as { request?: { headers?: Headers } };
+      expect(init.request?.headers?.get("x-fixmit-home-language")).toBe(expected);
+      spy.mockRestore();
+    });
+
     it("sanitizes non-ASCII request header values to prevent Vercel Runtime Malformed Response Header", async () => {
       const spy = vi.spyOn(NextResponse, "next");
 
@@ -442,37 +458,15 @@ describe("Middleware Integration Tests", () => {
 });
 
 describe("Middleware Matcher Configuration", () => {
-  const matcher: string[] = config.matcher;
-
-  it("should include all core middleware routes", () => {
-    expect(matcher).toContain("/auth/login");
-    expect(matcher).toContain("/auth/logout");
-    expect(matcher).toContain("/api/auth/signup");
-    expect(matcher).toContain("/apps/installed");
-    expect(matcher).toContain("/availability");
-    expect(matcher).toContain("/login");
-    expect(matcher).toContain("/:path*/embed");
-  });
-
-  it("should have no duplicate entries", () => {
-    const uniqueEntries = new Set(matcher);
-    expect(uniqueEntries.size).toBe(matcher.length);
-  });
-
-  it("should not contain any /api/ routes except /api/auth/signup", () => {
-    const apiRoutes = matcher.filter((entry) => entry.startsWith("/api/") && entry !== "/api/auth/signup");
-    expect(apiRoutes).toEqual([]);
-  });
-
-  it("should only contain the expected reduced route set", () => {
-    expect(matcher).toEqual([
-      "/auth/login",
-      "/login",
-      "/apps/installed",
-      "/auth/logout",
-      "/:path*/embed",
-      "/availability",
-      "/api/auth/signup",
-    ]);
-  });
+  const matches = (path: string) => config.matcher.some((pattern) => new RegExp(`^${pattern}$`).test(path));
+  it.each([
+    "/",
+    "/sitemap.xml",
+    "/robots.txt",
+    "/auth/login",
+    "/api/auth/signup",
+    "/settings/my-account",
+    "/team/test/embed",
+  ])("runs the access gate and language handling for %s", (path) => expect(matches(path)).toBe(true));
+  it("excludes Next static assets", () => expect(matches("/_next/static/chunk.js")).toBe(false));
 });

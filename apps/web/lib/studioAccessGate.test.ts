@@ -21,6 +21,18 @@ beforeEach(() => {
 });
 
 describe("studio access boundary", () => {
+  it.each([
+    "/robots.txt",
+    "/sitemap.xml",
+    "/fixmit/logo-white-background.png",
+  ])("serves crawl resources %s without exposing writes", async (path) => {
+    expect(await studioAccessGate(new NextRequest(`https://test.local${path}`))).toBeNull();
+    expect(
+      await studioAccessGate(new NextRequest(`https://test.local${path}`, { method: "HEAD" }))
+    ).toBeNull();
+    expect(studioRouteAccess(path, "POST")).toBe("private");
+  });
+
   it("allows only the signed webhook POST endpoint without a browser session", async () => {
     const url = "https://test.local/api/integrations/stripepayment/webhook";
     expect(await studioAccessGate(new NextRequest(url, { method: "POST" }))).toBeNull();

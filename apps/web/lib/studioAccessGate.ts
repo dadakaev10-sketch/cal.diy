@@ -13,6 +13,9 @@ import { studioPublicBookingRoute } from "./studioPublicBooking";
 
 const publicPages = new Set(["/", "/auth/login", "/auth/error", "/auth/logout", "/register", "/recover"]);
 const publicAssets = new Set([
+  "/robots.txt",
+  "/sitemap.xml",
+  "/fixmit/logo-white-background.png",
   "/api/logo",
   "/emails/checkCircle@2x.png",
   "/emails/xCircle@2x.png",
