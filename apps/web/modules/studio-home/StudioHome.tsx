@@ -31,6 +31,7 @@ export default function StudioHome({
         <nav className={styles.nav} aria-label={t("home_nav_features")}>
           <a href="#features">{t("home_nav_features")}</a>
           <a href="#how">{t("home_nav_how")}</a>
+          <a href={`/pricing?lang=${language}`}>{t("public_pricing_title")}</a>
         </nav>
         <div className={styles.headerActions}>
           <nav className={styles.languages} aria-label={t("home_language")}>
@@ -219,7 +220,13 @@ export default function StudioHome({
           <strong>Fixmit</strong>
           <p>{t("home_footer")}</p>
         </div>
-        <a href="#top">{t("home_back_top")} ↑</a>
+        <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          {["pricing", "terms", "privacy", "refund", "imprint"].map((slug) => (
+            <a key={slug} href={`/${slug}?lang=${language}`}>
+              {t(`public_${slug}_title`)}
+            </a>
+          ))}
+        </nav>
       </footer>
     </div>
   );

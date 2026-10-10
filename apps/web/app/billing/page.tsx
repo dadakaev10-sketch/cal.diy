@@ -90,6 +90,13 @@ export default async function BillingPage() {
           }>
           {t("fixmit_billing_manage")}
         </a>
+        <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", fontSize: 13 }}>
+          {["pricing", "terms", "privacy", "refund", "imprint"].map((slug) => (
+            <a key={slug} href={`/${slug}?lang=${user.locale === "en" ? "en" : "de"}`}>
+              {t(`public_${slug}_title`)}
+            </a>
+          ))}
+        </nav>
         <a className={styles.secondary} href="/auth/logout">
           {t("sign_out")}
         </a>

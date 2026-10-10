@@ -1,4 +1,9 @@
 const privateRoots = new Set([
+  "pricing",
+  "terms",
+  "privacy",
+  "refund",
+  "imprint",
   "_next",
   "_proxy",
   "api",

@@ -137,10 +137,15 @@ describe("email-first studio provisioning", () => {
     expect(await completeStudioRegistration(input)).toBe("studio_slug_unavailable");
     expect(mocks.createUser).not.toHaveBeenCalled();
   });
-  it("rejects reserved routes", async () => {
-    expect(await completeStudioRegistration({ ...input, slug: "studio-admin" })).toBe(
-      "studio_slug_unavailable"
-    );
+  it.each([
+    "studio-admin",
+    "pricing",
+    "terms",
+    "privacy",
+    "refund",
+    "imprint",
+  ])("rejects reserved route %s", async (slug) => {
+    expect(await completeStudioRegistration({ ...input, slug })).toBe("studio_slug_unavailable");
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
   it("leaves all writes in the transaction when provisioning fails", async () => {

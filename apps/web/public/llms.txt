@@ -11,6 +11,9 @@ Official website: https://fixmit.com/
 - [Русский](https://fixmit.com/?lang=ru): Онлайн-запись и собственная страница для студий, салонов и частных специалистов.
 - [Sitemap](https://fixmit.com/sitemap.xml): Public marketing page URLs and language alternatives.
 
+- [Pricing](https://fixmit.com/pricing): Current subscription price, billing interval and included features.
+- [Terms](https://fixmit.com/terms) · [Privacy](https://fixmit.com/privacy) · [Refund policy](https://fixmit.com/refund) · [Legal notice](https://fixmit.com/imprint)
+
 ## What Fixmit does
 
 Businesses create a profile, describe their services and define available appointment times. Customers use the business's booking link to choose a service and an available time.

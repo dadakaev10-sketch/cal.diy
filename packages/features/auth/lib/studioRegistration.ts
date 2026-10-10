@@ -28,6 +28,11 @@ export const studioRegistrationSchema = z.object({
 });
 
 const reserved = new Set([
+  "pricing",
+  "terms",
+  "privacy",
+  "refund",
+  "imprint",
   "api",
   "auth",
   "register",

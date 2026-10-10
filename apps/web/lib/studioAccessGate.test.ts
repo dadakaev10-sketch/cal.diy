@@ -32,6 +32,11 @@ beforeEach(() => {
 
 describe("studio access boundary", () => {
   it.each([
+    "/pricing",
+    "/terms",
+    "/privacy",
+    "/refund",
+    "/imprint",
     "/robots.txt",
     "/llms.txt",
     "/sitemap.xml",
