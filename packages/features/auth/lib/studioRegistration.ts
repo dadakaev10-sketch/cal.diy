@@ -40,6 +40,7 @@ const reserved = new Set([
   "event-types",
   "availability",
   "bookings",
+  "billing",
   "booking",
   "apps",
   "workflows",

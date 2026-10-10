@@ -7,6 +7,7 @@ import getIP from "@calcom/lib/getIP";
 import { checkCfTurnstileToken } from "@calcom/lib/server/checkCfTurnstileToken";
 import { defaultResponder } from "@calcom/lib/server/defaultResponder";
 import { piiHasher } from "@calcom/lib/server/PiiHasher";
+import { assertBillingForBooking } from "@lib/fixmitBillingBooking";
 import type { NextApiRequest } from "next";
 
 // @TODO: Didn't look at the contents of this function in order to not break old booking page.
@@ -27,6 +28,9 @@ type RequestMeta = {
 } & PlatformParams;
 
 async function handler(req: NextApiRequest & RequestMeta) {
+  if (Array.isArray(req.body)) {
+    for (const booking of req.body) await assertBillingForBooking(booking);
+  }
   const userIp = getIP(req);
 
   if (process.env.NEXT_PUBLIC_CLOUDFLARE_USE_TURNSTILE_IN_BOOKER === "1") {

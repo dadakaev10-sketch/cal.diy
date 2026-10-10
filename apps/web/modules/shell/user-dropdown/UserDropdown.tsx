@@ -170,6 +170,10 @@ export function UserDropdown({ small }: UserDropdownProps) {
               <SettingsIcon />
               {t("my_settings")}
             </MenuItem>
+            <MenuItem render={<Link href="/billing" />}>
+              <SettingsIcon />
+              {t("fixmit_billing_title")}
+            </MenuItem>
             <MenuItem render={<Link href="/settings/my-account/out-of-office" />}>
               <MoonIcon />
               {t("out_of_office")}

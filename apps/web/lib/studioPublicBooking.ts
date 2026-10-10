@@ -6,6 +6,7 @@ const privateRoots = new Set([
   "auth",
   "availability",
   "bookings",
+  "billing",
   "connect",
   "confirm",
   "d",

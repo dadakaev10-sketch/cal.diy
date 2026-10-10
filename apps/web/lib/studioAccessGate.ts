@@ -9,6 +9,7 @@ import prisma from "@calcom/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { billingEnabled, entitled } from "./fixmitBilling";
 import { studioPublicBookingRoute } from "./studioPublicBooking";
 
 const publicPages = new Set(["/", "/auth/login", "/auth/error", "/auth/logout", "/register", "/recover"]);
@@ -81,6 +82,7 @@ export async function studioAccessGate(req: NextRequest) {
     return NextResponse.redirect(new URL("/recover", req.url));
   }
   if (path === "/api/integrations/stripepayment/webhook" && req.method === "POST") return null;
+  if (path === "/api/fixmit-billing/webhook" && req.method === "POST") return null;
   const access = studioRouteAccess(path, req.method);
   if (access === "disabled") return NextResponse.json({ error: "Not available" }, { status: 404 });
   if (access === "register") return NextResponse.redirect(new URL("/register", req.url));
@@ -137,6 +139,18 @@ export async function studioAccessGate(req: NextRequest) {
         );
       }
     }
+    if (bookingRoute === "booking-page" && billingEnabled()) {
+      const username = path.split("/")[1];
+      const owner = await prisma.user.findFirst({
+        where: { username: { equals: username, mode: "insensitive" } },
+        select: { id: true },
+      });
+      if (owner && !(await entitled(owner.id)))
+        return new NextResponse("Booking page unavailable", {
+          status: 404,
+          headers: { "Cache-Control": "no-store" },
+        });
+    }
     if (access === "public" && (!bookingRoute || bookingRoute === "booking-page")) return null;
     const token = await getToken({
       req,
@@ -155,8 +169,18 @@ export async function studioAccessGate(req: NextRequest) {
         !user.locked &&
         user.password &&
         token?.studioPasswordStamp === studioPasswordStamp(user.password.hash, secret)
-      )
+      ) {
+        const billingRoute = path === "/billing" || path.startsWith("/api/fixmit-billing/");
+        if (!billingRoute && access !== "public" && !(await entitled(user.id))) {
+          return path.startsWith("/api/")
+            ? NextResponse.json(
+                { error: "subscription_required", billingUrl: "/billing" },
+                { status: 402, headers: { "Cache-Control": "no-store" } }
+              )
+            : NextResponse.redirect(new URL("/billing", req.url));
+        }
         return null;
+      }
     }
   } catch {
     return NextResponse.json(

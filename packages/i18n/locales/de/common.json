@@ -4871,5 +4871,17 @@
   "home_faq_4": "Kann ich meine Buchungsseite individuell gestalten?",
   "home_faq_4_text": "Ja. Du kannst ein Profilbild, eine Beschreibung und Farben auswählen sowie Leistungen mit Dauer, Kategorien und optional sichtbaren Preisen darstellen. Deinen Link kannst du auf deiner Website und in deinen Social-Media-Profilen teilen.",
   "home_faq_5": "In welchen Sprachen ist Fixmit verfügbar?",
-  "home_faq_5_text": "Die Startseite und das Dashboard sind auf Deutsch, Englisch und Russisch verfügbar. Eigene Profiltexte und Leistungsbeschreibungen schreibst du selbst in der Sprache deiner Kunden."
+  "home_faq_5_text": "Die Startseite und das Dashboard sind auf Deutsch, Englisch und Russisch verfügbar. Eigene Profiltexte und Leistungsbeschreibungen schreibst du selbst in der Sprache deiner Kunden.",
+  "fixmit_billing_title": "Dein Fixmit-Abo",
+  "fixmit_billing_price": "14 Tage kostenlos. Danach 9 US-Dollar pro Monat.",
+  "fixmit_billing_terms": "Keine Einrichtungsgebühr. Automatische monatliche Verlängerung. Jederzeit über PayPal kündbar.",
+  "fixmit_billing_active": "Dein Zugang ist freigeschaltet.",
+  "fixmit_billing_continue": "Zu Fixmit",
+  "fixmit_billing_manage": "Abo bei PayPal verwalten",
+  "fixmit_billing_pending": "PayPal bestätigt dein Abo noch. Prüfe den Status gleich erneut.",
+  "fixmit_billing_error": "Die Prüfung ist gerade nicht möglich. Bitte versuche es erneut.",
+  "fixmit_billing_check": "Freischaltung prüfen",
+  "fixmit_billing_unavailable": "Der Abo-Abschluss ist vorübergehend nicht verfügbar. Bitte versuche es später erneut.",
+  "fixmit_billing_inactive": "Dein Abo ist pausiert oder beendet. Prüfe es bei PayPal. Für einen neuen Abschluss wende dich bitte an den Support.",
+  "fixmit_billing_existing": "Dein bestehendes Konto bleibt ohne Abo freigeschaltet."
 }

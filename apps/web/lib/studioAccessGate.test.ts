@@ -1,7 +1,15 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ token: vi.fn(), user: vi.fn(), query: vi.fn(), execute: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  token: vi.fn(),
+  user: vi.fn(),
+  query: vi.fn(),
+  execute: vi.fn(),
+  entitled: vi.fn(),
+  billingEnabled: vi.fn(),
+}));
+vi.mock("./fixmitBilling", () => ({ entitled: mocks.entitled, billingEnabled: mocks.billingEnabled }));
 vi.mock("next-auth/jwt", () => ({ getToken: mocks.token }));
 vi.mock("@calcom/prisma", () => ({
   default: { user: { findUnique: mocks.user }, $queryRaw: mocks.query, $executeRaw: mocks.execute },
@@ -12,6 +20,8 @@ import { studioAccessGate, studioRouteAccess } from "./studioAccessGate";
 
 beforeEach(() => {
   vi.resetAllMocks();
+  mocks.entitled.mockResolvedValue(true);
+  mocks.billingEnabled.mockReturnValue(false);
   vi.stubEnv("STUDIO_ACCESS_GATE_ENABLED", "true");
   vi.stubEnv("NEXTAUTH_SECRET", "test-secret");
   vi.stubEnv("NEXTAUTH_URL", "https://test.local");
@@ -166,5 +176,35 @@ describe("studio access boundary", () => {
   it("fails closed without the authentication secret", async () => {
     vi.stubEnv("NEXTAUTH_SECRET", "");
     expect((await studioAccessGate(new NextRequest("https://test.local/auth/login")))?.status).toBe(503);
+  });
+});
+
+describe("subscription gate", () => {
+  it("redirects unpaid dashboard users while leaving checkout reachable", async () => {
+    mocks.token.mockResolvedValue({
+      sub: "7",
+      studioPasswordStamp: studioPasswordStamp("hash", "test-secret"),
+    });
+    mocks.user.mockResolvedValue({ id: 7, locked: false, password: { hash: "hash" } });
+    mocks.entitled.mockResolvedValue(false);
+    const response = await studioAccessGate(new NextRequest("https://test.local/event-types"));
+    expect(response?.headers.get("location")).toBe("https://test.local/billing");
+    expect((await studioAccessGate(new NextRequest("https://test.local/api/private")))?.status).toBe(402);
+    expect(await studioAccessGate(new NextRequest("https://test.local/billing"))).toBeNull();
+    expect(
+      await studioAccessGate(
+        new NextRequest("https://test.local/api/fixmit-billing/confirm", { method: "POST" })
+      )
+    ).toBeNull();
+  });
+  it("permits only POST webhooks through authentication", async () => {
+    expect(
+      await studioAccessGate(
+        new NextRequest("https://test.local/api/fixmit-billing/webhook", { method: "POST" })
+      )
+    ).toBeNull();
+    expect(
+      (await studioAccessGate(new NextRequest("https://test.local/api/fixmit-billing/webhook")))?.status
+    ).toBe(401);
   });
 });

@@ -5007,5 +5007,17 @@
   "home_faq_4": "Can I customize my booking page?",
   "home_faq_4_text": "Yes. Choose a profile picture, description and colors, and show services with duration, categories and optional displayed prices. Share your link on your website and social media profiles.",
   "home_faq_5": "Which languages does Fixmit support?",
-  "home_faq_5_text": "The homepage and dashboard are available in German, English and Russian. You write your own profile text and service descriptions in your customers’ language."
+  "home_faq_5_text": "The homepage and dashboard are available in German, English and Russian. You write your own profile text and service descriptions in your customers’ language.",
+  "fixmit_billing_title": "Your Fixmit subscription",
+  "fixmit_billing_price": "14 days free. Then USD 9 per month.",
+  "fixmit_billing_terms": "No setup fee. Renews automatically every month. Cancel anytime through PayPal.",
+  "fixmit_billing_active": "Your access is active.",
+  "fixmit_billing_continue": "Open Fixmit",
+  "fixmit_billing_manage": "Manage subscription at PayPal",
+  "fixmit_billing_pending": "PayPal is still confirming your subscription. Check again shortly.",
+  "fixmit_billing_error": "We could not verify your subscription. Please try again.",
+  "fixmit_billing_check": "Check activation",
+  "fixmit_billing_unavailable": "Checkout is temporarily unavailable. Please try again later.",
+  "fixmit_billing_inactive": "Your subscription is paused or ended. Check PayPal. Contact support to subscribe again.",
+  "fixmit_billing_existing": "Your existing account keeps access without a subscription."
 }
