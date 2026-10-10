@@ -31,8 +31,9 @@ export default async function BillingPage({
   );
   if (!user) redirect("/auth/login?callbackUrl=%2Fbilling");
   const t = await getTranslation(user.locale, "common");
+  const isFree = !billingEnabled();
   const grandfathered = billingEnabled() && !(await requiresBilling(user.id));
-  let active = grandfathered;
+  let active = isFree || grandfathered;
   let canCheckout = false;
   let clientId = "";
   let status = "";
@@ -55,6 +56,7 @@ export default async function BillingPage({
       status = "UNAVAILABLE";
     }
   }
+  if (isFree) hasSubscription = !!(await readBilling(user.id))?.subscriptionId;
   const labels = Object.fromEntries(
     [
       "fixmit_billing_pending",
@@ -73,13 +75,15 @@ export default async function BillingPage({
         <h1>{t("fixmit_access_title")}</h1>
         <p>
           {t(
-            grandfathered
-              ? "fixmit_billing_existing"
-              : oneTime || !!passUntil
-                ? "fixmit_pass_price"
-                : isTest
-                  ? "fixmit_billing_test_price"
-                  : "fixmit_billing_price"
+            isFree
+              ? "public_free_terms"
+              : grandfathered
+                ? "fixmit_billing_existing"
+                : oneTime || !!passUntil
+                  ? "fixmit_pass_price"
+                  : isTest
+                    ? "fixmit_billing_test_price"
+                    : "fixmit_billing_price"
           )}
         </p>
         {!grandfathered && !active && (

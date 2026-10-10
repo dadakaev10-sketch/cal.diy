@@ -4961,5 +4961,19 @@
   "public_amount_test": "0,50",
   "public_amount_regular": "9",
   "public_pass_period": "Einmalig · ohne Verlängerung",
-  "public_subscription_period": "Pro Monat · bis zur Kündigung"
+  "public_subscription_period": "Pro Monat · bis zur Kündigung",
+  "public_free_name": "Fixmit zum Start",
+  "public_free_price": "Kostenlos",
+  "public_free_period": "Keine Kreditkarte · kein Abo nötig",
+  "public_free_terms": "Nutze Fixmit vorerst kostenlos. Erstelle dein Konto und starte direkt mit deiner eigenen Buchungsseite. Ein kostenpflichtiges Pro-Abo kommt später – nur, wenn du es selbst auswählst.",
+  "public_free_start": "Kostenlos starten",
+  "public_free_0_heading": "Dein Business. Einfach buchbar.",
+  "public_free_0_text": "Deine eigene Buchungsseite, Terminverwaltung und Leistungen an einem Ort – für Studios, Salons und Selbstständige.",
+  "public_free_1_heading": "Jetzt kostenlos enthalten",
+  "public_free_1_text": "Öffentliche Profil- und Buchungsseite · Leistungen mit Beschreibung, Dauer und Preisen · Kategorien · Arbeitszeiten und Verfügbarkeit · Buchungsverwaltung · Individuelle Profilgestaltung.",
+  "public_free_2_heading": "Später: Fixmit Pro",
+  "public_free_2_text": "Ein optionales Pro-Abo für 9 US-Dollar pro Monat ist geplant. Details und Funktionen geben wir vor der Einführung bekannt. Es gibt keine automatische Umstellung auf einen kostenpflichtigen Tarif.",
+  "public_free_3_heading": "Deine Leistungen, deine Preise",
+  "public_free_3_text": "Der Zugang zu Fixmit ist derzeit kostenlos. Preise für Behandlungen oder andere Leistungen auf einer Buchungsseite werden vom jeweiligen Unternehmen festgelegt.",
+  "public_free_contract": "Fixmit ist derzeit kostenlos nutzbar. Für neue Konten ist kein Zahlungsabschluss erforderlich. Ein optionales Pro-Abo ist für später geplant. Ein kostenpflichtiger Tarif beginnt ausschließlich nach deiner ausdrücklichen Auswahl und Bestätigung der angezeigten Konditionen. Frühere Zahlungen und abgeschlossene Verträge unterliegen den jeweils vereinbarten Bedingungen."
 }

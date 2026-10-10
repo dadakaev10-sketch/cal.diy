@@ -18,8 +18,8 @@ import { z } from "zod";
 const respond = (data: object, status = 200) =>
   NextResponse.json(data, { status, headers: { "Cache-Control": "no-store" } });
 export async function POST(req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
-  if (!billingEnabled()) return respond({ error: "unavailable" }, 503);
   const { action } = await params;
+  if (!billingEnabled() && action !== "webhook") return respond({ error: "unavailable" }, 503);
   try {
     if (action === "webhook") {
       const webhookId = process.env.PAYPAL_WEBHOOK_ID;

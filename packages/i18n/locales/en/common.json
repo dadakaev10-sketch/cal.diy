@@ -5097,5 +5097,19 @@
   "public_amount_test": "0.50",
   "public_amount_regular": "9",
   "public_pass_period": "One-time · no renewal",
-  "public_subscription_period": "Per month · until cancelled"
+  "public_subscription_period": "Per month · until cancelled",
+  "public_free_name": "Get started with Fixmit",
+  "public_free_price": "Free",
+  "public_free_period": "No credit card · no subscription required",
+  "public_free_terms": "Use Fixmit for free for now. Create your account and get started with your own booking page. A paid Pro subscription will be available later, only if you choose it.",
+  "public_free_start": "Get started for free",
+  "public_free_0_heading": "Your business. Ready to book.",
+  "public_free_0_text": "Your own booking page, appointment management and services in one place, for studios, salons and independent professionals.",
+  "public_free_1_heading": "Included for free now",
+  "public_free_1_text": "Public profile and booking page; services with descriptions, durations and prices; categories; working hours and availability; booking management; profile customization.",
+  "public_free_2_heading": "Coming later: Fixmit Pro",
+  "public_free_2_text": "An optional Pro subscription at USD 9 per month is planned. We will announce details and features before launch. You will not be automatically switched to a paid plan.",
+  "public_free_3_heading": "Your services, your prices",
+  "public_free_3_text": "Access to Fixmit is currently free. Prices for treatments or other services on a booking page are set by the respective business.",
+  "public_free_contract": "Fixmit is currently free to use. New accounts do not require a payment. An optional Pro subscription is planned for later. A paid plan only starts after you explicitly select it and confirm the displayed terms. Previous payments and agreements remain subject to their agreed terms."
 }

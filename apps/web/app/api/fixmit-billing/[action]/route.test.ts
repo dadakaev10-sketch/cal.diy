@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const m = vi.hoisted(() => ({
+  enabled: vi.fn(),
   query: vi.fn(),
   user: vi.fn(),
   guard: vi.fn(),
@@ -22,7 +23,7 @@ vi.mock("@lib/studioAccountRequest", () => ({
   readStudioAccountBody: (req: Request) => req.json(),
 }));
 vi.mock("@lib/fixmitBilling", () => ({
-  billingEnabled: () => true,
+  billingEnabled: m.enabled,
   createBilling: m.create,
   hasBillingAccess: (row: { active: boolean }) => row.active,
   paypalRequest: m.remote,
@@ -49,11 +50,38 @@ const request = (body: object = {}) =>
 const params = (action: string) => ({ params: Promise.resolve({ action }) });
 beforeEach(() => {
   vi.resetAllMocks();
+  m.enabled.mockReturnValue(true);
   vi.stubEnv("PAYPAL_WEBHOOK_ID", "test-webhook");
   m.user.mockResolvedValue({ id: 7 });
   m.required.mockResolvedValue(true);
 });
 describe("PayPal billing endpoints", () => {
+  it.each([
+    "create",
+    "confirm",
+    "pass-create",
+    "pass-confirm",
+  ])("blocks %s while access is free", async (action) => {
+    m.enabled.mockReturnValue(false);
+    expect((await POST(request(), params(action))).status).toBe(503);
+    expect(m.create).not.toHaveBeenCalled();
+    expect(m.passCreate).not.toHaveBeenCalled();
+    expect(m.passSync).not.toHaveBeenCalled();
+  });
+  it("still verifies and processes existing payment webhooks while access is free", async () => {
+    m.enabled.mockReturnValue(false);
+    m.remote.mockResolvedValue({ verification_status: "SUCCESS" });
+    m.query.mockResolvedValue([{ userId: 7 }]);
+    expect(
+      (
+        await POST(
+          request({ event_type: "BILLING.SUBSCRIPTION.CANCELLED", resource: { id: "I-TEST" } }),
+          params("webhook")
+        )
+      ).status
+    ).toBe(200);
+    expect(m.sync).toHaveBeenCalledWith(7);
+  });
   it("requires authentication", async () => {
     m.user.mockResolvedValue(null);
     expect((await POST(request(), params("create"))).status).toBe(401);

@@ -13,6 +13,7 @@ export async function PublicInfo({
 }) {
   const language = (await searchParams).lang === "en" ? "en" : "de";
   const t = await getTranslation(language, "common");
+  const isFree = process.env.FIXMIT_BILLING_ENABLED !== "true";
   const isTest = process.env.PAYPAL_USE_TEST_PLAN === "true";
   return (
     <div className={styles.shell} lang={language}>
@@ -33,7 +34,19 @@ export async function PublicInfo({
       <main className={styles.main}>
         <p className={styles.eyebrow}>FIXMIT</p>
         <h1>{t(`public_${page}_title`)}</h1>
-        {page === "pricing" ? (
+        {page === "pricing" && isFree ? (
+          <div className={styles.offer}>
+            <h2>{t("public_free_name")}</h2>
+            <div className={styles.price}>
+              <strong>{t("public_free_price")}</strong>
+            </div>
+            <p className={styles.period}>{t("public_free_period")}</p>
+            <p>{t("public_free_terms")}</p>
+            <a className={styles.button} href={`/register?lang=${language}`}>
+              {t("public_free_start")} ↗
+            </a>
+          </div>
+        ) : page === "pricing" ? (
           <div className={styles.offers}>
             <div className={styles.offer}>
               <h2>{t("public_pass_name")}</h2>
@@ -65,8 +78,14 @@ export async function PublicInfo({
         )}
         {Array.from({ length: sectionCounts[page] }, (_, n) => (
           <section key={n}>
-            <h2>{t(`public_${page}_${n}_heading`)}</h2>
-            <p>{t(`public_${page}_${n}_text`)}</p>
+            <h2>{t(`public_${page === "pricing" && isFree ? "free" : page}_${n}_heading`)}</h2>
+            <p>
+              {t(
+                page === "terms" && isFree && n === 2
+                  ? "public_free_contract"
+                  : `public_${page === "pricing" && isFree ? "free" : page}_${n}_text`
+              )}
+            </p>
           </section>
         ))}
         <p>

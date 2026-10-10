@@ -109,6 +109,11 @@ describe("Fixmit subscription security", () => {
       subscriptionAccess({ ...sub, billing_info: { next_billing_time: "2027-01-01T00:00:00Z" } }, null, now)
     ).toBeNull();
   });
+  it("allows new accounts without a payment while billing is disabled", async () => {
+    vi.stubEnv("FIXMIT_BILLING_ENABLED", "false");
+    expect(await requiresBilling(7)).toBe(false);
+    expect(db.user).not.toHaveBeenCalled();
+  });
   it("keeps existing accounts and admins free", async () => {
     db.user.mockResolvedValue({ role: "USER", createdDate: new Date("2026-10-09") });
     expect(await requiresBilling(7)).toBe(false);
