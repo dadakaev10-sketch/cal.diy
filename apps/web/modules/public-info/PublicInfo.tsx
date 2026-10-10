@@ -34,23 +34,32 @@ export async function PublicInfo({
         <p className={styles.eyebrow}>FIXMIT</p>
         <h1>{t(`public_${page}_title`)}</h1>
         {page === "pricing" ? (
-          <>
+          <div className={styles.offers}>
             <div className={styles.offer}>
-              <h2>{t("fixmit_pass_price")}</h2>
+              <h2>{t("public_pass_name")}</h2>
+              <div className={styles.price}>
+                <strong>{t("public_amount_test")}</strong>
+                <span>USD</span>
+              </div>
+              <p className={styles.period}>{t("public_pass_period")}</p>
               <p>{t("fixmit_pass_terms")}</p>
               <a className={styles.button} href={`/register?lang=${language}`}>
                 {t("public_pass_buy")} ↗
               </a>
             </div>
-            <div className={styles.offer} style={{ marginTop: 24 }}>
-              <p>{t("fixmit_subscription_option")}</p>
-              <h2>{t(isTest ? "public_test_price" : "public_regular_price")}</h2>
+            <div className={styles.offer}>
+              <h2>{t("fixmit_subscription_option")}</h2>
+              <div className={styles.price}>
+                <strong>{t(isTest ? "public_amount_test" : "public_amount_regular")}</strong>
+                <span>USD</span>
+              </div>
+              <p className={styles.period}>{t("public_subscription_period")}</p>
               <p>{t(isTest ? "public_no_trial" : "public_trial")}</p>
               <a className={styles.button} href={`/register?lang=${language}`}>
                 {t("public_subscribe")} ↗
               </a>
             </div>
-          </>
+          </div>
         ) : (
           <p className={styles.updated}>{t("public_updated")}</p>
         )}

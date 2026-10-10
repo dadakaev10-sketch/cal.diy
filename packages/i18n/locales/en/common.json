@@ -5092,5 +5092,10 @@
   "fixmit_pass_card_notice": "PayPal offers card payment without a PayPal account when guest checkout is available for your purchase. Available payment methods are shown by PayPal at checkout.",
   "fixmit_pass_cancelled": "Payment cancelled. You can try again.",
   "public_pass_buy": "Choose 30 days of access",
-  "fixmit_access_title": "Your Fixmit access"
+  "fixmit_access_title": "Your Fixmit access",
+  "public_pass_name": "30-day access",
+  "public_amount_test": "0.50",
+  "public_amount_regular": "9",
+  "public_pass_period": "One-time · no renewal",
+  "public_subscription_period": "Per month · until cancelled"
 }

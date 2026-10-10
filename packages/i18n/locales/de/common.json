@@ -4956,5 +4956,10 @@
   "fixmit_pass_card_notice": "PayPal bietet Kartenzahlung ohne PayPal-Konto an, wenn der Gast-Checkout für deinen Kauf verfügbar ist. Die verfügbaren Zahlungsmethoden zeigt PayPal beim Bezahlen.",
   "fixmit_pass_cancelled": "Zahlung abgebrochen. Du kannst es erneut versuchen.",
   "public_pass_buy": "30 Tage Zugang wählen",
-  "fixmit_access_title": "Dein Fixmit-Zugang"
+  "fixmit_access_title": "Dein Fixmit-Zugang",
+  "public_pass_name": "30 Tage Zugang",
+  "public_amount_test": "0,50",
+  "public_amount_regular": "9",
+  "public_pass_period": "Einmalig · ohne Verlängerung",
+  "public_subscription_period": "Pro Monat · bis zur Kündigung"
 }
