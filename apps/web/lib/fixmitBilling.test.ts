@@ -49,7 +49,7 @@ beforeEach(() => {
   vi.stubEnv("PAYPAL_CLIENT_SECRET", "test-only");
   vi.stubEnv("PAYPAL_PLAN_ID", "P-TEST");
   vi.stubEnv("PAYPAL_TEST_PLAN_ID", "");
-  vi.stubEnv("PAYPAL_TEST_EMAIL", "");
+  vi.stubEnv("PAYPAL_USE_TEST_PLAN", "false");
   vi.stubEnv("NEXTAUTH_SECRET", "test-secret");
   db.transaction.mockImplementation((fn) => fn({ $queryRaw: db.query, $executeRaw: db.execute }));
   db.query.mockResolvedValue([row]);
@@ -162,26 +162,23 @@ describe("Fixmit subscription security", () => {
   });
 });
 
-describe("Restricted live test offer", () => {
-  it("leaves regular pricing unchanged unless both test settings exist", async () => {
+describe("Temporary live test offer", () => {
+  it("keeps regular pricing when the temporary offer is disabled", () => {
     vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
-    expect(await billingOffer(7)).toEqual({ planId: "P-TEST", isTest: false });
-    expect(db.user).not.toHaveBeenCalled();
+    expect(billingOffer()).toEqual({ planId: "P-TEST", isTest: false });
   });
-  it("uses the database email, not client input, to select the test plan", async () => {
+  it("selects the test offer globally only through server configuration", () => {
     vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
-    vi.stubEnv("PAYPAL_TEST_EMAIL", " Test@Example.com ");
-    db.user.mockResolvedValue({ email: "test@example.com" });
-    expect(await billingOffer(7)).toEqual({ planId: "P-LIVE-TEST", isTest: true });
-    db.user.mockResolvedValue({ email: "customer@example.com" });
-    expect(await billingOffer(7)).toEqual({ planId: "P-TEST", isTest: false });
-    db.user.mockResolvedValue(null);
-    expect((await billingOffer(7)).isTest).toBe(false);
+    vi.stubEnv("PAYPAL_USE_TEST_PLAN", "true");
+    expect(billingOffer()).toEqual({ planId: "P-LIVE-TEST", isTest: true });
   });
-  it("creates the approved test plan only for the configured account", async () => {
+  it("fails closed rather than charging the regular price if test configuration is incomplete", () => {
+    vi.stubEnv("PAYPAL_USE_TEST_PLAN", "true");
+    expect(() => billingOffer()).toThrow();
+  });
+  it("creates the test plan when the temporary offer is enabled", async () => {
     vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
-    vi.stubEnv("PAYPAL_TEST_EMAIL", "test@example.com");
-    db.user.mockResolvedValue({ email: "test@example.com" });
+    vi.stubEnv("PAYPAL_USE_TEST_PLAN", "true");
     db.query.mockResolvedValue([{ ...row, subscriptionId: null }]);
     await createBilling(7);
     expect(JSON.parse(String(vi.mocked(fetch).mock.calls[1][1]?.body)).plan_id).toBe("P-LIVE-TEST");

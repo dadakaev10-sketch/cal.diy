@@ -45,14 +45,12 @@ export function paypalConfig() {
         : "https://api-m.paypal.com",
   };
 }
-export async function billingOffer(userId: number) {
+export function billingOffer() {
   const regularPlanId = paypalConfig().planId;
+  const isTest = process.env.PAYPAL_USE_TEST_PLAN === "true";
   const testPlanId = process.env.PAYPAL_TEST_PLAN_ID;
-  const testEmail = process.env.PAYPAL_TEST_EMAIL?.trim().toLowerCase();
-  if (!testPlanId || !testEmail) return { planId: regularPlanId, isTest: false };
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-  const isTest = user?.email?.trim().toLowerCase() === testEmail;
-  return { planId: isTest ? testPlanId : regularPlanId, isTest };
+  if (isTest && !testPlanId) throw unavailable();
+  return { planId: isTest && testPlanId ? testPlanId : regularPlanId, isTest };
 }
 export async function paypalRequest(path: string, init: RequestInit = {}): Promise<unknown> {
   const config = paypalConfig();
@@ -145,7 +143,7 @@ export async function createBilling(userId: number) {
       }
       // Never retry an ambiguous create after PayPal's idempotency retention window.
       if (Date.now() - row.createdAt.getTime() > 70 * 3600000) throw unavailable();
-      const offer = await billingOffer(userId);
+      const offer = billingOffer();
       const result = z.object({ id: z.string().regex(/^I-[A-Z0-9]+$/) }).parse(
         await paypalRequest("/v1/billing/subscriptions", {
           method: "POST",

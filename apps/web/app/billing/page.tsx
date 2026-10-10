@@ -33,7 +33,7 @@ export default async function BillingPage() {
   if (billingEnabled() && !grandfathered) {
     try {
       clientId = paypalConfig().clientId;
-      isTest = (await billingOffer(user.id)).isTest;
+      isTest = billingOffer().isTest;
       const stored = await readBilling(user.id);
       const row = stored?.subscriptionId ? await syncBilling(user.id) : stored;
       active = hasBillingAccess(row);
