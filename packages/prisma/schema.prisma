@@ -399,6 +399,7 @@ model TravelSchedule {
 
 // It holds Personal Profiles of a User plus it has email, password and other core things..
 model User {
+  fixmitSubscription FixmitSubscription?
   id                  Int                  @id @default(autoincrement())
   uuid                String               @unique @default(uuid()) @db.Uuid
   username            String?
@@ -2905,4 +2906,15 @@ model AttributeSyncFieldMapping {
 
   @@unique([integrationAttributeSyncId, attributeId])
   @@index([integrationAttributeSyncId])
+}
+
+model FixmitSubscription {
+  userId Int @id
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId String @unique
+  subscriptionId String? @unique
+  status String @default("NEW")
+  accessUntil DateTime?
+  checkedAt DateTime?
+  createdAt DateTime @default(now())
 }

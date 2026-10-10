@@ -1,0 +1,9 @@
+CREATE TABLE "FixmitSubscription" (
+  "userId" INTEGER PRIMARY KEY REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  "requestId" TEXT NOT NULL UNIQUE,
+  "subscriptionId" TEXT UNIQUE,
+  "status" TEXT NOT NULL DEFAULT 'NEW',
+  "accessUntil" TIMESTAMP(3),
+  "checkedAt" TIMESTAMP(3),
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
