@@ -34,13 +34,23 @@ export async function PublicInfo({
         <p className={styles.eyebrow}>FIXMIT</p>
         <h1>{t(`public_${page}_title`)}</h1>
         {page === "pricing" ? (
-          <div className={styles.offer}>
-            <h2>{t(isTest ? "public_test_price" : "public_regular_price")}</h2>
-            <p>{t(isTest ? "public_no_trial" : "public_trial")}</p>
-            <a className={styles.button} href={`/register?lang=${language}`}>
-              {t("public_subscribe")} ↗
-            </a>
-          </div>
+          <>
+            <div className={styles.offer}>
+              <h2>{t("fixmit_pass_price")}</h2>
+              <p>{t("fixmit_pass_terms")}</p>
+              <a className={styles.button} href={`/register?lang=${language}`}>
+                {t("public_pass_buy")} ↗
+              </a>
+            </div>
+            <div className={styles.offer} style={{ marginTop: 24 }}>
+              <p>{t("fixmit_subscription_option")}</p>
+              <h2>{t(isTest ? "public_test_price" : "public_regular_price")}</h2>
+              <p>{t(isTest ? "public_no_trial" : "public_trial")}</p>
+              <a className={styles.button} href={`/register?lang=${language}`}>
+                {t("public_subscribe")} ↗
+              </a>
+            </div>
+          </>
         ) : (
           <p className={styles.updated}>{t("public_updated")}</p>
         )}

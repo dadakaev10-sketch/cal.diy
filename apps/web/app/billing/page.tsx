@@ -10,15 +10,22 @@ import {
   syncBilling,
 } from "@lib/fixmitBilling";
 import { billingUser } from "@lib/fixmitBillingAuth";
+import { activePass } from "@lib/fixmitPass";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 import styles from "../../modules/auth/studio-auth.module.css";
+import OneTimeCheckout from "./one-time-checkout";
 import PayPalCheckout from "./paypal-checkout";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Fixmit Abo", robots: { index: false, follow: false } };
-export default async function BillingPage() {
+export const metadata = { title: "Fixmit Zugang", robots: { index: false, follow: false } };
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ purchase?: string }>;
+}) {
+  const oneTime = (await searchParams).purchase === "one-time";
   const user = await billingUser(
     new NextRequest(new URL("/billing", process.env.NEXTAUTH_URL), { headers: await headers() })
   );
@@ -30,21 +37,32 @@ export default async function BillingPage() {
   let clientId = "";
   let status = "";
   let isTest = false;
+  let hasSubscription = false;
+  let passUntil: Date | null = null;
   if (billingEnabled() && !grandfathered) {
     try {
       clientId = paypalConfig().clientId;
       isTest = billingOffer().isTest;
       const stored = await readBilling(user.id);
-      const row = stored?.subscriptionId ? await syncBilling(user.id) : stored;
-      active = hasBillingAccess(row);
+      const pass = await activePass(user.id);
+      hasSubscription = !!stored?.subscriptionId;
+      const row = !pass && stored?.subscriptionId ? await syncBilling(user.id) : stored;
+      passUntil = pass?.accessUntil || null;
+      active = hasBillingAccess(row) || !!pass;
       status = row?.status || "NEW";
-      canCheckout = ["NEW", "APPROVAL_PENDING"].includes(status);
+      canCheckout = oneTime || ["NEW", "APPROVAL_PENDING"].includes(status);
     } catch {
       status = "UNAVAILABLE";
     }
   }
   const labels = Object.fromEntries(
-    ["fixmit_billing_pending", "fixmit_billing_error", "fixmit_billing_check"].map((key) => [key, t(key)])
+    [
+      "fixmit_billing_pending",
+      "fixmit_billing_error",
+      "fixmit_billing_check",
+      "fixmit_pass_card_notice",
+      "fixmit_pass_cancelled",
+    ].map((key) => [key, t(key)])
   );
   return (
     <main className={styles.shell}>
@@ -52,17 +70,56 @@ export default async function BillingPage() {
         <a className={styles.brand} href="/">
           Fixmit
         </a>
-        <h1>{t("fixmit_billing_title")}</h1>
+        <h1>{t("fixmit_access_title")}</h1>
         <p>
           {t(
             grandfathered
               ? "fixmit_billing_existing"
-              : isTest
-                ? "fixmit_billing_test_price"
-                : "fixmit_billing_price"
+              : oneTime || !!passUntil
+                ? "fixmit_pass_price"
+                : isTest
+                  ? "fixmit_billing_test_price"
+                  : "fixmit_billing_price"
           )}
         </p>
-        {!grandfathered && <p>{t("fixmit_billing_terms")}</p>}
+        {!grandfathered && !active && (
+          <nav style={{ display: "flex", gap: 16, marginBottom: 20 }}>
+            <a
+              href="/billing"
+              style={{
+                padding: "8px 12px",
+                borderRadius: 8,
+                background: !oneTime ? "#dce8df" : "#f4f6f3",
+                fontWeight: !oneTime ? 700 : 400,
+              }}
+              aria-current={!oneTime ? "page" : undefined}>
+              {t("fixmit_subscription_option")}
+            </a>
+            <a
+              href="/billing?purchase=one-time"
+              style={{
+                padding: "8px 12px",
+                borderRadius: 8,
+                background: oneTime ? "#dce8df" : "#f4f6f3",
+                fontWeight: oneTime ? 700 : 400,
+              }}
+              aria-current={oneTime ? "page" : undefined}>
+              {t("fixmit_pass_option")}
+            </a>
+          </nav>
+        )}
+        {!grandfathered && !active && <p>{t(oneTime ? "fixmit_pass_terms" : "fixmit_billing_terms")}</p>}
+        {passUntil && (
+          <p>
+            {t("fixmit_pass_until", {
+              date: new Intl.DateTimeFormat(user.locale || "de", {
+                dateStyle: "medium",
+                timeStyle: "short",
+                timeZone: "UTC",
+              }).format(passUntil),
+            })}
+          </p>
+        )}
         {active ? (
           <>
             <p role="status">{t("fixmit_billing_active")}</p>
@@ -71,7 +128,13 @@ export default async function BillingPage() {
             </a>
           </>
         ) : null}
-        {!active && canCheckout ? <PayPalCheckout clientId={clientId} labels={labels} /> : null}
+        {!active && canCheckout ? (
+          oneTime ? (
+            <OneTimeCheckout clientId={clientId} labels={labels} />
+          ) : (
+            <PayPalCheckout clientId={clientId} labels={labels} />
+          )
+        ) : null}
         {!active && !canCheckout && (
           <p role="status">
             {t(
@@ -81,15 +144,17 @@ export default async function BillingPage() {
             )}
           </p>
         )}
-        <a
-          className={styles.secondary}
-          href={
-            process.env.PAYPAL_ENVIRONMENT === "sandbox"
-              ? "https://www.sandbox.paypal.com/myaccount/autopay/"
-              : "https://www.paypal.com/myaccount/autopay/"
-          }>
-          {t("fixmit_billing_manage")}
-        </a>
+        {hasSubscription && (
+          <a
+            className={styles.secondary}
+            href={
+              process.env.PAYPAL_ENVIRONMENT === "sandbox"
+                ? "https://www.sandbox.paypal.com/myaccount/autopay/"
+                : "https://www.paypal.com/myaccount/autopay/"
+            }>
+            {t("fixmit_billing_manage")}
+          </a>
+        )}
         <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", fontSize: 13 }}>
           {["pricing", "terms", "privacy", "refund", "imprint"].map((slug) => (
             <a key={slug} href={`/${slug}?lang=${user.locale === "en" ? "en" : "de"}`}>
