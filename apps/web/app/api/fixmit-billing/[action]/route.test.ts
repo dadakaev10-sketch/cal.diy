@@ -9,6 +9,11 @@ const m = vi.hoisted(() => ({
   sync: vi.fn(),
   create: vi.fn(),
   required: vi.fn(),
+  entitled: vi.fn(),
+  passCreate: vi.fn(),
+  passSync: vi.fn(),
+  passLatest: vi.fn(),
+  passWebhook: vi.fn(),
 }));
 vi.mock("@calcom/prisma", () => ({ default: { $queryRaw: m.query } }));
 vi.mock("@lib/fixmitBillingAuth", () => ({ billingUser: m.user }));
@@ -23,6 +28,14 @@ vi.mock("@lib/fixmitBilling", () => ({
   paypalRequest: m.remote,
   syncBilling: m.sync,
   requiresBilling: m.required,
+  entitled: m.entitled,
+}));
+
+vi.mock("@lib/fixmitPass", () => ({
+  createPass: m.passCreate,
+  syncPass: m.passSync,
+  latestPass: m.passLatest,
+  passWebhook: m.passWebhook,
 }));
 
 import { POST } from "./route";
@@ -100,5 +113,59 @@ describe("PayPal billing endpoints", () => {
         )
       ).status
     ).toBe(503);
+  });
+});
+
+describe("One-time payment endpoints", () => {
+  it.each(["pass-create", "pass-confirm"])("requires an authenticated account for %s", async (action) => {
+    m.user.mockResolvedValue(null);
+    expect((await POST(request(), params(action))).status).toBe(401);
+    expect(m.passCreate).not.toHaveBeenCalled();
+    expect(m.passSync).not.toHaveBeenCalled();
+  });
+  it("prevents purchasing another pass while access is active", async () => {
+    m.entitled.mockResolvedValue(true);
+    expect((await POST(request(), params("pass-create"))).status).toBe(409);
+    expect(m.passCreate).not.toHaveBeenCalled();
+  });
+  it("binds confirmation to the authenticated user", async () => {
+    m.passSync.mockResolvedValue({ status: "COMPLETED", accessUntil: new Date(Date.now() + 86400000) });
+    const result = await POST(request({ orderId: "ORDER1", userId: 99 }), params("pass-confirm"));
+    expect(await result.json()).toMatchObject({ active: true });
+    expect(m.passSync).toHaveBeenCalledWith("ORDER1", 7, true);
+  });
+  it("does not unlock a pending capture", async () => {
+    m.passSync.mockResolvedValue({ status: "PENDING", accessUntil: null });
+    const result = await POST(request({ orderId: "ORDER1" }), params("pass-confirm"));
+    expect(await result.json()).toMatchObject({ active: false });
+  });
+  it("can recover the latest order after the checkout window closes", async () => {
+    m.passLatest.mockResolvedValue({ orderId: "ORDER1" });
+    m.passSync.mockResolvedValue({ status: "APPROVED", accessUntil: null });
+    await POST(request(), params("pass-confirm"));
+    expect(m.passSync).toHaveBeenCalledWith("ORDER1", 7, true);
+  });
+  it("never processes unsigned capture events", async () => {
+    m.remote.mockResolvedValue({ verification_status: "FAILURE" });
+    expect(
+      (
+        await POST(
+          request({ event_type: "PAYMENT.CAPTURE.COMPLETED", resource: { id: "CAPTURE1" } }),
+          params("webhook")
+        )
+      ).status
+    ).toBe(403);
+    expect(m.passWebhook).not.toHaveBeenCalled();
+  });
+  it("preserves capture links for verified refund processing", async () => {
+    m.remote.mockResolvedValue({ verification_status: "SUCCESS" });
+    const resource = {
+      id: "REFUND1",
+      links: [{ rel: "up", href: "https://api.paypal.com/v2/payments/captures/CAPTURE1" }],
+    };
+    expect(
+      (await POST(request({ event_type: "PAYMENT.CAPTURE.REFUNDED", resource }), params("webhook"))).status
+    ).toBe(200);
+    expect(m.passWebhook).toHaveBeenCalledWith("PAYMENT.CAPTURE.REFUNDED", resource);
   });
 });

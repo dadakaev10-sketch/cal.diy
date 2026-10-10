@@ -11,6 +11,8 @@ vi.mock("@calcom/prisma", () => ({
   },
 }));
 
+vi.mock("./fixmitPass", () => ({ activePass: vi.fn().mockResolvedValue(undefined) }));
+
 import {
   type BillingRow,
   billingOffer,
