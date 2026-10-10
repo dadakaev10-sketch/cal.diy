@@ -5009,6 +5009,7 @@
   "home_faq_5": "Which languages does Fixmit support?",
   "home_faq_5_text": "The homepage and dashboard are available in German, English and Russian. You write your own profile text and service descriptions in your customers’ language.",
   "fixmit_billing_title": "Your Fixmit subscription",
+  "fixmit_billing_test_price": "Test subscription: USD 0.50 per month. Charged immediately, with no free trial.",
   "fixmit_billing_price": "14 days free. Then USD 9 per month.",
   "fixmit_billing_terms": "No setup fee. Renews automatically every month. Cancel anytime through PayPal.",
   "fixmit_billing_active": "Your access is active.",

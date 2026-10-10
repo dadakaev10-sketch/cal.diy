@@ -45,6 +45,15 @@ export function paypalConfig() {
         : "https://api-m.paypal.com",
   };
 }
+export async function billingOffer(userId: number) {
+  const regularPlanId = paypalConfig().planId;
+  const testPlanId = process.env.PAYPAL_TEST_PLAN_ID;
+  const testEmail = process.env.PAYPAL_TEST_EMAIL?.trim().toLowerCase();
+  if (!testPlanId || !testEmail) return { planId: regularPlanId, isTest: false };
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  const isTest = user?.email?.trim().toLowerCase() === testEmail;
+  return { planId: isTest ? testPlanId : regularPlanId, isTest };
+}
 export async function paypalRequest(path: string, init: RequestInit = {}): Promise<unknown> {
   const config = paypalConfig();
   const tokenResponse = await fetch(`${config.base}/v1/oauth2/token`, {
@@ -109,7 +118,7 @@ export async function syncBilling(userId: number) {
       );
       if (
         sub.id !== row.subscriptionId ||
-        sub.plan_id !== paypalConfig().planId ||
+        ![paypalConfig().planId, process.env.PAYPAL_TEST_PLAN_ID].includes(sub.plan_id) ||
         sub.custom_id !== accountReference(userId)
       )
         throw ErrorWithCode.Factory.Forbidden("Subscription mismatch");
@@ -136,12 +145,13 @@ export async function createBilling(userId: number) {
       }
       // Never retry an ambiguous create after PayPal's idempotency retention window.
       if (Date.now() - row.createdAt.getTime() > 70 * 3600000) throw unavailable();
+      const offer = await billingOffer(userId);
       const result = z.object({ id: z.string().regex(/^I-[A-Z0-9]+$/) }).parse(
         await paypalRequest("/v1/billing/subscriptions", {
           method: "POST",
           headers: { "PayPal-Request-Id": row.requestId },
           body: JSON.stringify({
-            plan_id: paypalConfig().planId,
+            plan_id: offer.planId,
             custom_id: accountReference(userId),
             application_context: {
               brand_name: "Fixmit",

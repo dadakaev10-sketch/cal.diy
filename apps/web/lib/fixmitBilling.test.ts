@@ -13,6 +13,7 @@ vi.mock("@calcom/prisma", () => ({
 
 import {
   type BillingRow,
+  billingOffer,
   createBilling,
   entitled,
   hasBillingAccess,
@@ -47,6 +48,8 @@ beforeEach(() => {
   vi.stubEnv("PAYPAL_CLIENT_ID", "public-test-client");
   vi.stubEnv("PAYPAL_CLIENT_SECRET", "test-only");
   vi.stubEnv("PAYPAL_PLAN_ID", "P-TEST");
+  vi.stubEnv("PAYPAL_TEST_PLAN_ID", "");
+  vi.stubEnv("PAYPAL_TEST_EMAIL", "");
   vi.stubEnv("NEXTAUTH_SECRET", "test-secret");
   db.transaction.mockImplementation((fn) => fn({ $queryRaw: db.query, $executeRaw: db.execute }));
   db.query.mockResolvedValue([row]);
@@ -156,5 +159,45 @@ describe("Fixmit subscription security", () => {
     db.query.mockResolvedValue([{ ...row, checkedAt: new Date("2026-10-09") }]);
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
     await expect(entitled(7)).rejects.toThrow("offline");
+  });
+});
+
+describe("Restricted live test offer", () => {
+  it("leaves regular pricing unchanged unless both test settings exist", async () => {
+    vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
+    expect(await billingOffer(7)).toEqual({ planId: "P-TEST", isTest: false });
+    expect(db.user).not.toHaveBeenCalled();
+  });
+  it("uses the database email, not client input, to select the test plan", async () => {
+    vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
+    vi.stubEnv("PAYPAL_TEST_EMAIL", " Test@Example.com ");
+    db.user.mockResolvedValue({ email: "test@example.com" });
+    expect(await billingOffer(7)).toEqual({ planId: "P-LIVE-TEST", isTest: true });
+    db.user.mockResolvedValue({ email: "customer@example.com" });
+    expect(await billingOffer(7)).toEqual({ planId: "P-TEST", isTest: false });
+    db.user.mockResolvedValue(null);
+    expect((await billingOffer(7)).isTest).toBe(false);
+  });
+  it("creates the approved test plan only for the configured account", async () => {
+    vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
+    vi.stubEnv("PAYPAL_TEST_EMAIL", "test@example.com");
+    db.user.mockResolvedValue({ email: "test@example.com" });
+    db.query.mockResolvedValue([{ ...row, subscriptionId: null }]);
+    await createBilling(7);
+    expect(JSON.parse(String(vi.mocked(fetch).mock.calls[1][1]?.body)).plan_id).toBe("P-LIVE-TEST");
+  });
+  it("still processes test subscription webhooks after the offer is disabled", async () => {
+    vi.stubEnv("PAYPAL_TEST_PLAN_ID", "P-LIVE-TEST");
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ access_token: "mock" })))
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ ...sub, plan_id: "P-LIVE-TEST", status: "CANCELLED" }))
+        )
+    );
+    expect((await syncBilling(7))?.status).toBe("CANCELLED");
+    expect(db.execute).toHaveBeenCalledOnce();
   });
 });

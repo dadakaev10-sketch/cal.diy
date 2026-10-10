@@ -2,6 +2,7 @@ import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
 import {
   billingEnabled,
+  billingOffer,
   hasBillingAccess,
   paypalConfig,
   readBilling,
@@ -28,9 +29,11 @@ export default async function BillingPage() {
   let canCheckout = false;
   let clientId = "";
   let status = "";
+  let isTest = false;
   if (billingEnabled() && !grandfathered) {
     try {
       clientId = paypalConfig().clientId;
+      isTest = (await billingOffer(user.id)).isTest;
       const stored = await readBilling(user.id);
       const row = stored?.subscriptionId ? await syncBilling(user.id) : stored;
       active = hasBillingAccess(row);
@@ -50,7 +53,15 @@ export default async function BillingPage() {
           Fixmit
         </a>
         <h1>{t("fixmit_billing_title")}</h1>
-        <p>{t(grandfathered ? "fixmit_billing_existing" : "fixmit_billing_price")}</p>
+        <p>
+          {t(
+            grandfathered
+              ? "fixmit_billing_existing"
+              : isTest
+                ? "fixmit_billing_test_price"
+                : "fixmit_billing_price"
+          )}
+        </p>
         {!grandfathered && <p>{t("fixmit_billing_terms")}</p>}
         {active ? (
           <>
