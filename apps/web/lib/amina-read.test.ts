@@ -90,9 +90,11 @@ it("veröffentlicht nur ausgewählte Leistungsfelder, niemals Metadaten", async 
   ]);
   const response = await get("services", "");
   expect(await response.json()).toEqual({
+    catalog: { enabled: false, categories: [] },
     services: [
       {
         id: 1,
+        category_id: null,
         title: "Testleistung",
         description: "Beschreibung",
         minutes: 60,
@@ -103,4 +105,44 @@ it("veröffentlicht nur ausgewählte Leistungsfelder, niemals Metadaten", async 
   });
   expect(mocks.key).not.toHaveBeenCalled();
   expect(mocks.list).not.toHaveBeenCalled();
+});
+
+it("übernimmt vorhandene Haupt- und Unterkategorien ohne private Metadaten", async () => {
+  const root = {
+    id: "11111111-1111-4111-8111-111111111111",
+    name: "Gesicht",
+    icon: "sparkles",
+    parentId: null,
+  };
+  const child = {
+    id: "22222222-2222-4222-8222-222222222222",
+    name: "Pflege",
+    icon: "sun",
+    parentId: root.id,
+  };
+  const unused = {
+    id: "33333333-3333-4333-8333-333333333333",
+    name: "Nicht verwendet",
+    icon: "star",
+    parentId: null,
+  };
+  mocks.owner.mockResolvedValue({
+    id: 42,
+    metadata: { private: "secret", serviceCatalog: { enabled: true, categories: [root, child, unused] } },
+  });
+  mocks.events.mockResolvedValue([
+    {
+      id: 1,
+      title: "Pflege",
+      description: "",
+      length: 60,
+      slug: "pflege",
+      metadata: { serviceCategoryId: child.id },
+    },
+  ]);
+  const response = await get("services", "");
+  const data = await response.json();
+  expect(data.catalog).toEqual({ enabled: true, categories: [root, child] });
+  expect(data.services[0].category_id).toBe(child.id);
+  expect(JSON.stringify(data)).not.toContain("secret");
 });

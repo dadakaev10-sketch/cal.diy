@@ -6,6 +6,7 @@ import { getEventTypesPublic } from "@calcom/features/eventtypes/lib/getEventTyp
 import prisma from "@calcom/prisma";
 import type { Prisma } from "@calcom/prisma/client";
 import { billingEnabled, entitled } from "@lib/fixmitBilling";
+import { publicServiceCatalog } from "@lib/serviceCatalog";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -29,14 +30,16 @@ export async function GET(request: Request, context: { params: Promise<{ resourc
       return reply({ error: "Too many requests" }, 429);
     const owner = await prisma.user.findFirst({
       where: { username: "azbeauty", locked: false },
-      select: { id: true },
+      select: { id: true, metadata: true },
     });
     if (!owner || (billingEnabled() && !(await entitled(owner.id))))
       return reply({ error: "Not available" }, 404);
 
     if (resource === "services") {
       const events = await getEventTypesPublic(owner.id);
+      const catalog = publicServiceCatalog(owner.metadata, events);
       return reply({
+        catalog,
         services: events.map((event) => {
           const payment = getPaymentAppData(event);
           const display = event.metadata?.serviceDisplayPrice;
@@ -46,6 +49,11 @@ export async function GET(request: Request, context: { params: Promise<{ resourc
           else if (display?.enabled) price = { amountMinor: display.amountMinor, currency: display.currency };
           return {
             id: event.id,
+            category_id: catalog.categories.some(
+              (category) => category.id === event.metadata?.serviceCategoryId
+            )
+              ? event.metadata?.serviceCategoryId
+              : null,
             title: event.title,
             description: event.description || "",
             minutes: event.length,
