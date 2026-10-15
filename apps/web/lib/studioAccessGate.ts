@@ -90,6 +90,8 @@ export function studioRouteAccess(path: string, method: string) {
 export async function studioAccessGate(req: NextRequest) {
   if (process.env.STUDIO_ACCESS_GATE_ENABLED !== "true") return null;
   const path = req.nextUrl.pathname.replace(/\/+$/, "") || "/";
+  // Nur diese lesenden Integrationsrouten prüfen ihren API-Zugang selbst.
+  if (req.method === "GET" && ["/api/amina/services", "/api/amina/bookings"].includes(path)) return null;
   if (["GET", "HEAD"].includes(req.method) && path === "/auth/forgot-password") {
     return NextResponse.redirect(new URL("/recover", req.url));
   }
