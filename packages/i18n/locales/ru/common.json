@@ -4738,5 +4738,16 @@
   "fixmit_billing_check": "Проверить активацию",
   "fixmit_billing_unavailable": "Оформление подписки временно недоступно. Попробуйте позже.",
   "fixmit_billing_inactive": "Подписка приостановлена или завершена. Проверьте PayPal. Для повторного оформления обратитесь в поддержку.",
-  "fixmit_billing_existing": "Ваш существующий аккаунт сохраняет доступ без подписки."
+  "fixmit_billing_existing": "Ваш существующий аккаунт сохраняет доступ без подписки.",
+  "service_category_icon_microneedling": "Микронидлинг",
+  "service_category_icon_peeling": "Пилинг",
+  "service_category_icon_gesichtsbehandlung": "Уход за лицом",
+  "service_category_icon_rf-microneedling": "RF-микронидлинг",
+  "service_category_icon_wiederkehrend": "Повторение (песочные часы)",
+  "service_category_icon_recurring": "Повторение (календарь)",
+  "service_category_icon_ruecken": "Спина",
+  "service_category_icon_gesichtsreinigung": "Чистка лица",
+  "service_category_icon_haarwachstum": "Рост волос",
+  "service_category_icon_bart": "Борода",
+  "service_category_icon_augenbrauen": "Брови"
 }

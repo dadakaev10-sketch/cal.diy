@@ -1,6 +1,27 @@
 import { z } from "zod";
 
+export const customServiceCategoryIcons = [
+  "microneedling",
+  "peeling",
+  "gesichtsbehandlung",
+  "rf-microneedling",
+  "wiederkehrend",
+  "recurring",
+  "ruecken",
+  "gesichtsreinigung",
+  "haarwachstum",
+  "bart",
+  "augenbrauen",
+] as const;
+
+export function isCustomServiceCategoryIcon(
+  value: string
+): value is (typeof customServiceCategoryIcons)[number] {
+  return z.enum(customServiceCategoryIcons).safeParse(value).success;
+}
+
 export const serviceCategoryIcons = [
+  ...customServiceCategoryIcons,
   "grid-3x3",
   "sparkles",
   "star",

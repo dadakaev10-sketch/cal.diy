@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -12 624 624" fill="none">
+  <title>Wiederkehrend</title>
+  <g stroke="currentColor" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M590 300C590 460 460 590 300 590S10 460 10 300C10 240 27 183 58 134L28 115 134 72 129 184 99 163C71 204 57 250 57 300C57 434 166 543 300 543S543 434 543 300"/>
+    <path d="M300 8C446 8 566 114 588 258M300 56C421 56 521 144 541 258" stroke-dasharray="17 28"/>
+    <rect x="206" y="122" width="188" height="28" rx="9"/>
+    <rect x="206" y="450" width="188" height="28" rx="9"/>
+    <path d="M221 150v94C221 269 251 278 277 295Q288 302 277 309C251 326 221 340 221 362v88M379 150v94C379 269 349 278 323 295Q312 302 323 309C349 326 379 340 379 362v88"/>
+    <path d="M247 225Q300 187 353 225L300 285Z"/>
+    <path d="m243 450 41-47Q298 387 312 403l41 47"/>
+    <path d="M300 318v11m0 26v11"/>
+  </g>
+</svg>

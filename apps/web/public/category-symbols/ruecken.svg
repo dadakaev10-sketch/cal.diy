@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 447 447" fill="none">
+  <title>Rücken</title>
+  <g stroke="currentColor" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M179 11h89a12 12 0 0 1 12 12v22c0 22 13 39 35 43l57 11c30 6 50 34 48 64l-20 263a11 11 0 0 1-11 10H58a11 11 0 0 1-11-10L27 163c-2-30 18-58 48-64l57-11c22-4 35-21 35-43V23a12 12 0 0 1 12-12Z"/>
+    <path d="m90.5 208 38 166-13 62M356.5 208l-38 166 13 62"/>
+  </g>
+  <path d="M223.5 141v192" stroke="currentColor" stroke-width="18" stroke-linecap="round"/>
+</svg>

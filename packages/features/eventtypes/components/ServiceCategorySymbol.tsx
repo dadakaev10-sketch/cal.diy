@@ -1,4 +1,4 @@
-import { isServiceCategoryIcon } from "@calcom/prisma/serviceCatalog";
+import { isCustomServiceCategoryIcon, isServiceCategoryIcon } from "@calcom/prisma/serviceCatalog";
 import { Icon } from "@calcom/ui/components/icon";
 
 export function ServiceCategorySymbol({
@@ -8,7 +8,19 @@ export function ServiceCategorySymbol({
   symbol: string;
   className?: string;
 }) {
-  if (isServiceCategoryIcon(symbol)) return <Icon name={symbol} className={className} />;
+  if (isCustomServiceCategoryIcon(symbol)) {
+    const mask = `url("/category-symbols/${symbol}.svg") center / contain no-repeat`;
+    return (
+      <span
+        aria-hidden
+        className={`inline-block shrink-0 ${className}`}
+        style={{ backgroundColor: "currentColor", mask, WebkitMask: mask }}
+      />
+    );
+  }
+  if (isServiceCategoryIcon(symbol) && !isCustomServiceCategoryIcon(symbol)) {
+    return <Icon name={symbol} className={className} />;
+  }
   return (
     <span
       aria-hidden

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" fill="none">
+  <title>Peeling</title>
+  <g stroke="currentColor" stroke-width="48" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 120C260 405 653 576 1128 576"/>
+    <path d="M72 576 240 408M120 408h120v120"/>
+    <path d="M72 696h1056"/>
+    <path d="M72 792h288v96H72zM456 792h288v96H456zM840 792h288v96H840zM264 984h288v96H264zM648 984h288v96H648z"/>
+  </g>
+</svg>

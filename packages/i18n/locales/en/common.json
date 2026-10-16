@@ -5129,5 +5129,16 @@
   "customer_status_cancelled": "Cancelled",
   "customer_status_rejected": "Rejected",
   "customer_status_pending": "Pending",
-  "customer_status_awaiting_host": "Awaiting host"
+  "customer_status_awaiting_host": "Awaiting host",
+  "service_category_icon_microneedling": "Microneedling",
+  "service_category_icon_peeling": "Peeling",
+  "service_category_icon_gesichtsbehandlung": "Facial treatment",
+  "service_category_icon_rf-microneedling": "RF microneedling",
+  "service_category_icon_wiederkehrend": "Recurring (hourglass)",
+  "service_category_icon_recurring": "Recurring (calendar)",
+  "service_category_icon_ruecken": "Back",
+  "service_category_icon_gesichtsreinigung": "Facial cleansing",
+  "service_category_icon_haarwachstum": "Hair growth",
+  "service_category_icon_bart": "Beard",
+  "service_category_icon_augenbrauen": "Eyebrows"
 }

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { readServiceCatalog, serviceCatalogSchema, serviceCategorySymbolSchema } from "./serviceCatalog";
+import {
+  customServiceCategoryIcons,
+  readServiceCatalog,
+  serviceCatalogSchema,
+  serviceCategorySymbolSchema,
+} from "./serviceCatalog";
 import { EventTypeMetaDataSchema } from "./zod-utils";
 
 const root = {
@@ -46,6 +51,7 @@ describe("service catalog", () => {
 
 describe("category symbols", () => {
   it.each([
+    ...customServiceCategoryIcons,
     "sparkles",
     "paintbrush",
     "💆🏽‍♀️",

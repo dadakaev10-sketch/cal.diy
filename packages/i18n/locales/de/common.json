@@ -4993,5 +4993,16 @@
   "customer_status_cancelled": "Abgesagt",
   "customer_status_rejected": "Abgelehnt",
   "customer_status_pending": "Ausstehend",
-  "customer_status_awaiting_host": "Wartet auf Gastgeber"
+  "customer_status_awaiting_host": "Wartet auf Gastgeber",
+  "service_category_icon_microneedling": "Microneedling",
+  "service_category_icon_peeling": "Peeling",
+  "service_category_icon_gesichtsbehandlung": "Gesichtsbehandlung",
+  "service_category_icon_rf-microneedling": "RF-Microneedling",
+  "service_category_icon_wiederkehrend": "Wiederkehrend (Sanduhr)",
+  "service_category_icon_recurring": "Wiederkehrend (Kalender)",
+  "service_category_icon_ruecken": "Rücken",
+  "service_category_icon_gesichtsreinigung": "Gesichtsreinigung",
+  "service_category_icon_haarwachstum": "Haarwachstum",
+  "service_category_icon_bart": "Bart",
+  "service_category_icon_augenbrauen": "Augenbrauen"
 }

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <title>Recurring</title>
+  <g stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="42" y="57" width="172" height="163" rx="18"/>
+    <path d="M42 98h172M79 37v38M177 37v38"/>
+    <path d="M161 146a36 36 0 0 0-62-9l-7 10M92 129v18h19"/>
+    <path d="M95 174a36 36 0 0 0 62 9l7-10M164 191v-18h-19"/>
+  </g>
+</svg>
