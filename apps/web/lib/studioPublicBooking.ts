@@ -11,6 +11,7 @@ const privateRoots = new Set([
   "auth",
   "availability",
   "bookings",
+  "customers",
   "billing",
   "connect",
   "confirm",
@@ -67,6 +68,11 @@ const mutations: Record<string, ReadonlySet<string>> = {
 
 export function studioPublicBookingRoute(path: string, method: string) {
   if (method === "POST" && ["/api/book/event", "/api/book/recurring-event", "/api/cancel"].includes(path))
+    return "booking-write";
+  if (
+    method === "POST" &&
+    /^\/api\/payment\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/cancel$/i.test(path)
+  )
     return "booking-write";
   const rpc = /^\/api\/trpc\/(public|slots|i18n|timezones|features|auth)\/([a-zA-Z,]+)$/.exec(path);
   if (rpc) {

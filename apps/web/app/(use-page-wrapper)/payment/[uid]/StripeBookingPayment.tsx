@@ -62,7 +62,11 @@ function Form({ paymentUid, canCancel }: { paymentUid: string; canCancel: boolea
                 setBusy(true);
                 setError("");
                 try {
-                  const response = await fetch(`/api/payment/${paymentUid}/cancel`, { method: "POST" });
+                  const response = await fetch(`/api/payment/${paymentUid}/cancel`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: "{}",
+                  });
                   if (!response.ok) throw new Error();
                   router.refresh();
                 } catch {

@@ -4,6 +4,13 @@ import { describe, expect, it } from "vitest";
 import { studioPublicBookingRoute as route } from "./studioPublicBooking";
 
 describe("public customer booking boundary", () => {
+  it("allows only token-scoped customer checkout cancellations", () => {
+    const path = "/api/payment/689513a2-5dfa-4a43-8b2a-e2c798254c18/cancel";
+    expect(route(path, "POST")).toBe("booking-write");
+    expect(route(path, "GET")).toBeNull();
+    expect(route(`${path}/admin`, "POST")).toBeNull();
+    expect(route("/api/payment/not-a-uuid/cancel", "POST")).toBeNull();
+  });
   it("opens only UUID payment pages for customer reads", () => {
     const path = "/payment/689513a2-5dfa-4a43-8b2a-e2c798254c18";
     expect(route(path, "GET")).toBe("booking-page");

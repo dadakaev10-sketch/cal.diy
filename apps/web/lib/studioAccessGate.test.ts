@@ -49,6 +49,36 @@ describe("studio access boundary", () => {
     expect(studioRouteAccess(path, "POST")).toBe("private");
   });
 
+  it("allows anonymous checkout cancellation only with valid origin and JSON", async () => {
+    const url = "https://test.local/api/payment/689513a2-5dfa-4a43-8b2a-e2c798254c18/cancel";
+    expect(
+      await studioAccessGate(
+        new NextRequest(url, {
+          method: "POST",
+          headers: { origin: "https://test.local", "content-type": "application/json" },
+          body: "{}",
+        })
+      )
+    ).toBeNull();
+    expect(
+      (
+        await studioAccessGate(
+          new NextRequest(url, { method: "POST", headers: { origin: "https://test.local" } })
+        )
+      )?.status
+    ).toBe(403);
+    expect(
+      (
+        await studioAccessGate(
+          new NextRequest(url, {
+            method: "POST",
+            headers: { origin: "https://other.example", "content-type": "application/json" },
+            body: "{}",
+          })
+        )
+      )?.status
+    ).toBe(403);
+  });
   it("allows only the signed webhook POST endpoint without a browser session", async () => {
     const url = "https://test.local/api/integrations/stripepayment/webhook";
     expect(await studioAccessGate(new NextRequest(url, { method: "POST" }))).toBeNull();
