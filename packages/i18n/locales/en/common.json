@@ -1,4 +1,5 @@
 {
+  "stripe_booking_expiry_notice": "Your appointment is reserved for 15 minutes to pay the deposit. Without payment, the booking is automatically cancelled afterwards. Payments in progress are not interrupted.",
   "stripe_booking_cancel": "Cancel booking",
   "stripe_booking_cancel_confirm": "Cancel this unpaid booking? The appointment slot will be released.",
   "stripe_booking_continue": "Continue payment",

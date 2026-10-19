@@ -1,4 +1,5 @@
 import { createPaymentLink } from "@calcom/app-store/stripepayment/lib/client";
+import { depositSnapshotSchema } from "@calcom/app-store/stripepayment/lib/deposit";
 import { sendAwaitingPaymentEmailAndSMS } from "@calcom/emails/email-manager";
 import { getBooking } from "@calcom/features/bookings/lib/payment/getBooking";
 import { AttendeeRepository } from "@calcom/features/bookings/repositories/AttendeeRepository";
@@ -35,6 +36,13 @@ export async function sendAwaitingPaymentEmail(payload: string): Promise<void> {
       return;
     }
 
+    const state = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      select: { status: true, payment: { where: { id: paymentId }, select: { data: true, appId: true } } },
+    });
+    if (!state || !["PENDING", "ACCEPTED"].includes(state.status)) return;
+    if (state.payment.some((p) => p.appId === "stripe" && depositSnapshotSchema.safeParse(p.data).success))
+      return;
     if (payment.success || booking.paid) {
       log.debug(
         `Payment ${paymentId} already succeeded or booking ${bookingId} already paid, skipping email`

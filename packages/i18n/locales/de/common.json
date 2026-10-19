@@ -1,4 +1,5 @@
 {
+  "stripe_booking_expiry_notice": "Der Termin ist für 15 Minuten zur Anzahlung reserviert. Ohne Zahlung wird die Buchung anschließend automatisch abgebrochen. Laufende Zahlungen werden nicht unterbrochen.",
   "stripe_booking_cancel": "Buchung abbrechen",
   "stripe_booking_cancel_confirm": "Möchtest du die unbezahlte Buchung abbrechen? Der Termin wird wieder freigegeben.",
   "stripe_booking_continue": "Weiter zur Zahlung",

@@ -97,6 +97,7 @@ export async function studioAccessGate(req: NextRequest) {
   }
   if (path === "/api/integrations/stripepayment/webhook" && req.method === "POST") return null;
   if (path === "/api/fixmit-billing/webhook" && req.method === "POST") return null;
+  if (path === "/api/cron/expire-deposits" && req.method === "POST") return null;
   const access = studioRouteAccess(path, req.method);
   if (access === "disabled") return NextResponse.json({ error: "Not available" }, { status: 404 });
   if (access === "register") return NextResponse.redirect(new URL("/register", req.url));

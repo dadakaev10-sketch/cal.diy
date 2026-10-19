@@ -126,3 +126,53 @@ describe("cancel unpaid checkout", () => {
     expect(m.retrieve).not.toHaveBeenCalled();
   });
 });
+
+describe("automatic deposit expiry", () => {
+  function expired(age = 16 * 60 * 1000) {
+    const p = record();
+    return {
+      ...p,
+      data: { ...p.data, kind: "deposit", totalAmount: 10000, depositAmount: 3000 },
+      booking: { ...p.booking, createdAt: new Date(Date.now() - age) },
+    };
+  }
+  it("expires an unpaid deposit after fifteen minutes", async () => {
+    m.current.mockResolvedValue(expired());
+    expect(await cancelUnpaidBooking("uid", true)).toEqual({ cancelled: true });
+    expect(m.cancel).toHaveBeenCalledWith(
+      "pi_test",
+      { cancellation_reason: "abandoned" },
+      { stripeAccount: "acct_test" }
+    );
+  });
+  it("keeps a booking before its deadline", async () => {
+    m.current.mockResolvedValue(expired(14 * 60 * 1000));
+    expect(await cancelUnpaidBooking("uid", true)).toEqual({ cancelled: false });
+    expect(m.retrieve).not.toHaveBeenCalled();
+    expect(m.bookingCancel).not.toHaveBeenCalled();
+  });
+  it.each([
+    "processing",
+    "succeeded",
+    "requires_action",
+    "requires_confirmation",
+    "requires_capture",
+  ])("preserves %s", async (status) => {
+    m.current.mockResolvedValue(expired());
+    m.retrieve.mockResolvedValue(intent(status));
+    expect(await cancelUnpaidBooking("uid", true)).toEqual({ cancelled: false });
+    expect(m.cancel).not.toHaveBeenCalled();
+    expect(m.bookingCancel).not.toHaveBeenCalled();
+  });
+  it("leaves bookings unchanged when Stripe cannot be reached", async () => {
+    m.current.mockResolvedValue(expired());
+    m.retrieve.mockRejectedValue(new Error("network"));
+    await expect(cancelUnpaidBooking("uid", true)).rejects.toThrow();
+    expect(m.bookingCancel).not.toHaveBeenCalled();
+  });
+  it("ignores non-deposit payments", async () => {
+    m.current.mockResolvedValue(record());
+    expect(await cancelUnpaidBooking("uid", true)).toEqual({ cancelled: false });
+    expect(m.retrieve).not.toHaveBeenCalled();
+  });
+});

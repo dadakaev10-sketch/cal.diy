@@ -4,10 +4,12 @@ import { ErrorWithCode } from "@calcom/lib/errors";
 import prisma from "@calcom/prisma";
 import { stripeBookingEnabled, stripeBookingLiveMode } from "./bookingConfig";
 import { bookingStripeData, verifyBookingIntent } from "./bookingPayment";
-import { balanceSnapshotSchema } from "./deposit";
+import { balanceSnapshotSchema, depositSnapshotSchema } from "./deposit";
 import stripe from "./server";
 
-export async function cancelUnpaidBooking(uid: string) {
+export const DEPOSIT_TIMEOUT_MS = 15 * 60 * 1000;
+
+export async function cancelUnpaidBooking(uid: string, automatic = false) {
   if (!stripeBookingEnabled()) throw new ErrorWithCode(ErrorCode.NotFound);
   const payment = await prisma.payment.findUnique({ where: { uid }, select: { id: true } });
   if (!payment) throw new ErrorWithCode(ErrorCode.NotFound);
@@ -33,6 +35,7 @@ export async function cancelUnpaidBooking(uid: string) {
               status: true,
               paid: true,
               endTime: true,
+              createdAt: true,
               eventType: { select: { disableCancelling: true, seatsPerTimeSlot: true } },
               payment: { select: { id: true, success: true } },
             },
@@ -63,9 +66,22 @@ export async function cancelUnpaidBooking(uid: string) {
       ) {
         throw new ErrorWithCode(ErrorCode.BadRequest);
       }
+      if (
+        automatic &&
+        (!depositSnapshotSchema.safeParse(current.data).success ||
+          booking.createdAt.getTime() > Date.now() - DEPOSIT_TIMEOUT_MS)
+      ) {
+        return { cancelled: false };
+      }
       const options = { stripeAccount: account.data.stripeAccount };
       const intent = await stripe.paymentIntents.retrieve(current.externalId, options);
       verifyBookingIntent(intent, current, stripeBookingLiveMode());
+      if (
+        automatic &&
+        (intent.amount_received > 0 || !["canceled", "requires_payment_method"].includes(intent.status))
+      ) {
+        return { cancelled: false };
+      }
       if (
         intent.amount_received > 0 ||
         !["canceled", "requires_payment_method", "requires_confirmation", "requires_action"].includes(
@@ -78,7 +94,7 @@ export async function cancelUnpaidBooking(uid: string) {
         // Stripe cancellation must succeed before releasing the slot, including concurrent payment attempts.
         const cancelled = await stripe.paymentIntents.cancel(
           current.externalId,
-          { cancellation_reason: "requested_by_customer" },
+          { cancellation_reason: automatic ? "abandoned" : "requested_by_customer" },
           options
         );
         if (cancelled.status !== "canceled") throw new ErrorWithCode(ErrorCode.BadRequest);
@@ -87,7 +103,9 @@ export async function cancelUnpaidBooking(uid: string) {
         userId: -1,
         bookingData: {
           uid: booking.uid,
-          cancellationReason: "Checkout cancelled before payment",
+          cancellationReason: automatic
+            ? "Booking expired: no deposit within 15 minutes"
+            : "Checkout cancelled before payment",
           allRemainingBookings: false,
         },
       });

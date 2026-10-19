@@ -154,6 +154,9 @@ export default function StripeBookingPayment(props: {
             )}
           </>
         )}
+        {props.canCancel && !props.cancelled && !props.paid && !props.processing && (
+          <p className="text-sm text-slate-600">{t("stripe_booking_expiry_notice")}</p>
+        )}
         {props.publicKey.startsWith("pk_test_") && (
           <p className="rounded-lg bg-amber-50 p-3 text-sm">{t("stripe_booking_sandbox")}</p>
         )}
