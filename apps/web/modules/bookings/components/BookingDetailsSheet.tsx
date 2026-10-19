@@ -1,5 +1,7 @@
 "use client";
 
+import BookingBalance from "./BookingBalance";
+
 import dayjs from "@calcom/dayjs";
 import { useBookingLocation } from "@calcom/features/bookings/hooks";
 import { shouldShowFieldInCustomResponses } from "@calcom/lib/bookings/SystemField";
@@ -414,6 +416,7 @@ function BookingDetailsSheetInner({
                   />
                 )}
 
+                <BookingBalance key={booking.uid} uid={booking.uid} />
                 <SlotsSection booking={booking} />
 
                 <AdditionalNotesSection booking={booking} />
@@ -1030,7 +1033,11 @@ function BookingHeaderBadges({
         <Badge variant="orange">{t("error_collecting_card")}</Badge>
       ) : booking.paid ? (
         <Badge variant="green" data-testid="paid_badge">
-          {payment?.paymentOption === "HOLD" ? t("card_held") : t("paid")}
+          {payment?.paymentOption === "HOLD"
+            ? t("card_held")
+            : payment?.appId === "stripe"
+              ? t("booking_payment_received")
+              : t("paid")}
         </Badge>
       ) : null}
       {recurringInfo && (

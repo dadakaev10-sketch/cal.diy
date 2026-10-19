@@ -48,6 +48,9 @@ function Form() {
 }
 
 export default function StripeBookingPayment(props: {
+  total?: number;
+  remaining?: number;
+  isBalance?: boolean;
   title: string;
   amount: number;
   currency: string;
@@ -81,9 +84,27 @@ export default function StripeBookingPayment(props: {
       <section className="mx-auto max-w-lg space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
         <p className="text-sm font-semibold">Fixmit</p>
         <h1 className="text-2xl font-semibold">{props.title}</h1>
+        {props.total !== undefined && (
+          <p>
+            {t("booking_payment_total")}:{" "}
+            {formatter.format(convertFromSmallestToPresentableCurrencyUnit(props.total, props.currency))}
+          </p>
+        )}
+        {props.total !== undefined && (
+          <p className="font-medium">
+            {t(props.isBalance ? "booking_payment_balance" : "booking_payment_deposit")}
+          </p>
+        )}
         <p className="text-xl">
           {formatter.format(convertFromSmallestToPresentableCurrencyUnit(props.amount, props.currency))}
         </p>
+        {props.remaining !== undefined && props.remaining > 0 && (
+          <p>
+            {t("booking_payment_remaining")}:{" "}
+            {formatter.format(convertFromSmallestToPresentableCurrencyUnit(props.remaining, props.currency))}.{" "}
+            {t("booking_payment_balance_help")}
+          </p>
+        )}
         {props.publicKey.startsWith("pk_test_") && (
           <p className="rounded-lg bg-amber-50 p-3 text-sm">{t("stripe_booking_sandbox")}</p>
         )}

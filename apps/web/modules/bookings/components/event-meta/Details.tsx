@@ -1,4 +1,5 @@
 import { getPaymentAppData } from "@calcom/app-store/_utils/payments/getPaymentAppData";
+import { calculateDeposit, depositFromMetadata } from "@calcom/app-store/stripepayment/lib/deposit";
 import { useBookerStore } from "@calcom/features/bookings/Booker/store";
 import { Price } from "@calcom/features/bookings/components/event-meta/Price";
 import type { BookerEvent } from "@calcom/features/bookings/types";
@@ -199,11 +200,40 @@ export const EventDetails = ({ event, blocks = defaultEventDetailsBlocks }: Even
                     currency={event.currency}
                   />
                 }>
-                <Price
-                  price={paymentAppData.price}
-                  currency={event.currency}
-                  displayAlternateSymbol={false}
-                />
+                <div>
+                  <Price
+                    price={paymentAppData.price}
+                    currency={event.currency}
+                    displayAlternateSymbol={false}
+                  />
+                  {paymentAppData.appId === "stripe" &&
+                    (() => {
+                      const settings = depositFromMetadata(event.metadata);
+                      if (!settings?.depositMode || settings.depositMode === "none") return null;
+                      try {
+                        const due = calculateDeposit(paymentAppData.price, settings);
+                        return (
+                          <div className="mt-1 text-sm">
+                            <span>{t("booking_payment_deposit")}: </span>
+                            <Price
+                              price={due}
+                              currency={paymentAppData.currency}
+                              displayAlternateSymbol={false}
+                            />
+                            <span> · {t("booking_payment_remaining")}: </span>
+                            <Price
+                              price={paymentAppData.price - due}
+                              currency={paymentAppData.currency}
+                              displayAlternateSymbol={false}
+                            />
+                            <p>{t("booking_payment_balance_help")}</p>
+                          </div>
+                        );
+                      } catch {
+                        return <p>{t("booking_payment_config_error")}</p>;
+                      }
+                    })()}
+                </div>
               </EventMetaBlock>
             );
           }

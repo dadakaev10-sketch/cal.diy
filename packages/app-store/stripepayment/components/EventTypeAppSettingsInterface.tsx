@@ -1,20 +1,16 @@
-import * as RadioGroup from "@radix-ui/react-radio-group";
-import { useState, useEffect } from "react";
-
 import type { EventTypeAppSettingsComponent } from "@calcom/app-store/types";
 import {
-  convertToSmallestCurrencyUnit,
   convertFromSmallestToPresentableCurrencyUnit,
+  convertToSmallestCurrencyUnit,
 } from "@calcom/lib/currencyConversions";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { RefundPolicy } from "@calcom/lib/payment/types";
 import classNames from "@calcom/ui/classNames";
 import { Alert } from "@calcom/ui/components/alert";
-import { Select } from "@calcom/ui/components/form";
-import { CheckboxField } from "@calcom/ui/components/form";
-import { TextField } from "@calcom/ui/components/form";
+import { CheckboxField, Select, TextField } from "@calcom/ui/components/form";
 import { RadioField } from "@calcom/ui/components/radio";
-
+import * as RadioGroup from "@radix-ui/react-radio-group";
+import { useEffect, useState } from "react";
 import { paymentOptions } from "../lib/constants";
 import { currencyOptions } from "../lib/currencyOptions";
 import { autoChargeNoShowFeeTimeUnitEnum } from "../zod";
@@ -37,6 +33,8 @@ const EventTypeAppSettingsInterface: EventTypeAppSettingsComponent = ({
   );
   const paymentOption = getAppData("paymentOption");
   const paymentOptionSelectValue = paymentOptions.find((option) => paymentOption === option.value);
+  const depositMode = getAppData("depositMode") || "none";
+  const depositValue = getAppData("depositValue");
   const requirePayment = getAppData("enabled");
   const getSelectedOption = () =>
     options.find((opt) => opt.value === (getAppData("refundCountCalendarDays") === true ? 1 : 0));
@@ -151,6 +149,7 @@ const EventTypeAppSettingsInterface: EventTypeAppSettingsComponent = ({
                 if (input) {
                   setAppData("paymentOption", input.value);
                   if (input.value === "HOLD") {
+                    setAppData("depositMode", "none");
                     setAppData("refundPolicy", RefundPolicy.NEVER);
                     setAppData("refundDaysCount", undefined);
                     setAppData("refundCountCalendarDays", undefined);
@@ -161,6 +160,65 @@ const EventTypeAppSettingsInterface: EventTypeAppSettingsComponent = ({
               isDisabled={seatsEnabled || disabled}
             />
           </div>
+          {paymentOption !== "HOLD" && (
+            <fieldset className="mt-4 space-y-3">
+              <legend className="text-default text-sm font-medium">
+                {t("booking_payment_deposit_settings")}
+              </legend>
+              <label className="block text-sm">
+                {t("booking_payment_mode")}
+                <select
+                  className="border-default bg-default mt-1 block rounded border p-2"
+                  value={depositMode}
+                  disabled={disabled}
+                  onChange={(e) => {
+                    setAppData("depositMode", e.target.value);
+                    setAppData("depositValue", undefined);
+                  }}>
+                  <option value="none">{t("booking_payment_full")}</option>
+                  <option value="percent">{t("booking_payment_percent")}</option>
+                  <option value="fixed">{t("booking_payment_fixed")}</option>
+                </select>
+              </label>
+              {depositMode !== "none" && (
+                <TextField
+                  type="number"
+                  required
+                  disabled={disabled}
+                  label={t(
+                    depositMode === "percent"
+                      ? "booking_payment_percent_value"
+                      : "booking_payment_fixed_value"
+                  )}
+                  min={depositMode === "percent" ? 0.01 : 0.5}
+                  step="0.01"
+                  max={
+                    depositMode === "percent"
+                      ? 99.99
+                      : convertFromSmallestToPresentableCurrencyUnit(Math.max(0, price - 1), currency)
+                  }
+                  value={
+                    depositValue
+                      ? depositMode === "fixed"
+                        ? convertFromSmallestToPresentableCurrencyUnit(depositValue, currency)
+                        : depositValue
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setAppData(
+                      "depositValue",
+                      e.target.value
+                        ? depositMode === "fixed"
+                          ? convertToSmallestCurrencyUnit(Number(e.target.value), currency)
+                          : Number(e.target.value)
+                        : undefined
+                    )
+                  }
+                />
+              )}
+              <p className="text-subtle text-sm">{t("booking_payment_settings_help")}</p>
+            </fieldset>
+          )}
           {seatsEnabled && paymentOption === "HOLD" && (
             <Alert className="mt-2" severity="warning" title={t("seats_and_no_show_fee_error")} />
           )}
