@@ -9,6 +9,7 @@ import { setTestEmail } from "@calcom/lib/testEmails";
 import { prisma } from "@calcom/prisma";
 import { decodeHTML } from "entities";
 import { z } from "zod";
+import { embedEmailIcons } from "../lib/embedEmailIcons";
 import { sanitizeDisplayName } from "../lib/sanitizeDisplayName";
 
 export default class BaseEmail {
@@ -39,17 +40,17 @@ export default class BaseEmail {
       return new Promise((r) => r("Skipped Sending Email due to active Kill Switch"));
     }
 
+    const payload = embedEmailIcons(await this.getNodeMailerPayload());
+
     if (process.env.INTEGRATION_TEST_MODE === "true") {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-expect-error
-      setTestEmail(await this.getNodeMailerPayload());
+      setTestEmail(payload);
       console.log(
         "Skipped Sending Email as process.env.NEXT_PUBLIC_UNIT_TESTS is set. Emails are available in globalThis.testEmails"
       );
       return new Promise((r) => r("Skipped sendEmail for Unit Tests"));
     }
-
-    const payload = await this.getNodeMailerPayload();
 
     const from = "from" in payload ? (payload.from as string) : "";
     const to = "to" in payload ? (payload.to as string) : "";
