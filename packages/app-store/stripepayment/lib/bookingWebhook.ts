@@ -1,15 +1,18 @@
+import process from "node:process";
 import { handlePaymentSuccess } from "@calcom/app-store/_utils/payments/handlePaymentSuccess";
 import { HttpError } from "@calcom/lib/http-error";
 import { distributedTracing } from "@calcom/lib/tracing/factory";
 import prisma from "@calcom/prisma";
 import type Stripe from "stripe";
 import { bookingStripeData, verifyBookingIntent } from "./bookingPayment";
+import { balanceSnapshotSchema, depositSnapshotSchema } from "./deposit";
 import stripe from "./server";
 
 export async function handleStripeBookingEvent(event: Stripe.Event) {
   if (event.type !== "payment_intent.succeeded") return;
+  const account = event.account || process.env.FIXMIT_STRIPE_DIRECT_ACCOUNT_ID;
   const object = event.data.object;
-  if (!("id" in object) || typeof object.id !== "string" || !event.account) {
+  if (!("id" in object) || typeof object.id !== "string" || !account) {
     throw new HttpError({ statusCode: 400, message: "Connected account required" });
   }
   const externalId = object.id;
@@ -32,7 +35,8 @@ export async function handleStripeBookingEvent(event: Stripe.Event) {
       "metadata" in object &&
       object.metadata &&
       typeof object.metadata === "object" &&
-      "bookingId" in object.metadata
+      "fixmit_booking_payment" in object.metadata &&
+      object.metadata.fixmit_booking_payment === "true"
     ) {
       throw new HttpError({ statusCode: 503, message: "Booking payment not persisted yet" });
     }
@@ -41,15 +45,60 @@ export async function handleStripeBookingEvent(event: Stripe.Event) {
   const data = bookingStripeData.parse(payment.data);
   if (
     payment.appId !== "stripe" ||
-    data.stripeAccount !== event.account ||
+    data.stripeAccount !== account ||
     payment.paymentOption !== "ON_BOOKING"
   ) {
     throw new HttpError({ statusCode: 400, message: "Payment account mismatch" });
   }
-  const intent = await stripe.paymentIntents.retrieve(externalId, { stripeAccount: event.account });
+  const intent = await stripe.paymentIntents.retrieve(externalId, { stripeAccount: account });
   verifyBookingIntent(intent, payment, event.livemode);
   if (intent.status !== "succeeded" || intent.amount_received !== payment.amount) {
     throw new HttpError({ statusCode: 400, message: "Payment not completed" });
+  }
+  const balance = balanceSnapshotSchema.safeParse(payment.data);
+  if (balance.success) {
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(73125, ${payment.bookingId})`;
+      const parent = await tx.payment.findUnique({
+        where: { id: balance.data.depositPaymentId },
+        select: { bookingId: true, amount: true, currency: true, data: true, success: true, refunded: true },
+      });
+      const snapshot = depositSnapshotSchema.safeParse(parent?.data);
+      const parentAccount = bookingStripeData.safeParse(parent?.data);
+      if (
+        !parent ||
+        !snapshot.success ||
+        !parentAccount.success ||
+        parent.bookingId !== payment.bookingId ||
+        parentAccount.data.stripeAccount !== account ||
+        parent.currency !== payment.currency ||
+        snapshot.data.totalAmount !== balance.data.totalAmount ||
+        snapshot.data.depositAmount !== parent.amount ||
+        payment.amount !== snapshot.data.totalAmount - parent.amount
+      ) {
+        throw new HttpError({ statusCode: 400, message: "Invalid booking balance" });
+      }
+      const current = await tx.payment.findUniqueOrThrow({
+        where: { id: payment.id },
+        select: { success: true, refunded: true },
+      });
+      if (current.success || current.refunded) return;
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          success: true,
+          data: {
+            ...data,
+            ...balance.data,
+            method: "online",
+            settledAt: new Date().toISOString(),
+            reviewRequired: !parent.success || parent.refunded,
+          },
+        },
+        select: { id: true },
+      });
+    });
+    return;
   }
   // Serialize different Stripe event IDs for the same payment without holding booking row locks.
   await prisma.$transaction(

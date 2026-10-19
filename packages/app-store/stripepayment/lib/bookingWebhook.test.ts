@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   find: vi.fn(),
+  parent: vi.fn(),
   current: vi.fn(),
   retrieve: vi.fn(),
   complete: vi.fn(),
@@ -16,7 +17,7 @@ vi.mock("@calcom/prisma", () => ({
     $transaction: async (callback: (tx: unknown) => Promise<unknown>) =>
       callback({
         $executeRaw: mocks.execute,
-        payment: { findUniqueOrThrow: mocks.current, update: mocks.update },
+        payment: { findUnique: mocks.parent, findUniqueOrThrow: mocks.current, update: mocks.update },
       }),
   },
 }));
@@ -44,7 +45,7 @@ const intent = {
   amount: 500,
   amount_received: 500,
   currency: "eur",
-  metadata: { bookingId: "7" },
+  metadata: { bookingId: "7", fixmit_booking_payment: "true" },
   livemode: false,
   status: "succeeded",
 } as Stripe.PaymentIntent;
@@ -64,6 +65,7 @@ const current = {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "");
   mocks.find.mockResolvedValue(payment);
   mocks.current.mockResolvedValue(current);
   mocks.retrieve.mockResolvedValue(intent);
@@ -71,6 +73,13 @@ beforeEach(() => {
 });
 
 describe("Stripe booking webhook", () => {
+  it("accepts signed direct-account events only for the configured studio", async () => {
+    vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_test");
+    await handleStripeBookingEvent({ ...event, account: undefined });
+    expect(mocks.retrieve).toHaveBeenCalledWith("pi_test", { stripeAccount: "acct_test" });
+    vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_other");
+    await expect(handleStripeBookingEvent({ ...event, account: undefined })).rejects.toThrow();
+  });
   it("retrieves the intent in the owning account and completes it once", async () => {
     await handleStripeBookingEvent(event);
     expect(mocks.retrieve).toHaveBeenCalledWith("pi_test", { stripeAccount: "acct_test" });
@@ -123,6 +132,65 @@ describe("Stripe booking webhook", () => {
   it("does not mark fulfillment complete on a handler failure", async () => {
     mocks.complete.mockRejectedValue(new Error("calendar failed"));
     await expect(handleStripeBookingEvent(event)).rejects.toThrow("calendar failed");
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("Stripe balance payment webhook", () => {
+  const balanceData = { ...payment.data, kind: "balance", depositPaymentId: 1, totalAmount: 800 };
+  beforeEach(() => {
+    mocks.find.mockResolvedValue({ ...payment, data: balanceData });
+    mocks.current.mockResolvedValue({ ...current, data: balanceData });
+    mocks.parent.mockResolvedValue({
+      bookingId: 7,
+      amount: 300,
+      currency: "EUR",
+      success: true,
+      refunded: false,
+      data: { ...payment.data, kind: "deposit", totalAmount: 800, depositAmount: 300 },
+    });
+  });
+  it("records the remaining payment without confirming or emailing the booking twice", async () => {
+    await handleStripeBookingEvent(event);
+    expect(mocks.complete).not.toHaveBeenCalled();
+    expect(mocks.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          success: true,
+          data: expect.objectContaining({ method: "online", kind: "balance" }),
+        }),
+      })
+    );
+  });
+  it("is idempotent for repeated events", async () => {
+    mocks.current.mockResolvedValue({ success: true, refunded: false });
+    await handleStripeBookingEvent(event);
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+  it.each([
+    { bookingId: 9 },
+    { amount: 400 },
+    { currency: "USD" },
+    {
+      data: {
+        ...payment.data,
+        stripeAccount: "acct_other",
+        kind: "deposit",
+        totalAmount: 800,
+        depositAmount: 300,
+      },
+    },
+  ])("rejects inconsistent parent payment: %j", async (change) => {
+    mocks.parent.mockResolvedValue({
+      bookingId: 7,
+      amount: 300,
+      currency: "EUR",
+      success: true,
+      refunded: false,
+      data: { ...payment.data, kind: "deposit", totalAmount: 800, depositAmount: 300 },
+      ...change,
+    });
+    await expect(handleStripeBookingEvent(event)).rejects.toThrow();
     expect(mocks.update).not.toHaveBeenCalled();
   });
 });

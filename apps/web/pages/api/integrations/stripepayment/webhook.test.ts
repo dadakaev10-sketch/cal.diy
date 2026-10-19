@@ -34,11 +34,24 @@ async function request(signature?: string, method = "POST") {
 }
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.stubEnv("FIXMIT_STRIPE_BOOKING_LIVE_ENABLED", "");
   vi.stubEnv("STRIPE_WEBHOOK_SECRET", secret);
   vi.stubEnv("STRIPE_PRIVATE_KEY", "sk_test_unit");
   mocks.raw.mockResolvedValue(Buffer.from(payload));
 });
 describe("signed Stripe endpoint", () => {
+  it("supports restricted live keys only after explicit activation and verifies mode", async () => {
+    vi.stubEnv("STRIPE_PRIVATE_KEY", "rk_live_unit");
+    vi.stubEnv("FIXMIT_STRIPE_BOOKING_LIVE_ENABLED", "true");
+    const livePayload = payload.replace('"livemode":false', '"livemode":true');
+    mocks.raw.mockResolvedValue(Buffer.from(livePayload));
+    const res = await request(stripe.webhooks.generateTestHeaderString({ payload: livePayload, secret }));
+    expect(res.status).toHaveBeenCalledWith(200);
+    mocks.raw.mockResolvedValue(Buffer.from(payload));
+    expect(
+      (await request(stripe.webhooks.generateTestHeaderString({ payload, secret }))).status
+    ).toHaveBeenCalledWith(400);
+  });
   it("accepts a correctly signed sandbox event", async () => {
     const res = await request(stripe.webhooks.generateTestHeaderString({ payload, secret }));
     expect(res.status).toHaveBeenCalledWith(200);

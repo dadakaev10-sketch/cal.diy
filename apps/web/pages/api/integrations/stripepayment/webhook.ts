@@ -1,4 +1,8 @@
 import process from "node:process";
+import {
+  stripeBookingEnabled,
+  stripeBookingLiveMode,
+} from "@calcom/app-store/stripepayment/lib/bookingConfig";
 import { handleStripeBookingEvent } from "@calcom/app-store/stripepayment/lib/bookingWebhook";
 import stripe from "@calcom/app-store/stripepayment/lib/server";
 import { HttpError } from "@calcom/lib/http-error";
@@ -9,9 +13,8 @@ export const config = { api: { bodyParser: false } };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
-  if (!process.env.STRIPE_PRIVATE_KEY?.startsWith("sk_test_")) {
-    return res.status(503).json({ message: "Booking payments are sandbox-only" });
-  }
+  if (!stripeBookingEnabled())
+    return res.status(503).json({ message: "Stripe booking payments are not enabled" });
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = req.headers["stripe-signature"];
   if (!secret) return res.status(503).json({ message: "Stripe not configured" });
@@ -23,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch {
     return res.status(400).json({ message: "Invalid Stripe event" });
   }
-  const live = process.env.STRIPE_PRIVATE_KEY?.startsWith("sk_live_") === true;
+  const live = stripeBookingLiveMode();
   if (event.livemode !== live) return res.status(400).end();
   try {
     await handleStripeBookingEvent(event);
