@@ -1,14 +1,21 @@
+import process from "node:process";
+import { WEBAPP_URL } from "@calcom/lib/constants";
+import prisma from "@calcom/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import stringify from "qs-stringify";
 import type Stripe from "stripe";
 import { z } from "zod";
-
-import { WEBAPP_URL } from "@calcom/lib/constants";
-import prisma from "@calcom/prisma";
-
 import { getStripeAppKeys } from "../lib/getStripeAppKeys";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (process.env.FIXMIT_STRIPE_DIRECT_ACCOUNT_ID) {
+    return res
+      .status(400)
+      .json({
+        message:
+          "Stripe is configured directly for the studio. Contact the Fixmit administrator to connect another account.",
+      });
+  }
   const { client_id } = await getStripeAppKeys();
 
   if (req.method === "GET") {

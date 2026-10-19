@@ -1,7 +1,4 @@
-import Stripe from "stripe";
-import { v4 as uuidv4 } from "uuid";
-import z from "zod";
-
+import process from "node:process";
 import dayjs from "@calcom/dayjs";
 import { BookingRepository } from "@calcom/features/bookings/repositories/BookingRepository";
 import tasker from "@calcom/features/tasker";
@@ -15,9 +12,13 @@ import type { Booking, Payment, PaymentOption, Prisma } from "@calcom/prisma/cli
 import type { EventTypeMetadata } from "@calcom/prisma/zod-utils";
 import type { CalendarEvent } from "@calcom/types/Calendar";
 import type { IAbstractPaymentService } from "@calcom/types/PaymentService";
-
+import Stripe from "stripe";
+import { v4 as uuidv4 } from "uuid";
+import z from "zod";
 import { paymentOptionEnum } from "../zod";
+import { assertStripeBookingAccount } from "./bookingConfig";
 import { retrieveOrCreateStripeCustomerByEmail } from "./customer";
+import { calculateDeposit, depositFromMetadata } from "./deposit";
 import type { StripePaymentData, StripeSetupIntentData } from "./server";
 
 const log = logger.getSubLogger({ prefix: ["payment-service:stripe"] });
@@ -80,6 +81,17 @@ class StripePaymentService implements IAbstractPaymentService {
         throw new Error("Stripe credentials not found");
       }
 
+      assertStripeBookingAccount(this.credentials.stripe_user_id, userId);
+      const booking = await prisma.booking.findUniqueOrThrow({
+        where: { id: bookingId },
+        select: { eventType: { select: { metadata: true } } },
+      });
+      const amount = calculateDeposit(payment.amount, depositFromMetadata(booking.eventType?.metadata));
+      const depositSnapshot =
+        amount < payment.amount
+          ? { kind: "deposit", totalAmount: payment.amount, depositAmount: amount }
+          : {};
+
       const customer = await retrieveOrCreateStripeCustomerByEmail(
         this.credentials.stripe_user_id,
         bookerEmail,
@@ -87,25 +99,29 @@ class StripePaymentService implements IAbstractPaymentService {
       );
 
       const params: Stripe.PaymentIntentCreateParams = {
-        amount: payment.amount,
+        amount,
         currency: payment.currency,
         customer: customer.id,
         automatic_payment_methods: {
           enabled: true,
         },
-        metadata: this.generateMetadata({
-          bookingId,
-          userId,
-          username,
-          bookerName,
-          bookerEmail: bookerEmail,
-          bookerPhoneNumber: bookerPhoneNumber ?? null,
-          eventTitle: eventTitle || "",
-          bookingTitle: bookingTitle || "",
-        }),
+        metadata: {
+          fixmit_booking_payment: "true",
+          ...this.generateMetadata({
+            bookingId,
+            userId,
+            username,
+            bookerName,
+            bookerEmail: bookerEmail,
+            bookerPhoneNumber: bookerPhoneNumber ?? null,
+            eventTitle: eventTitle || "",
+            bookingTitle: bookingTitle || "",
+          }),
+        },
       };
 
       const paymentIntent = await this.stripe.paymentIntents.create(params, {
+        idempotencyKey: `fixmit-booking-${bookingId}-${userId}`,
         stripeAccount: this.credentials.stripe_user_id,
       });
 
@@ -122,12 +138,13 @@ class StripePaymentService implements IAbstractPaymentService {
               id: bookingId,
             },
           },
-          amount: payment.amount,
+          amount,
           currency: payment.currency,
           externalId: paymentIntent.id,
           data: Object.assign({}, paymentIntent, {
             stripe_publishable_key: this.credentials.stripe_publishable_key,
             stripeAccount: this.credentials.stripe_user_id,
+            ...depositSnapshot,
           }) as unknown as Prisma.InputJsonValue,
           fee: 0,
           refunded: false,
@@ -338,6 +355,15 @@ class StripePaymentService implements IAbstractPaymentService {
       id: paymentId,
     });
     if (!payment) {
+      return null;
+    }
+    if (
+      payment.data &&
+      typeof payment.data === "object" &&
+      !Array.isArray(payment.data) &&
+      payment.data.kind === "balance" &&
+      payment.data.method === "studio"
+    ) {
       return null;
     }
     if (!payment.success) {

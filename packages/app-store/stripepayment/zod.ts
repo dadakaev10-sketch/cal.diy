@@ -1,9 +1,8 @@
-import { z } from "zod";
-
 import { RefundPolicy } from "@calcom/lib/payment/types";
-
+import { z } from "zod";
 import { eventTypeAppCardZod } from "../eventTypeAppCardZod";
 import { paymentOptions } from "./lib/constants";
+import { depositSettingsSchema } from "./lib/deposit";
 
 // Extract the payment options enum from paymentOptions
 // https://stackoverflow.com/a/73825370
@@ -18,6 +17,7 @@ export const autoChargeNoShowFeeTimeUnitEnum = z.enum(["minutes", "hours", "days
 
 export const appDataSchema = eventTypeAppCardZod.merge(
   z.object({
+    ...depositSettingsSchema.shape,
     price: z.number(),
     currency: z.string(),
     paymentOption: paymentOptionEnum.optional(),
