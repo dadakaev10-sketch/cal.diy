@@ -63,6 +63,9 @@ export default async function Page({ params }: PageProps) {
   }
   return (
     <StripeBookingPayment
+      paymentUid={uid}
+      cancelled={payment.booking.status === "CANCELLED"}
+      canCancel={!balance.success && payment.booking.status === "PENDING" && !payment.booking.paid}
       total={
         deposit.success ? deposit.data.totalAmount : balance.success ? balance.data.totalAmount : undefined
       }

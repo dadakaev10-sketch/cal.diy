@@ -1,4 +1,9 @@
 {
+  "stripe_booking_cancel": "Buchung abbrechen",
+  "stripe_booking_cancel_confirm": "Möchtest du die unbezahlte Buchung abbrechen? Der Termin wird wieder freigegeben.",
+  "stripe_booking_continue": "Weiter zur Zahlung",
+  "stripe_booking_cancelled": "Die Buchung wurde abgebrochen. Der Termin ist wieder frei.",
+  "stripe_booking_cancel_error": "Die Buchung konnte nicht abgebrochen werden. Möglicherweise läuft die Zahlung bereits. Bitte prüfe den Zahlungsstatus und kontaktiere bei Bedarf das Studio.",
   "category_symbol_choose": "Symbol auswählen",
   "category_symbol_icons": "Symbole",
   "category_symbol_emojis": "Emojis",

@@ -1,4 +1,9 @@
 {
+  "stripe_booking_cancel": "Cancel booking",
+  "stripe_booking_cancel_confirm": "Cancel this unpaid booking? The appointment slot will be released.",
+  "stripe_booking_continue": "Continue payment",
+  "stripe_booking_cancelled": "The booking has been cancelled. The appointment slot is available again.",
+  "stripe_booking_cancel_error": "The booking could not be cancelled. A payment may already be in progress. Please check the payment status and contact the studio if needed.",
   "category_symbol_choose": "Choose a symbol",
   "category_symbol_icons": "Icons",
   "category_symbol_emojis": "Emojis",
