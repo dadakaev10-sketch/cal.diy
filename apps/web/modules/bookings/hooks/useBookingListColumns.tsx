@@ -5,20 +5,17 @@ import type useMeQuery from "@calcom/trpc/react/hooks/useMeQuery";
 import BookingListItem from "@calcom/web/components/booking/BookingListItem";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useMemo } from "react";
-
 import type { BookingListingStatus, RowData } from "../types";
 
 export function useBookingListColumns({
   user,
   status,
   canReadOthersBookings,
-  bookingsV3Enabled,
   handleBookingClick,
 }: {
   user: ReturnType<typeof useMeQuery>["data"];
   status: BookingListingStatus;
   canReadOthersBookings: boolean;
-  bookingsV3Enabled: boolean;
   handleBookingClick: (bookingUid: string) => void;
 }) {
   const { t } = useLocale();
@@ -140,12 +137,12 @@ export function useBookingListColumns({
               }}
               listingStatus={status}
               recurringInfo={recurringInfo}
-              {...(bookingsV3Enabled && { onClick: () => handleBookingClick(booking.uid) })}
+              onClick={() => handleBookingClick(booking.uid)}
               {...booking}
             />
           );
         },
       }),
     ];
-  }, [user, status, t, bookingsV3Enabled, handleBookingClick]);
+  }, [user, status, t, handleBookingClick]);
 }

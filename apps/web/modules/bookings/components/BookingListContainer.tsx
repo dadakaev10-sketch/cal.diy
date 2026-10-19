@@ -112,7 +112,6 @@ function BookingListInner({
     user,
     status,
     canReadOthersBookings: permissions.canReadOthersBookings,
-    bookingsV3Enabled,
     handleBookingClick,
   });
 
@@ -217,15 +216,13 @@ function BookingListInner({
         />
       </div>
 
-      {bookingsV3Enabled && (
-        <BookingDetailsSheet
-          userTimeZone={user?.timeZone}
-          userTimeFormat={user?.timeFormat === null ? undefined : user?.timeFormat}
-          userId={user?.id}
-          userEmail={user?.email}
-          bookingAuditEnabled={bookingAuditEnabled}
-        />
-      )}
+      <BookingDetailsSheet
+        userTimeZone={user?.timeZone}
+        userTimeFormat={user?.timeFormat === null ? undefined : user?.timeFormat}
+        userId={user?.id}
+        userEmail={user?.email}
+        bookingAuditEnabled={bookingAuditEnabled}
+      />
     </>
   );
 }
@@ -277,7 +274,6 @@ export function BookingListContainer(props: BookingListContainerProps) {
   const bookings = useMemo(() => query.data?.bookings ?? [], [query.data?.bookings]);
 
   // Always call the hook and provide navigation capabilities
-  // The BookingDetailsSheet is only rendered when bookingsV3Enabled is true (see line 212)
   // const capabilities = useListNavigationCapabilities({
   //   limit,
   //   offset,
