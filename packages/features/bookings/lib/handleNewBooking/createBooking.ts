@@ -1,4 +1,5 @@
 import dayjs from "@calcom/dayjs";
+import {prepareAminaReschedulePayments} from '@calcom/web/lib/prepareAminaReschedulePayments';
 import { isPrismaObjOrUndefined } from "@calcom/lib/isPrismaObj";
 import { withReporting } from "@calcom/lib/sentryWrapper";
 import prisma from "@calcom/prisma";
@@ -137,6 +138,10 @@ async function saveBooking(
   }
 
   return prisma.$transaction(async (tx) => {
+    if(originalRescheduledBooking){
+      const state=await prepareAminaReschedulePayments(tx,originalRescheduledBooking.id,organizerUser.id);
+      if(state){createBookingObj.data.payment={connect:state.payments};createBookingObj.data.paid=state.paid;}
+    }
     if (originalBookingUpdateDataForCancellation) {
       await tx.booking.update(originalBookingUpdateDataForCancellation);
     }
@@ -144,7 +149,7 @@ async function saveBooking(
     const booking = await tx.booking.create(createBookingObj);
 
     return { ...booking, userUuid: booking.user?.uuid ?? null };
-  });
+  },{timeout:60000,maxWait:10000});
 }
 
 function getEventTypeRel(eventTypeId: EventTypeId) {

@@ -64,6 +64,8 @@ type PlatformParams = {
 export type BookingToDelete = Awaited<ReturnType<typeof getBookingToDelete>>;
 
 export type CancelBookingInput = {
+  // Ausschließlich serverintern: Termin absagen, Zahlungsentscheidung separat belassen.
+  skipPaymentActions?: boolean;
   userId?: number;
   userUuid?: string;
   bookingData: z.infer<typeof bookingCancelInput>;
@@ -406,7 +408,7 @@ async function handler(input: CancelBookingInput, dependencies?: Dependencies) {
 
     updatedBookings.push(updatedBooking);
 
-    if (bookingToDelete.payment.some((payment) => payment.paymentOption === "ON_BOOKING")) {
+    if (!input.skipPaymentActions && bookingToDelete.payment.some((payment) => payment.paymentOption === "ON_BOOKING")) {
       try {
         await processPaymentRefund({
           booking: bookingToDelete,
@@ -414,7 +416,7 @@ async function handler(input: CancelBookingInput, dependencies?: Dependencies) {
       } catch (error) {
         log.error(`Error processing payment refund for booking ${bookingToDelete.uid}:`, error);
       }
-    } else if (bookingToDelete.payment.some((payment) => payment.paymentOption === "HOLD")) {
+    } else if (!input.skipPaymentActions && bookingToDelete.payment.some((payment) => payment.paymentOption === "HOLD")) {
       try {
         await processNoShowFeeOnCancellation({
           booking: bookingToDelete,

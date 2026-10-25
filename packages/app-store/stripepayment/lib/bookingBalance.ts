@@ -8,7 +8,7 @@ import { bookingStripeData, verifyBookingIntent } from "./bookingPayment";
 import { balanceSnapshotSchema, depositSnapshotSchema } from "./deposit";
 import stripe from "./server";
 
-export async function bookingBalance(uid: string, userId: number, action?: "link" | "studio") {
+export async function bookingBalance(uid: string, userId: number, action?: "link" | "studio", management?: {expected:{total:number;paid:number;remaining:number};studioMethod:"cash"}) {
   return prisma.$transaction(
     async (tx) => {
       const booking = await tx.booking.findFirst({
@@ -18,6 +18,8 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
       if (!booking) throw new ErrorWithCode(ErrorCode.NotFound);
       // A booking lock serializes link creation, manual settlement, and balance webhooks.
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(73125, ${booking.id})`;
+      const lockedBooking=await tx.booking.findFirst({where:{id:booking.id,userId},select:{id:true,status:true}});
+      if(!lockedBooking)throw new ErrorWithCode(ErrorCode.NotFound);
       const payments = await tx.payment.findMany({
         where: { bookingId: booking.id, appId: "stripe" },
         select: {
@@ -42,8 +44,12 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
         const parsed = balanceSnapshotSchema.safeParse(p.data);
         return parsed.success && parsed.data.depositPaymentId === deposit.id;
       });
-      const active = booking.status === "ACCEPTED" && deposit.success && !deposit.refunded;
+      const active = lockedBooking.status === "ACCEPTED" && deposit.success && !deposit.refunded;
       const balanceAmount = snapshot.totalAmount - deposit.amount;
+      // Prüfung unter derselben Sperre wie die Zahlung: veralteten Restbetrag niemals bar bestätigen.
+      const currentPaid=(deposit.success&&!deposit.refunded?deposit.amount:0)+(balance?.success&&!balance.refunded?balance.amount:0);
+      if(management&&(management.expected.total!==snapshot.totalAmount||management.expected.paid!==currentPaid||management.expected.remaining!==snapshot.totalAmount-currentPaid))
+        throw new ErrorWithCode(ErrorCode.BadRequest,"Payment changed; reload before settling");
       if (action && (!active || balance?.refunded))
         throw new ErrorWithCode(ErrorCode.BadRequest, "Payment unavailable");
       if (action) assertStripeBookingAccount(credentials.stripeAccount, userId);
@@ -80,15 +86,19 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
             },
           });
         }
+        const previousData=balance.data;
+        const generation=previousData&&typeof previousData==='object'&&!Array.isArray(previousData)?previousData.balanceIntentVersion:undefined;
+        if(generation!==undefined&&(typeof generation!=='string'||!/^[0-9a-f-]{36}$/i.test(generation)))throw new ErrorWithCode(ErrorCode.BadRequest,'Invalid balance link generation');
         const data = {
           ...credentials,
           kind: "balance",
           depositPaymentId: deposit.id,
           totalAmount: snapshot.totalAmount,
+          ...(typeof generation==='string'?{balanceIntentVersion:generation}:{}),
         };
         if (action === "studio") {
           if (balance.externalId.startsWith("pi_")) {
-            const intent = await stripe.paymentIntents.retrieve(balance.externalId, {
+            const intent = await stripe.paymentIntents.retrieve(balance.externalId, {}, {
               stripeAccount: credentials.stripeAccount,
             });
             verifyBookingIntent(intent, { ...balance, bookingId: booking.id }, stripeBookingLiveMode());
@@ -103,7 +113,7 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
             where: { id: balance.id },
             data: {
               success: true,
-              data: { ...data, method: "studio", settledAt: new Date().toISOString(), settledBy: userId },
+              data: { ...data, method: "studio", ...(management?{settlementMethod:management.studioMethod}:{}), settledAt: new Date().toISOString(), settledBy: userId },
             },
             select: {
               id: true,
@@ -129,7 +139,7 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
                 paymentKind: "balance",
               },
             },
-            { stripeAccount: credentials.stripeAccount, idempotencyKey: `booking-balance-${deposit.uid}` }
+            { stripeAccount: credentials.stripeAccount, idempotencyKey: `booking-balance-${deposit.uid}${generation?'-'+generation:''}` }
           );
           if (intent.status === "canceled")
             throw new ErrorWithCode(ErrorCode.BadRequest, "Payment link expired");

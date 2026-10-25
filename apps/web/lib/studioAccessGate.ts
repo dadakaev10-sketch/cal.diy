@@ -94,6 +94,8 @@ export async function studioAccessGate(req: NextRequest) {
   if (req.method === "GET" && ["/api/amina/services", "/api/amina/bookings"].includes(path)) return null;
   // Dieser einzelne Endpunkt prüft den persönlichen API-Schlüssel selbst.
   if (["GET", "PATCH"].includes(req.method) && path === "/api/amina/availability") return null;
+  // Die Route selbst prüft zusätzlich persönlichen Schlüssel, Besitzer und den separaten Management-Schalter.
+  if (["GET", "PATCH"].includes(req.method) && path === "/api/amina/management") return null;
   if (["GET", "HEAD"].includes(req.method) && path === "/auth/forgot-password") {
     return NextResponse.redirect(new URL("/recover", req.url));
   }
