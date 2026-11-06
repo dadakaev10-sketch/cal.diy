@@ -3,7 +3,7 @@ import { getTranslation } from "@calcom/i18n/server";
 import styles from "./public-info.module.css";
 export const INFO_PAGES = ["pricing", "terms", "privacy", "refund", "imprint"] as const;
 type InfoPage = (typeof INFO_PAGES)[number];
-const sectionCounts = { pricing: 4, terms: 7, privacy: 8, refund: 4, imprint: 3 };
+const sectionCounts = { pricing: 4, terms: 7, privacy: 9, refund: 4, imprint: 3 };
 export async function PublicInfo({
   page,
   searchParams,
@@ -99,6 +99,7 @@ export async function PublicInfo({
         )}
         {page === "privacy" && (
           <p>
+            <a href="https://stripe.com/privacy">Stripe Privacy</a> ·{" "}
             <a href="https://www.paypal.com/privacy">PayPal Privacy</a> ·{" "}
             <a href="https://www.paddle.com/legal/privacy">Paddle Privacy</a>
           </p>

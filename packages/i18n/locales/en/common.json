@@ -5061,7 +5061,7 @@
   "public_privacy_3_heading": "Public profiles and bookings",
   "public_privacy_3_text": "Your profile name, photo, description, published business address and services may be visible on your public booking page and indexed by search engines. A booking shares the entered contact and appointment details with the selected business. Passwords and internal booking lists are not part of the public profile.",
   "public_privacy_4_heading": "Service providers and payments",
-  "public_privacy_4_text": "Technical service providers are used for hosting, infrastructure and email delivery. PayPal processes payment data under its own responsibility for PayPal purchases. For an expressly offered Paddle checkout, Paddle does so as reseller. Fixmit receives identifiers and status updates needed to manage subscriptions; full card numbers and card security codes are not stored in Fixmit.",
+  "public_privacy_4_text": "Technical providers support hosting, service delivery and email. Stripe processes online deposits and remaining payments for studio services; the studio is the payment recipient. Fixmit processes total, paid and outstanding amounts, payment status and transaction identifiers to manage bookings and balance payments. Full card numbers and security codes are not stored in Fixmit or the iPhone app. For an offered PayPal checkout, PayPal processes payment data independently. Where Paddle checkout is explicitly offered, Paddle acts as merchant of record.",
   "public_privacy_5_heading": "Cookies and local settings",
   "public_privacy_5_text": "Fixmit uses technically necessary cookies for login, session security and protection against forged requests. Language and display preferences may be stored in the browser. Payment providers may use their own cookies during checkout; their privacy notices also apply.",
   "public_privacy_6_heading": "Retention and international processing",
@@ -5171,5 +5171,7 @@
   "booking_payment_balance_help": "Pay the balance at the studio or later using a payment link.",
   "booking_payment_config_error": "The deposit is not configured correctly. Please contact the studio.",
   "booking_payment_deposit_paid": "Deposit paid",
-  "booking_payment_received": "Payment received"
+  "booking_payment_received": "Payment received",
+  "public_privacy_8_heading": "Fixmit Studio for iPhone",
+  "public_privacy_8_text": "The native app processes account name and email, studio address, profile description and selected logos, as well as customer names, emails, phone numbers, appointments and payment status to manage your studio. The session token is stored in the device-bound iOS Keychain and removed on logout; the app does not store your password. Photos or files are uploaded as a profile image only after you select and save them. The app does not access your entire photo library, device contacts, device calendar or location. It contains no advertising, tracking or analytics SDKs. Under Studio → Datenschutz & Konto → Konto löschen, you can delete your Fixmit account after confirming your password, including the studio profile, uploaded profile images, your bookings and customer directory. Previously sent emails, other studios’ data and records held by payment providers are not automatically deleted. The studio and payment provider remain responsible for legally required payment record retention."
 }

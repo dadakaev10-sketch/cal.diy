@@ -7,9 +7,9 @@ export async function deleteUser(user: Pick<User, "id" | "email" | "metadata">) 
   await deleteStripeCustomer(user).catch(console.warn);
   // Remove my account
   // TODO: Move this to Repository pattern.
-  await prisma.user.delete({
-    where: {
-      id: user.id,
-    },
+  await prisma.$transaction(async (tx) => {
+    // Avatars have no user foreign key and must be removed explicitly.
+    await tx.avatar.deleteMany({ where: { userId: user.id } });
+    await tx.user.delete({ where: { id: user.id } });
   });
 }

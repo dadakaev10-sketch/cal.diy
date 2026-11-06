@@ -1,7 +1,6 @@
 import { HttpError as HttpCode } from "@calcom/lib/http-error";
 import { prisma } from "@calcom/prisma";
 import type { Prisma } from "@calcom/prisma/client";
-
 import stripe from "./server";
 
 export async function getStripeCustomerIdFromUserId(userId: number) {
@@ -67,7 +66,14 @@ export async function getStripeCustomerId(user: UserType): Promise<string> {
 }
 
 export async function deleteStripeCustomer(user: UserType): Promise<string | null> {
-  const customerId = await getStripeCustomerId(user);
+  const metadata = user.metadata;
+  const customerId =
+    metadata &&
+    typeof metadata === "object" &&
+    !Array.isArray(metadata) &&
+    typeof metadata.stripeCustomerId === "string"
+      ? metadata.stripeCustomerId
+      : null;
 
   if (!customerId) {
     console.warn(`No stripe customer found for user:${user.email}`);
