@@ -33,6 +33,7 @@ const reserved = new Set([
   "privacy",
   "refund",
   "imprint",
+  "support",
   "api",
   "auth",
   "register",

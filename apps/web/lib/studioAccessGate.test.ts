@@ -37,6 +37,7 @@ describe("studio access boundary", () => {
     "/privacy",
     "/refund",
     "/imprint",
+    "/support",
     "/robots.txt",
     "/llms.txt",
     "/sitemap.xml",

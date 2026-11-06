@@ -144,6 +144,7 @@ describe("email-first studio provisioning", () => {
     "privacy",
     "refund",
     "imprint",
+    "support",
   ])("rejects reserved route %s", async (slug) => {
     expect(await completeStudioRegistration({ ...input, slug })).toBe("studio_slug_unavailable");
     expect(mocks.transaction).not.toHaveBeenCalled();

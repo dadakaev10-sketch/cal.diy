@@ -18,6 +18,7 @@ const publicPages = new Set([
   "/privacy",
   "/refund",
   "/imprint",
+  "/support",
   "/",
   "/auth/login",
   "/auth/error",
