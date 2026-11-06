@@ -99,6 +99,8 @@ export async function PublicInfo({
         )}
         {page === "privacy" && (
           <p>
+            <a href="https://www.hostinger.com/legal/privacy-policy">Hostinger Privacy</a> ·{" "}
+            <a href="https://resend.com/legal/privacy-policy">Resend Privacy</a> ·{" "}
             <a href="https://stripe.com/privacy">Stripe Privacy</a> ·{" "}
             <a href="https://www.paypal.com/privacy">PayPal Privacy</a> ·{" "}
             <a href="https://www.paddle.com/legal/privacy">Paddle Privacy</a>
