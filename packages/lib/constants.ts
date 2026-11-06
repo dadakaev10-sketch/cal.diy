@@ -4,6 +4,7 @@
  * This handles cases where environment variables have their protocol stripped
  */
 
+import process from "node:process";
 function ensureProtocol(url: string | undefined): string {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
@@ -89,9 +90,9 @@ export const PUBLIC_QUERY_RESERVATION_INTERVAL_SECONDS =
 export const PUBLIC_QUERY_RESERVATION_STALE_TIME_SECONDS =
   parseInt(process.env.NEXT_PUBLIC_QUERY_RESERVATION_STALE_TIME_SECONDS ?? "", 10) || 20;
 export const PUBLIC_QUERY_AVAILABLE_SLOTS_INTERVAL_SECONDS =
-  parseInt(process.env.NEXT_PUBLIC_QUERY_AVAILABLE_SLOTS_INTERVAL_SECONDS ?? "", 10) || 5 * 60;
+  parseInt(process.env.NEXT_PUBLIC_QUERY_AVAILABLE_SLOTS_INTERVAL_SECONDS ?? "", 10) || 15;
 export const PUBLIC_INVALIDATE_AVAILABLE_SLOTS_ON_BOOKING_FORM =
-  process.env.NEXT_PUBLIC_INVALIDATE_AVAILABLE_SLOTS_ON_BOOKING_FORM === "1";
+  process.env.NEXT_PUBLIC_INVALIDATE_AVAILABLE_SLOTS_ON_BOOKING_FORM !== "0";
 
 // Enables a feature for x% of all visitors. Takes a number between 0 and 100.
 export const PUBLIC_QUICK_AVAILABILITY_ROLLOUT =

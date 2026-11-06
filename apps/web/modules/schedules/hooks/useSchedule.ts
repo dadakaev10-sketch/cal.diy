@@ -122,7 +122,9 @@ export const useSchedule = ({
     // It allows people who might not have the tab in focus earlier, to get latest available slots
     // It might not work correctly in iframes, so we have refetchInterval to take care of that.
     // But where it works, it should give user latest availability even if they come back to tab before refetchInterval.
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: "always" as const,
+    refetchOnMount: "always" as const,
+    staleTime: 0,
     // It allows long sitting users to get latest available slots
     refetchInterval: PUBLIC_QUERY_AVAILABLE_SLOTS_INTERVAL_SECONDS * 1000,
     enabled:

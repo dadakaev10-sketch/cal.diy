@@ -1,8 +1,8 @@
-import { z } from "zod";
-
+import { timeZoneSchema } from "@calcom/lib/dayjs/timeZone.schema";
 import { eventTypeLocations, eventTypeSlug } from "@calcom/lib/zod/eventType";
 import { SchedulingType } from "@calcom/prisma/enums";
 import { EventTypeMetaDataSchema } from "@calcom/prisma/zod-utils";
+import { z } from "zod";
 
 type CalVideoSettings =
   | {
@@ -81,6 +81,8 @@ export type TCreateEventTypeInput = {
   beforeEventBuffer?: number;
   afterEventBuffer?: number;
   scheduleId?: number;
+  lockTimeZoneToggleOnBookingPage?: boolean;
+  lockedTimeZone?: string;
   calVideoSettings?: CalVideoSettings;
 };
 
@@ -101,9 +103,15 @@ export const createEventTypeInput: z.ZodType<TCreateEventTypeInput> = z
     beforeEventBuffer: z.number().int().min(0).optional(),
     afterEventBuffer: z.number().int().min(0).optional(),
     scheduleId: z.number().int().optional(),
+    lockTimeZoneToggleOnBookingPage: z.boolean().optional(),
+    lockedTimeZone: timeZoneSchema.optional(),
     calVideoSettings: calVideoSettingsSchema,
   })
   .partial({ hidden: true, locations: true })
+  .refine((data) => !data.lockTimeZoneToggleOnBookingPage || !!data.lockedTimeZone, {
+    path: ["lockedTimeZone"],
+    message: "A locked booking timezone is required",
+  })
   .refine((data) => (data.teamId ? data.teamId && data.schedulingType : true), {
     path: ["schedulingType"],
     message: "You must select a scheduling type for team events",
