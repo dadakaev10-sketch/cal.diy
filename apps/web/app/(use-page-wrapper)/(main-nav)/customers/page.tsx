@@ -5,7 +5,7 @@ import { _generateMetadata, getTranslate } from "app/_utils";
 import { ShellMainAppDir } from "app/(use-page-wrapper)/(main-nav)/ShellMainAppDir";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { buildCustomerDirectory } from "~/customers/customer-directory";
+import { applyCustomerProfiles, buildCustomerDirectory } from "~/customers/customer-directory";
 import CustomersView from "~/customers/customers-view";
 
 export const dynamic = "force-dynamic";
@@ -19,26 +19,35 @@ export default async function Page() {
   const session = await getServerSession({ req: buildLegacyRequest(await headers(), await cookies()) });
   if (!session?.user?.id) return redirect("/auth/login");
   const t = await getTranslate();
-  const attendees = await prisma.attendee.findMany({
-    where: { booking: { userId: session.user.id } },
-    select: {
-      name: true,
-      email: true,
-      phoneNumber: true,
-      booking: { select: { id: true, title: true, startTime: true, endTime: true, status: true } },
-    },
-  });
-  const customers = buildCustomerDirectory(
-    attendees.map((attendee) => ({
-      ...attendee,
-      booking: attendee.booking
-        ? {
-            ...attendee.booking,
-            startTime: attendee.booking.startTime.toISOString(),
-            endTime: attendee.booking.endTime.toISOString(),
-          }
-        : null,
-    }))
+  const [attendees, profiles] = await Promise.all([
+    prisma.attendee.findMany({
+      where: { booking: { userId: session.user.id } },
+      select: {
+        name: true,
+        email: true,
+        phoneNumber: true,
+        booking: { select: { id: true, title: true, startTime: true, endTime: true, status: true } },
+      },
+    }),
+    prisma.studioCustomerProfile.findMany({
+      where: { userId: session.user.id },
+      select: { sourceEmail: true, email: true, name: true, phone: true, aliases: true },
+    }),
+  ]);
+  const customers = applyCustomerProfiles(
+    buildCustomerDirectory(
+      attendees.map((attendee) => ({
+        ...attendee,
+        booking: attendee.booking
+          ? {
+              ...attendee.booking,
+              startTime: attendee.booking.startTime.toISOString(),
+              endTime: attendee.booking.endTime.toISOString(),
+            }
+          : null,
+      }))
+    ),
+    profiles
   );
   return (
     <ShellMainAppDir heading={t("customer_directory")} subtitle={t("customer_directory_description")}>

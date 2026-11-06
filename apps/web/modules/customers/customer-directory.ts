@@ -41,3 +41,29 @@ export function buildCustomerDirectory(attendees: CustomerSource[]): Customer[] 
   }
   return Array.from(customers.values());
 }
+
+export type CustomerProfile = {
+  sourceEmail: string;
+  email: string;
+  name: string;
+  phone: string;
+  aliases: string[];
+};
+export function applyCustomerProfiles(customers: Customer[], profiles: CustomerProfile[]): Customer[] {
+  let result = customers;
+  for (const p of profiles) {
+    const keys = new Set([p.sourceEmail, p.email, ...p.aliases].map((s) => s.toLowerCase()));
+    const matching = result.filter((c) => keys.has(c.email.toLowerCase()));
+    const visits = new Map(matching.flatMap((c) => c.bookings).map((b) => [b.id, b]));
+    result = [
+      ...result.filter((c) => !keys.has(c.email.toLowerCase())),
+      {
+        email: p.email,
+        name: p.name,
+        phoneNumber: p.phone || null,
+        bookings: Array.from(visits.values()).sort((a, b) => b.startTime.localeCompare(a.startTime)),
+      },
+    ];
+  }
+  return result;
+}

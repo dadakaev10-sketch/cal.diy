@@ -399,6 +399,7 @@ model TravelSchedule {
 
 // It holds Personal Profiles of a User plus it has email, password and other core things..
 model User {
+  studioCustomerProfiles StudioCustomerProfile[]
   fixmitPasses        FixmitPass[]
   fixmitSubscription  FixmitSubscription?
   id                  Int                  @id @default(autoincrement())
@@ -2932,4 +2933,20 @@ model FixmitPass {
   createdAt   DateTime  @default(now())
 
   @@index([userId, createdAt])
+}
+
+model StudioCustomerProfile {
+  id          String   @id @default(cuid())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceEmail String
+  email       String
+  name        String
+  phone       String
+  aliases     String[] @default([])
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, sourceEmail])
+  @@unique([userId, email])
+  @@index([userId])
 }
