@@ -1,10 +1,8 @@
-import { default as cloneDeep } from "lodash/cloneDeep";
-import type { z } from "zod";
-
 import dayjs from "@calcom/dayjs";
 import type BaseEmail from "@calcom/emails/templates/_base-email";
 import type { EventNameObjectType } from "@calcom/features/eventtypes/lib/eventNaming";
 import { getEventName } from "@calcom/features/eventtypes/lib/eventNaming";
+import { notifyStudioBooking } from "@calcom/features/notifications/studioPush";
 import { formatCalEvent } from "@calcom/lib/formatCalendarEvent";
 import logger from "@calcom/lib/logger";
 import { safeStringify } from "@calcom/lib/safeStringify";
@@ -12,7 +10,8 @@ import { withReporting } from "@calcom/lib/sentryWrapper";
 import { prisma } from "@calcom/prisma";
 import type { EventTypeMetaDataSchema } from "@calcom/prisma/zod-utils";
 import type { CalendarEvent, Person } from "@calcom/types/Calendar";
-
+import { default as cloneDeep } from "lodash/cloneDeep";
+import type { z } from "zod";
 import AwaitingPaymentSMS from "../sms/attendee/awaiting-payment-sms";
 import CancelledSeatSMS from "../sms/attendee/cancelled-seat-sms";
 import EventCancelledSMS from "../sms/attendee/event-cancelled-sms";
@@ -83,6 +82,7 @@ const _sendScheduledEmailsAndSMS = async (
   attendeeEmailDisabled?: boolean,
   eventTypeMetadata?: EventTypeMetadata
 ) => {
+  await notifyStudioBooking(calEvent.uid, "created");
   const formattedCalEvent = formatCalEvent(calEvent);
   const emailsToSend: Promise<unknown>[] = [];
   const organizationSettings = await fetchOrganizationEmailSettings(calEvent.organizationId);
@@ -284,6 +284,7 @@ const _sendRescheduledEmailsAndSMS = async (
   calEvent: CalendarEvent,
   eventTypeMetadata?: EventTypeMetadata
 ) => {
+  await notifyStudioBooking(calEvent.uid, "rescheduled");
   const calendarEvent = formatCalEvent(calEvent);
   const emailsToSend: Promise<unknown>[] = [];
   const organizationSettings = await fetchOrganizationEmailSettings(calEvent.organizationId);
@@ -503,6 +504,7 @@ export const sendCancelledEmailsAndSMS = async (
   eventNameObject: Pick<EventNameObjectType, "eventName">,
   eventTypeMetadata?: EventTypeMetadata
 ) => {
+  await notifyStudioBooking(calEvent.uid, "cancelled");
   const calendarEvent = formatCalEvent(calEvent);
   const emailsToSend: Promise<unknown>[] = [];
   const calEventLength = calendarEvent.length;

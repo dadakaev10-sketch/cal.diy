@@ -88,6 +88,12 @@ export async function PublicInfo({
             </p>
           </section>
         ))}
+        {page === "privacy" && (
+          <section>
+            <h2>{t("public_privacy_push_heading")}</h2>
+            <p>{t("public_privacy_push_text")}</p>
+          </section>
+        )}
         <p>
           <a href="mailto:office@dadakaev.com">office@dadakaev.com</a>
         </p>
