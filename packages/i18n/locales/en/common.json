@@ -5085,7 +5085,7 @@
   "public_imprint_2_heading": "Contact and support",
   "public_imprint_2_text": "Email: office@dadakaev.com · Website: https://fixmit.com · Company website: https://dadakaev.com.",
   "public_subscribe": "Create an account",
-  "public_updated": "Updated: 10 October 2026",
+  "public_updated": "Last updated: 6 November 2026",
   "public_regular_price": "USD 9 / month",
   "public_test_price": "USD 0.50 / month",
   "public_trial": "14-day free trial. Monthly billing thereafter until cancelled.",
@@ -5173,5 +5173,16 @@
   "booking_payment_deposit_paid": "Deposit paid",
   "booking_payment_received": "Payment received",
   "public_privacy_8_heading": "Fixmit Studio for iPhone",
-  "public_privacy_8_text": "The native app processes account name and email, studio address, profile description and selected logos, as well as customer names, emails, phone numbers, appointments and payment status to manage your studio. The session token is stored in the device-bound iOS Keychain and removed on logout; the app does not store your password. Photos or files are uploaded as a profile image only after you select and save them. The app does not access your entire photo library, device contacts, device calendar or location. It contains no advertising, tracking or analytics SDKs. Under Studio → Datenschutz & Konto → Konto löschen, you can delete your Fixmit account after confirming your password, including the studio profile, uploaded profile images, your bookings and customer directory. Previously sent emails, other studios’ data and records held by payment providers are not automatically deleted. The studio and payment provider remain responsible for legally required payment record retention."
+  "public_privacy_8_text": "The native app processes account name and email, studio address, profile description and selected logos, as well as customer names, emails, phone numbers, appointments and payment status to manage your studio. The session token is stored in the device-bound iOS Keychain and removed on logout; the app does not store your password. Photos or files are uploaded as a profile image only after you select and save them. The app does not access your entire photo library, device contacts, device calendar or location. It contains no advertising, tracking or analytics SDKs. Under Studio → Datenschutz & Konto → Konto löschen, you can delete your Fixmit account after confirming your password, including the studio profile, uploaded profile images, your bookings and customer directory. Previously sent emails, other studios’ data and records held by payment providers are not automatically deleted. The studio and payment provider remain responsible for legally required payment record retention.",
+  "public_support_title": "Fixmit Studio support",
+  "public_support_0_heading": "Contact",
+  "public_support_0_text": "For app or account questions, contact office@dadakaev.com. Describe the issue and, if possible, include your app version and iPhone model. Do not send passwords, card details or complete customer records.",
+  "public_support_1_heading": "Sign in and registration",
+  "public_support_1_text": "Sign in with your Fixmit account. Select „Neues Studio erstellen“ to create a studio. Copy the verification link from your email and paste it into the app to complete registration. Accounts with two-factor authentication also require an authenticator code.",
+  "public_support_2_heading": "Appointments, customers and services",
+  "public_support_2_text": "The app includes daily and weekly calendars, appointment management, customer records, services and working hours. In Studio, block times and edit your public profile. Adding a blocked period does not automatically cancel existing appointments.",
+  "public_support_3_heading": "Payments for studio services",
+  "public_support_3_text": "For configured services, customers can pay an online deposit. In appointment details, share a remaining-payment link or record a payment actually received at the studio. Card information is entered with the payment provider. Contact the booked studio about treatment cancellations, refunds or service questions.",
+  "public_support_4_heading": "Delete your account and data",
+  "public_support_4_text": "In the iPhone app, open Studio → Datenschutz & Konto → Konto löschen. Confirm with your password and, when enabled, your current authenticator code. Deletion also affects your website account and related data. Save required records and resolve outstanding appointments and payments first. Send privacy requests to office@dadakaev.com."
 }

@@ -4949,7 +4949,7 @@
   "public_imprint_2_heading": "Kontakt und Support",
   "public_imprint_2_text": "E-Mail: office@dadakaev.com · Website: https://fixmit.com · Unternehmenswebsite: https://dadakaev.com.",
   "public_subscribe": "Konto erstellen",
-  "public_updated": "Stand: 10. Oktober 2026",
+  "public_updated": "Stand: 6. November 2026",
   "public_regular_price": "9 US-Dollar / Monat",
   "public_test_price": "0,50 US-Dollar / Monat",
   "public_trial": "14 Tage kostenlos testen. Danach monatliche Abrechnung bis zur Kündigung.",
@@ -5037,5 +5037,16 @@
   "booking_payment_deposit_paid": "Anzahlung bezahlt",
   "booking_payment_received": "Zahlung eingegangen",
   "public_privacy_8_heading": "Fixmit Studio für iPhone",
-  "public_privacy_8_text": "Die native App verarbeitet Kontoname und E-Mail-Adresse, Studio-Adresse, Profilbeschreibung und ausgewählte Logos sowie Kundennamen, E-Mail-Adressen, Telefonnummern, Termine und Zahlungsstatus zur Studioverwaltung. Der Sitzungsschlüssel wird im gerätegebundenen iOS-Schlüsselbund gespeichert und beim Abmelden entfernt; das Passwort wird nicht in der App gespeichert. Fotos oder Dateien werden nur nach deiner Auswahl und beim Speichern als Profilbild hochgeladen. Es gibt keinen Zugriff auf das gesamte Fotoarchiv, das iPhone-Adressbuch, den Gerätekalender oder den Standort. Die App enthält keine Werbe-, Tracking- oder Analyse-SDKs. Über „Studio → Datenschutz & Konto → Konto löschen“ kannst du dein Fixmit-Konto nach Passwortbestätigung einschließlich Studioprofil, hochgeladenen Profilbildern, eigenen Buchungen und Kundenkartei löschen. Bereits versendete E-Mails, Daten anderer Studios und Daten bei Zahlungsanbietern werden dadurch nicht automatisch gelöscht. Für gesetzlich aufzubewahrende Zahlungsunterlagen gelten die Pflichten des jeweiligen Studios und Zahlungsanbieters."
+  "public_privacy_8_text": "Die native App verarbeitet Kontoname und E-Mail-Adresse, Studio-Adresse, Profilbeschreibung und ausgewählte Logos sowie Kundennamen, E-Mail-Adressen, Telefonnummern, Termine und Zahlungsstatus zur Studioverwaltung. Der Sitzungsschlüssel wird im gerätegebundenen iOS-Schlüsselbund gespeichert und beim Abmelden entfernt; das Passwort wird nicht in der App gespeichert. Fotos oder Dateien werden nur nach deiner Auswahl und beim Speichern als Profilbild hochgeladen. Es gibt keinen Zugriff auf das gesamte Fotoarchiv, das iPhone-Adressbuch, den Gerätekalender oder den Standort. Die App enthält keine Werbe-, Tracking- oder Analyse-SDKs. Über „Studio → Datenschutz & Konto → Konto löschen“ kannst du dein Fixmit-Konto nach Passwortbestätigung einschließlich Studioprofil, hochgeladenen Profilbildern, eigenen Buchungen und Kundenkartei löschen. Bereits versendete E-Mails, Daten anderer Studios und Daten bei Zahlungsanbietern werden dadurch nicht automatisch gelöscht. Für gesetzlich aufzubewahrende Zahlungsunterlagen gelten die Pflichten des jeweiligen Studios und Zahlungsanbieters.",
+  "public_support_title": "Support für Fixmit Studio",
+  "public_support_0_heading": "Kontakt",
+  "public_support_0_text": "Bei Fragen zur App oder zu deinem Konto erreichst du uns unter office@dadakaev.com. Beschreibe das Problem und nenne möglichst deine App-Version und das verwendete iPhone-Modell. Sende keine Passwörter, Kartendaten oder vollständigen Kundendaten.",
+  "public_support_1_heading": "Anmelden und registrieren",
+  "public_support_1_text": "Melde dich mit deinem Fixmit-Konto an. Unter „Neues Studio erstellen“ kannst du ein Konto anlegen. Kopiere den Bestätigungslink aus deiner E-Mail und füge ihn in der App ein, um die Registrierung abzuschließen. Bei aktivierter Zwei-Faktor-Anmeldung wird zusätzlich dein Authenticator-Code benötigt.",
+  "public_support_2_heading": "Termine, Kunden und Dienstleistungen",
+  "public_support_2_text": "Die App bietet Tages- und Wochenkalender, Terminverwaltung, Kundenkartei, Dienstleistungen und Arbeitszeiten. Unter „Studio“ kannst du Zeiten sperren und dein öffentliches Profil bearbeiten. Bestehende Termine werden durch eine neue Zeitsperre nicht automatisch abgesagt.",
+  "public_support_3_heading": "Zahlungen für Studiobehandlungen",
+  "public_support_3_text": "Bei entsprechend eingerichteten Dienstleistungen können Kunden online anzahlen. In den Termindetails kannst du einen Restzahlungslink teilen oder eine tatsächlich im Studio erhaltene Restzahlung erfassen. Die Karteneingabe erfolgt beim Zahlungsanbieter. Für Terminabsagen, Erstattungen oder Fragen zu einer Behandlung wende dich an das gebuchte Studio.",
+  "public_support_4_heading": "Konto und Daten löschen",
+  "public_support_4_text": "Öffne in der iPhone-App „Studio → Datenschutz & Konto → Konto löschen“. Bestätige die Löschung mit deinem Passwort und bei aktivierter Zwei-Faktor-Anmeldung mit dem aktuellen Authenticator-Code. Die Löschung betrifft auch dein Webkonto und die zugehörigen Daten. Sichere benötigte Unterlagen und kläre offene Termine und Zahlungen vorher. Datenschutzanfragen kannst du an office@dadakaev.com richten."
 }

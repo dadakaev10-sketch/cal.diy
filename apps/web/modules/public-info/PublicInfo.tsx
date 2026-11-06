@@ -1,9 +1,9 @@
 import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
 import styles from "./public-info.module.css";
-export const INFO_PAGES = ["pricing", "terms", "privacy", "refund", "imprint"] as const;
+export const INFO_PAGES = ["pricing", "terms", "privacy", "refund", "imprint", "support"] as const;
 type InfoPage = (typeof INFO_PAGES)[number];
-const sectionCounts = { pricing: 4, terms: 7, privacy: 9, refund: 4, imprint: 3 };
+const sectionCounts = { pricing: 4, terms: 7, privacy: 9, refund: 4, imprint: 3, support: 5 };
 export async function PublicInfo({
   page,
   searchParams,
