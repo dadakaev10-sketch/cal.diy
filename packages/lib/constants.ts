@@ -4,7 +4,7 @@
  * This handles cases where environment variables have their protocol stripped
  */
 
-import process from "node:process";
+// biome-ignore-all lint/correctness/noProcessGlobal: Shared with Next.js Edge routes; process.env is replaced by the bundler.
 function ensureProtocol(url: string | undefined): string {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
