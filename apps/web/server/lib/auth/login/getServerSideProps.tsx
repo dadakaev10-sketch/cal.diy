@@ -47,7 +47,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
   }
 
-  if (session) {
+  if (session && query.reauth !== "1") {
     const { callbackUrl } = query;
 
     if (callbackUrl) {
@@ -87,6 +87,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       csrfToken: await getCsrfToken(context),
+      isReauth: !!session && query.reauth === "1",
       isGoogleLoginEnabled: IS_GOOGLE_LOGIN_ENABLED,
       isOutlookLoginEnabled: false,
       totpEmail,

@@ -281,7 +281,11 @@ const GeneralView = ({ user, travelSchedules }: GeneralViewProps) => {
                     <>{t("time_format")}</>
                   </Label>
                   <Select
-                    value={timeFormatOptions.find((option) => option.value === (typeof value === "object" ? value?.value : value)) || value}
+                    value={
+                      timeFormatOptions.find(
+                        (option) => option.value === (typeof value === "object" ? value?.value : value)
+                      ) || value
+                    }
                     options={timeFormatOptions}
                     onChange={(event) => {
                       if (event) formMethods.setValue("timeFormat", { ...event }, { shouldDirty: true });
@@ -303,7 +307,11 @@ const GeneralView = ({ user, travelSchedules }: GeneralViewProps) => {
                     <>{t("start_of_week")}</>
                   </Label>
                   <Select
-                    value={weekStartOptions.find((option) => option.value === (typeof value === "object" ? value?.value : value)) || value}
+                    value={
+                      weekStartOptions.find(
+                        (option) => option.value === (typeof value === "object" ? value?.value : value)
+                      ) || value
+                    }
                     options={weekStartOptions}
                     onChange={(event) => {
                       if (event) formMethods.setValue("weekStart", { ...event }, { shouldDirty: true });
@@ -378,6 +386,13 @@ const GeneralView = ({ user, travelSchedules }: GeneralViewProps) => {
           }}
           switchContainerClassName="mt-6"
         />
+        <div className="mt-6 rounded-xl border border-subtle p-5">
+          <h2 className="font-semibold">{t("studio_social_methods")}</h2>
+          <p className="my-2 text-sm text-subtle">{t("studio_social_link_intro")}</p>
+          <a className="text-sm font-semibold underline" href="/auth/social?link=1">
+            {t("studio_social_manage")}
+          </a>
+        </div>
         <TravelScheduleModal
           open={isTZScheduleOpen}
           onOpenChange={setIsTZScheduleOpen}

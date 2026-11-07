@@ -28,6 +28,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import styles from "./studio-auth.module.css";
+import StudioSocialButtons from "./studio-social-buttons";
 
 interface LoginValues {
   email: string;
@@ -100,6 +101,7 @@ function BackgroundGrid() {
 export type PageProps = inferSSRProps<typeof getServerSideProps>;
 export default function Login({
   csrfToken,
+  isReauth,
   isGoogleLoginEnabled,
   isOutlookLoginEnabled,
   totpEmail,
@@ -194,6 +196,12 @@ export default function Login({
           </p>
 
           <FormProvider {...methods}>
+            {!twoFactorRequired && (
+              <StudioSocialButtons
+                mode={isReauth ? "reauth" : "login"}
+                intent={isReauth ? "link" : undefined}
+              />
+            )}
             {/* Social Login Buttons */}
             {!twoFactorRequired && showSocialLogin && (
               <>

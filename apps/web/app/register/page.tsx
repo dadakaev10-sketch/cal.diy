@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import styles from "../../modules/auth/studio-auth.module.css";
 import StudioRegistrationForm from "../../modules/auth/studio-registration-form";
 import { studioRegistrationKeys } from "../../modules/auth/studio-registration-labels";
+import StudioSocialButtons from "../../modules/auth/studio-social-buttons";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export default async function RegisterPage({
         <p className={styles.eyebrow}>{t("studio_account_access")}</p>
         <h1>{t("home_register")}</h1>
         <p>{t(enabled ? "studio_registration_intro" : "studio_registration_disabled")}</p>
+        {enabled && <StudioSocialButtons />}
         {enabled ? (
           <StudioRegistrationForm
             mode="request"
