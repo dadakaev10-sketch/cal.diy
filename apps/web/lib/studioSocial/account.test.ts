@@ -55,7 +55,7 @@ vi.mock("@calcom/prisma", () => ({
 
 import { proofHash } from "@calcom/features/auth/lib/studioSocialIdentity";
 import { NextRequest, NextResponse } from "next/server";
-import { exchangeIdentity, unlink } from "./account";
+import { exchangeIdentity, socialOnboardInput, unlink } from "./account";
 
 const verifier = "a".repeat(43),
   request = new NextRequest("https://fixmit.com/api/studio-auth/exchange");
@@ -166,5 +166,33 @@ describe("social account isolation", () => {
     await expect(exchangeIdentity(request, { ticket: "t", verifier })).rejects.toThrow();
     expect(m.account.update).not.toHaveBeenCalled();
     expect(m.session).not.toHaveBeenCalled();
+  });
+});
+
+describe("native onboarding locale", () => {
+  const fields = {
+    ticket: "a".repeat(64),
+    verifier: "b".repeat(43),
+    name: "Test Owner",
+    studioName: "Test Studio",
+    slug: "test-studio",
+    timeZone: "Europe/Vienna",
+  };
+  it.each([
+    "en",
+    "de",
+    "es",
+    "ru",
+    "it",
+    "fr",
+  ])("accepts %s without weakening onboarding validation", (locale) => {
+    expect(socialOnboardInput.parse({ ...fields, locale }).locale).toBe(locale);
+    expect(socialOnboardInput.safeParse({ ...fields, locale, unknown: true }).success).toBe(false);
+  });
+  it("preserves the previous locale for older native and web clients", () => {
+    expect(socialOnboardInput.parse(fields).locale).toBe("de");
+  });
+  it("rejects unsupported locales", () => {
+    expect(socialOnboardInput.safeParse({ ...fields, locale: "invalid" }).success).toBe(false);
   });
 });

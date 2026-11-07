@@ -36,6 +36,7 @@ vi.mock("@calcom/lib/auth/hashPassword", () => ({ hashPassword: vi.fn().mockReso
 import {
   completeStudioRegistration,
   requestStudioRegistration,
+  studioLocaleSchema,
   studioRegistrationSchema,
 } from "./studioRegistration";
 
@@ -157,5 +158,38 @@ describe("email-first studio provisioning", () => {
   it("rejects untrusted slugs and unknown time zones", () => {
     expect(studioRegistrationSchema.safeParse({ ...input, slug: "../admin" }).success).toBe(false);
     expect(studioRegistrationSchema.safeParse({ ...input, timeZone: "Invalid/Zone" }).success).toBe(false);
+  });
+});
+
+describe("native studio registration languages", () => {
+  it.each(studioLocaleSchema.options)("keeps the %s email verification locale", async (locale) => {
+    await requestStudioRegistration({ email: "new@example.com", locale });
+    expect(mocks.createRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ locale }) })
+    );
+    expect(mocks.send).toHaveBeenCalledWith({ throwOnError: true });
+  });
+  it.each([
+    ["en", "Studio hours"],
+    ["de", "Studio-Zeiten"],
+    ["es", "Horario del estudio"],
+    ["ru", "Расписание студии"],
+    ["it", "Orari dello studio"],
+    ["fr", "Horaires du studio"],
+  ])("creates the initial schedule in %s", async (locale, name) => {
+    mocks.request.mockResolvedValue({
+      tokenHash: "hash",
+      email: "verified@example.com",
+      locale,
+      studioName: null,
+      createdBy: null,
+    });
+    expect(await completeStudioRegistration(input)).toBe("studio_registration_complete");
+    expect(mocks.schedule).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ name }) })
+    );
+  });
+  it("rejects an unsupported registration locale", () => {
+    expect(studioLocaleSchema.safeParse("../../de").success).toBe(false);
   });
 });

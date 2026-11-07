@@ -4,6 +4,7 @@ import { studioTokenHash } from "@calcom/features/auth/lib/studioAccountSecurity
 import { queueAppleRevocation, retryAppleRevocations } from "@calcom/features/auth/lib/studioApple";
 import {
   completeStudioRegistration,
+  studioLocaleSchema,
   studioRegistrationSchema,
 } from "@calcom/features/auth/lib/studioRegistration";
 import {
@@ -141,9 +142,13 @@ export async function exchangeIdentity(
 }
 export const socialOnboardInput = studioRegistrationSchema
   .omit({ token: true, password: true })
-  .extend({ ticket: z.string().regex(/^[a-f0-9]{64}$/), verifier: z.string() })
+  .extend({
+    ticket: z.string().regex(/^[a-f0-9]{64}$/),
+    verifier: z.string(),
+    locale: studioLocaleSchema.default("de"),
+  })
   .strict();
-export async function onboardSocial(input: z.infer<typeof socialOnboardInput>) {
+export async function onboardSocial(input: z.input<typeof socialOnboardInput>) {
   if (process.env.STUDIO_REGISTRATION_ENABLED !== "true") return socialError("registration_disabled");
   const { row, data } = await readSocialProof(input.ticket, "identity", identityProof);
   assertSocialVerifier(data.challenge, input.verifier);
@@ -151,7 +156,12 @@ export async function onboardSocial(input: z.infer<typeof socialOnboardInput>) {
   const token = randomBytes(32).toString("hex"),
     tokenHash = studioTokenHash(token);
   await prisma.studioRegistrationRequest.create({
-    data: { tokenHash, email: data.identity.email, locale: "de", expiresAt: new Date(Date.now() + 300000) },
+    data: {
+      tokenHash,
+      email: data.identity.email,
+      locale: studioLocaleSchema.parse(input.locale ?? "de"),
+      expiresAt: new Date(Date.now() + 300000),
+    },
     select: { tokenHash: true },
   });
   let result: string;

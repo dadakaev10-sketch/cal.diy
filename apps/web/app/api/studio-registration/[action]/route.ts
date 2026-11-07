@@ -3,6 +3,7 @@ import { validStudioCsrf } from "@calcom/features/auth/lib/studioAccountSecurity
 import {
   completeStudioRegistration,
   requestStudioRegistration,
+  studioLocaleSchema,
   studioRegistrationSchema,
 } from "@calcom/features/auth/lib/studioRegistration";
 import {
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ act
           .email()
           .max(254)
           .transform((v) => v.toLowerCase()),
-        locale: z.enum(["de", "en", "ru"]),
+        locale: studioLocaleSchema,
         studioName: z.string().trim().min(2).max(100).optional(),
       })
       .safeParse(body);

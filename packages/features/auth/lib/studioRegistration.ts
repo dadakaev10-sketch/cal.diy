@@ -67,9 +67,20 @@ const reserved = new Set([
   "support",
 ]);
 
+export const studioLocaleSchema = z.enum(["en", "de", "es", "ru", "it", "fr"]);
+export type StudioLocale = z.infer<typeof studioLocaleSchema>;
+const initialScheduleNames: Record<StudioLocale, string> = {
+  en: "Studio hours",
+  de: "Studio-Zeiten",
+  es: "Horario del estudio",
+  ru: "Расписание студии",
+  it: "Orari dello studio",
+  fr: "Horaires du studio",
+};
+
 export async function requestStudioRegistration(input: {
   email: string;
-  locale: "de" | "en" | "ru";
+  locale: StudioLocale;
   studioName?: string;
   createdBy?: number;
 }) {
@@ -176,12 +187,7 @@ export async function completeStudioRegistration(
     const schedule = await tx.schedule.create({
       data: {
         userId: user.id,
-        name:
-          request.locale === "de"
-            ? "Studio-Zeiten"
-            : request.locale === "ru"
-              ? "Расписание студии"
-              : "Studio hours",
+        name: initialScheduleNames[studioLocaleSchema.parse(request.locale)],
         timeZone: input.timeZone,
       },
       select: { id: true },
