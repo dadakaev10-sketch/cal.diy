@@ -47,6 +47,13 @@ async function handle(request: Request, remove: boolean) {
     await tx.notificationsSubscriptions.deleteMany({
       where: { id: { in: matches.filter((r) => r.id !== own?.id).map((r) => r.id) } },
     });
+    const previous = own ? parseDevice(own.subscription) : null;
+    if (own && previous && target.locale && target.locale !== previous.locale) {
+      await tx.notificationsSubscriptions.updateMany({
+        where: { id: own.id, userId, subscription: own.subscription },
+        data: { subscription: JSON.stringify({ ...previous, locale: target.locale }) },
+      });
+    }
     if (!own)
       await tx.notificationsSubscriptions.create({
         data: { userId, subscription: JSON.stringify({ ...target, kind: "fixmit-apns-v1", sent: [] }) },

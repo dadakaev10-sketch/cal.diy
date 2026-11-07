@@ -1,13 +1,19 @@
 import { createHash, createPrivateKey, sign } from "node:crypto";
 import { connect } from "node:http2";
 import process from "node:process";
+import { publicBookingLanguageSchema } from "@calcom/lib/publicBookingLanguage";
 import prisma from "@calcom/prisma";
 import { z } from "zod";
 
 export const deviceInput = z
-  .object({ token: z.string().regex(/^[a-f0-9]{64,256}$/), environment: z.enum(["sandbox", "production"]) })
+  .object({
+    token: z.string().regex(/^[a-f0-9]{64,256}$/),
+    environment: z.enum(["sandbox", "production"]),
+    locale: publicBookingLanguageSchema.optional(),
+  })
   .strict();
 const device = deviceInput.extend({
+  locale: publicBookingLanguageSchema.default("de"),
   kind: z.literal("fixmit-apns-v1"),
   sent: z.array(z.string()).max(100).default([]),
 });
@@ -23,12 +29,31 @@ export function pushPayload(
   kind: "created" | "cancelled" | "rescheduled",
   uid: string,
   start: Date,
-  zone: string
+  zone: string,
+  locale: z.infer<typeof publicBookingLanguageSchema> = "de"
 ) {
-  const title = { created: "Neue Buchung", cancelled: "Termin abgesagt", rescheduled: "Termin verschoben" }[
-    kind
-  ];
-  const body = new Intl.DateTimeFormat("de-AT", {
+  const titles = {
+    de: { created: "Neue Buchung", cancelled: "Termin abgesagt", rescheduled: "Termin verschoben" },
+    en: {
+      created: "New booking",
+      cancelled: "Appointment cancelled",
+      rescheduled: "Appointment rescheduled",
+    },
+    es: { created: "Nueva reserva", cancelled: "Cita cancelada", rescheduled: "Cita reprogramada" },
+    ru: { created: "Новая запись", cancelled: "Запись отменена", rescheduled: "Запись перенесена" },
+    it: {
+      created: "Nuova prenotazione",
+      cancelled: "Appuntamento annullato",
+      rescheduled: "Appuntamento spostato",
+    },
+    fr: {
+      created: "Nouvelle réservation",
+      cancelled: "Rendez-vous annulé",
+      rescheduled: "Rendez-vous déplacé",
+    },
+  };
+  const title = titles[locale][kind];
+  const body = new Intl.DateTimeFormat(locale, {
     timeZone: zone,
     dateStyle: "medium",
     timeStyle: "short",
@@ -130,7 +155,13 @@ export async function notifyStudioBooking(
       subscriptions.map(async (row) => {
         const target = parseDevice(row.subscription);
         if (!target || target.sent.includes(event)) return;
-        const payload = pushPayload(kind, uid, booking.startTime, booking.user?.timeZone || "Europe/Vienna");
+        const payload = pushPayload(
+          kind,
+          uid,
+          booking.startTime,
+          booking.user?.timeZone || "Europe/Vienna",
+          target.locale
+        );
         let status = await deliver(target.token, target.environment, payload, event);
         if (status === 429 || status >= 500)
           status = await deliver(target.token, target.environment, payload, event);

@@ -49,3 +49,38 @@ describe("native studio push", () => {
     vi.unstubAllEnvs();
   });
 });
+
+describe("push language", () => {
+  it.each([
+    ["en", "New booking"],
+    ["de", "Neue Buchung"],
+    ["es", "Nueva reserva"],
+    ["ru", "Новая запись"],
+    ["it", "Nuova prenotazione"],
+    ["fr", "Nouvelle réservation"],
+  ] as const)("uses the device's %s language without client details", (locale, title) => {
+    const payload = pushPayload("created", "uid", new Date("2026-11-07T09:00:00Z"), "Europe/Vienna", locale);
+    expect(payload.aps.alert.title).toBe(title);
+    expect(Object.keys(payload)).toEqual(["aps", "bookingUid"]);
+    expect(deviceInput.parse({ token: "ab".repeat(32), environment: "production", locale }).locale).toBe(
+      locale
+    );
+  });
+  it("defaults older device registrations to German", () => {
+    expect(
+      parseDevice(
+        JSON.stringify({
+          token: "ab".repeat(32),
+          environment: "sandbox",
+          kind: "fixmit-apns-v1",
+          sent: ["event"],
+        })
+      )?.locale
+    ).toBe("de");
+  });
+  it("rejects unsupported notification locales", () => {
+    expect(
+      deviceInput.safeParse({ token: "ab".repeat(32), environment: "production", locale: "invalid" }).success
+    ).toBe(false);
+  });
+});

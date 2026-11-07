@@ -5,7 +5,12 @@ const mocks = vi.hoisted(() => ({
   limit: vi.fn(),
   tx: {
     $executeRaw: vi.fn(),
-    notificationsSubscriptions: { findMany: vi.fn(), create: vi.fn(), deleteMany: vi.fn() },
+    notificationsSubscriptions: {
+      findMany: vi.fn(),
+      create: vi.fn(),
+      deleteMany: vi.fn(),
+      updateMany: vi.fn(),
+    },
   },
 }));
 vi.mock("@calcom/features/auth/lib/getServerSession", () => ({ getServerSession: mocks.session }));
@@ -71,5 +76,31 @@ describe("studio device authorization", () => {
     ]);
     await POST(req());
     expect(mocks.tx.notificationsSubscriptions.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("push locale preferences", () => {
+  it("updates only the signed-in device locale and preserves sent events", async () => {
+    const subscription = JSON.stringify({ ...body, kind: "fixmit-apns-v1", sent: ["already-sent"] });
+    mocks.tx.notificationsSubscriptions.findMany.mockResolvedValue([{ id: 11, userId: 7, subscription }]);
+    expect((await POST(req({ ...body, locale: "fr" }))).status).toBe(200);
+    expect(mocks.tx.notificationsSubscriptions.updateMany).toHaveBeenCalledWith({
+      where: { id: 11, userId: 7, subscription },
+      data: {
+        subscription: JSON.stringify({
+          ...body,
+          locale: "fr",
+          kind: "fixmit-apns-v1",
+          sent: ["already-sent"],
+        }),
+      },
+    });
+    expect(mocks.tx.notificationsSubscriptions.create).not.toHaveBeenCalled();
+  });
+  it("preserves an existing preference if an older client omits locale", async () => {
+    const subscription = JSON.stringify({ ...body, locale: "it", kind: "fixmit-apns-v1", sent: [] });
+    mocks.tx.notificationsSubscriptions.findMany.mockResolvedValue([{ id: 11, userId: 7, subscription }]);
+    await POST(req());
+    expect(mocks.tx.notificationsSubscriptions.updateMany).not.toHaveBeenCalled();
   });
 });
