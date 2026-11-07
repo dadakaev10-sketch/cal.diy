@@ -152,7 +152,7 @@ const checkIfUserShouldBelongToOrg = async (idP: IdentityProvider, email: string
 export async function authorizeCredentials(
   credentials: Record<"email" | "password" | "totpCode" | "backupCode", string> | undefined
 ): Promise<User | null> {
-  log.debug("CredentialsProvider:credentials:authorize", safeStringify({ credentials }));
+  log.debug("CredentialsProvider:credentials:authorize");
   if (!credentials) {
     console.error(`For some reason credentials are missing`);
     throw new Error(ErrorCode.InternalServerError);
@@ -270,6 +270,7 @@ export async function authorizeCredentials(
   const { studioPasswordStamp } = await import("./studioAccountSecurity");
   const baseUser = {
     ...AdapterUserPresenter.fromCalUser(user, role, hasActiveTeams),
+    studioAuthenticatedAt: Math.floor(Date.now() / 1000),
     ...(process.env.STUDIO_ACCESS_GATE_ENABLED === "true" && secret
       ? { studioPasswordStamp: studioPasswordStamp(user.password.hash, secret) }
       : {}),
@@ -441,6 +442,8 @@ export const getOptions = ({
           throw new Error(ErrorCode.InternalServerError);
         }
         token.studioPasswordStamp = user.studioPasswordStamp;
+        token.studioAuthenticatedAt =
+          "studioAuthenticatedAt" in user ? user.studioAuthenticatedAt : undefined;
       }
       // The data available in 'session' depends on what data was supplied in update method call of session
       if (trigger === "update") {

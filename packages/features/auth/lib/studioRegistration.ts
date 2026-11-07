@@ -7,6 +7,7 @@ import { ErrorWithCode } from "@calcom/lib/errors";
 import prisma from "@calcom/prisma";
 import { z } from "zod";
 import { studioAccountRateLimit, studioTokenHash, validStudioPassword } from "./studioAccountSecurity";
+import type { SocialIdentity } from "./studioSocialIdentity";
 
 export const studioRegistrationSchema = z.object({
   token: z.string().regex(/^[a-f0-9]{64}$/),
@@ -96,7 +97,10 @@ export async function requestStudioRegistration(input: {
   }
 }
 
-export async function completeStudioRegistration(rawInput: z.infer<typeof studioRegistrationSchema>) {
+export async function completeStudioRegistration(
+  rawInput: z.infer<typeof studioRegistrationSchema>,
+  social?: { identity: SocialIdentity; proof: { token: string; identifier: string } }
+) {
   const input = studioRegistrationSchema.parse(rawInput);
   if (reserved.has(input.slug)) return "studio_slug_unavailable";
   const hash = await hashPassword(input.password);
@@ -126,6 +130,17 @@ export async function completeStudioRegistration(rawInput: z.infer<typeof studio
       where: { tokenHash: request.tokenHash, expiresAt: { gt: new Date() } },
     });
     if (consumed.count !== 1) return "request_is_expired";
+    if (social) {
+      if (!social.identity.email || request.email !== social.identity.email) return "request_is_expired";
+      const proof = await tx.verificationToken.deleteMany({
+        where: {
+          token: social.proof.token,
+          identifier: social.proof.identifier,
+          expires: { gt: new Date() },
+        },
+      });
+      if (proof.count !== 1) return "request_is_expired";
+    }
     const user = await tx.user.create({
       data: {
         email: request.email,
@@ -138,12 +153,26 @@ export async function completeStudioRegistration(rawInput: z.infer<typeof studio
         weekStart: "Monday",
         identityProvider: "CAL",
         role: "USER",
+        ...(social ? { metadata: { studioSocialPasswordless: true } } : {}),
         locked: false,
         creationSource: "WEBAPP",
         password: { create: { hash } },
       },
       select: { id: true },
     });
+    if (social)
+      await tx.account.create({
+        data: {
+          userId: user.id,
+          type: "oauth",
+          provider: `studio-${social.identity.provider}`,
+          providerAccountId: social.identity.sub,
+          providerEmail: social.identity.email,
+          refresh_token: social.identity.refresh,
+          expires_at: Math.floor(Date.now() / 1000) + 86400,
+        },
+        select: { id: true },
+      });
     const schedule = await tx.schedule.create({
       data: {
         userId: user.id,

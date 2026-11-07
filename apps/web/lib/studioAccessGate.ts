@@ -5,6 +5,7 @@ import {
   studioPasswordStamp,
   validStudioOrigin,
 } from "@calcom/features/auth/lib/studioAccountSecurity";
+import { validSocialSession } from "@calcom/features/auth/lib/studioSocialSession";
 import prisma from "@calcom/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -84,6 +85,18 @@ export function studioRouteAccess(path: string, method: string) {
   ) {
     return "public";
   }
+  if (normalized === "/api/studio-auth/options" && method === "GET") return "public";
+  if (
+    [
+      "/api/studio-auth/start",
+      "/api/studio-auth/finish",
+      "/api/studio-auth/exchange",
+      "/api/studio-auth/onboard",
+      "/api/studio-auth/cancel",
+    ].includes(normalized) &&
+    method === "POST"
+  )
+    return "public";
   if (studioPublicBookingRoute(normalized, method)) return "public";
   return "private";
 }
@@ -178,13 +191,14 @@ export async function studioAccessGate(req: NextRequest) {
     if (Number.isSafeInteger(userId) && userId > 0) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, locked: true, password: { select: { hash: true } } },
+        select: { id: true, locked: true, twoFactorEnabled: true, password: { select: { hash: true } } },
       });
       if (
         user &&
         !user.locked &&
         user.password &&
-        token?.studioPasswordStamp === studioPasswordStamp(user.password.hash, secret)
+        token?.studioPasswordStamp === studioPasswordStamp(user.password.hash, secret) &&
+        (await validSocialSession(user.id, token?.studioSocial, user.twoFactorEnabled))
       ) {
         const billingRoute = path === "/billing" || path.startsWith("/api/fixmit-billing/");
         if (!billingRoute && access !== "public" && !(await entitled(user.id))) {
