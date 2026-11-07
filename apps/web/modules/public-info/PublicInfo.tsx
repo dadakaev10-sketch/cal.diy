@@ -43,7 +43,7 @@ export async function PublicInfo({
             <p className={styles.period}>{t("public_free_period")}</p>
             <p>{t("public_free_terms")}</p>
             <a className={styles.button} href={`/register?lang=${language}`}>
-              {t("public_free_start")} ↗
+              {t("public_free_start")}
             </a>
           </div>
         ) : page === "pricing" ? (
@@ -57,7 +57,7 @@ export async function PublicInfo({
               <p className={styles.period}>{t("public_pass_period")}</p>
               <p>{t("fixmit_pass_terms")}</p>
               <a className={styles.button} href={`/register?lang=${language}`}>
-                {t("public_pass_buy")} ↗
+                {t("public_pass_buy")}
               </a>
             </div>
             <div className={styles.offer}>
@@ -69,7 +69,7 @@ export async function PublicInfo({
               <p className={styles.period}>{t("public_subscription_period")}</p>
               <p>{t(isTest ? "public_no_trial" : "public_trial")}</p>
               <a className={styles.button} href={`/register?lang=${language}`}>
-                {t("public_subscribe")} ↗
+                {t("public_subscribe")}
               </a>
             </div>
           </div>
@@ -105,8 +105,13 @@ export async function PublicInfo({
         </p>
         {page === "refund" && (
           <p>
-            <a href="https://paddle.net">Paddle Support</a> ·{" "}
-            <a href="https://www.paddle.com/legal/refund-policy">Paddle Refund Policy</a>
+            <a href="https://reportaproblem.apple.com">
+              Apple: {language === "de" ? "Erstattung beantragen" : "Request a refund"}
+            </a>{" "}
+            ·{" "}
+            <a href="https://support.apple.com/118428">
+              Apple: {language === "de" ? "Abonnements verwalten" : "Manage subscriptions"}
+            </a>
           </p>
         )}
         {page === "privacy" && (
@@ -114,8 +119,6 @@ export async function PublicInfo({
             <a href="https://www.hostinger.com/legal/privacy-policy">Hostinger Privacy</a> ·{" "}
             <a href="https://resend.com/legal/privacy-policy">Resend Privacy</a> ·{" "}
             <a href="https://stripe.com/privacy">Stripe Privacy</a> ·{" "}
-            <a href="https://www.paypal.com/privacy">PayPal Privacy</a> ·{" "}
-            <a href="https://www.paddle.com/legal/privacy">Paddle Privacy</a> ·{" "}
             <a href="https://policies.google.com/privacy">Google Privacy</a> ·{" "}
             <a href="https://www.apple.com/legal/privacy/">Apple Privacy</a>
           </p>
