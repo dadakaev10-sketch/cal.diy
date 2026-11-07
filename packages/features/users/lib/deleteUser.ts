@@ -1,8 +1,10 @@
 import { deleteStripeCustomer } from "@calcom/app-store/stripepayment/lib/customer";
+import { revokeUserAppleAccounts } from "@calcom/features/auth/lib/studioApple";
 import prisma from "@calcom/prisma";
 import type { User } from "@calcom/prisma/client";
 
 export async function deleteUser(user: Pick<User, "id" | "email" | "metadata">) {
+  await revokeUserAppleAccounts(user.id);
   // If 2FA is disabled or totpCode is valid then delete the user from stripe and database
   await deleteStripeCustomer(user).catch(console.warn);
   await prisma.$transaction(

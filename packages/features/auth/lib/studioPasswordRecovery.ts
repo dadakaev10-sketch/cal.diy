@@ -60,6 +60,17 @@ export async function resetStudioPassword(token: string, password: string) {
       update: { hash },
       select: { userId: true },
     });
+    const current = await tx.user.findUnique({ where: { id: users[0].id }, select: { metadata: true } });
+    if (
+      current?.metadata &&
+      typeof current.metadata === "object" &&
+      !Array.isArray(current.metadata) &&
+      "studioSocialPasswordless" in current.metadata
+    ) {
+      const metadata = { ...current.metadata };
+      delete metadata.studioSocialPasswordless;
+      await tx.user.update({ where: { id: users[0].id }, data: { metadata }, select: { id: true } });
+    }
     await tx.resetPasswordRequest.deleteMany({ where: { email: request.email } });
     return true;
   });

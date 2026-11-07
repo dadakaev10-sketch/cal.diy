@@ -60,6 +60,8 @@ beforeEach(() => {
     fn({
       resetPasswordRequest: { findFirst: mocks.find, deleteMany: mocks.remove },
       userPassword: { upsert: mocks.update },
+      user: { findUnique: vi.fn().mockResolvedValue({ metadata: {} }), update: vi.fn() },
+      $executeRaw: mocks.execute,
       $queryRaw: vi.fn().mockResolvedValue([{ id: 1 }]),
     })
   );

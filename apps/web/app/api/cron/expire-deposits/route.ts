@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import process from "node:process";
 import { expireDeposits } from "@calcom/app-store/stripepayment/lib/expireDeposits";
+import { cleanupSocialProofs } from "@calcom/features/auth/lib/studioApple";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -17,5 +18,11 @@ export async function POST(request: Request) {
   const cursor = Number(new URL(request.url).searchParams.get("cursor") || 0);
   if (!Number.isSafeInteger(cursor) || cursor < 0)
     return NextResponse.json({ error: "Invalid cursor" }, { status: 400 });
-  return NextResponse.json(await expireDeposits(cursor), { headers: { "Cache-Control": "no-store" } });
+  const result = await expireDeposits(cursor);
+  try {
+    await cleanupSocialProofs();
+  } catch {
+    console.warn("SOCIAL_PROOF_CLEANUP_PENDING");
+  }
+  return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
 }

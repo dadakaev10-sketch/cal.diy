@@ -7,8 +7,10 @@ const mocks = vi.hoisted(() => ({
   studios: vi.fn(),
   deleteStudios: vi.fn(),
   transaction: vi.fn(),
+  apple: vi.fn(),
 }));
 vi.mock("@calcom/app-store/stripepayment/lib/customer", () => ({ deleteStripeCustomer: mocks.stripe }));
+vi.mock("@calcom/features/auth/lib/studioApple", () => ({ revokeUserAppleAccounts: mocks.apple }));
 vi.mock("@calcom/prisma", () => ({ default: { $transaction: mocks.transaction } }));
 
 import { deleteUser } from "./deleteUser";
@@ -17,6 +19,7 @@ describe("account deletion", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mocks.stripe.mockResolvedValue(null);
+    mocks.apple.mockResolvedValue(undefined);
     mocks.studios.mockResolvedValue([{ id: 9 }]);
     mocks.transaction.mockImplementation(async (fn) =>
       fn({
@@ -39,6 +42,8 @@ describe("account deletion", () => {
     expect(mocks.deleteStudios).toHaveBeenCalledWith({ where: { id: { in: [9] } } });
     expect(mocks.user).toHaveBeenCalledWith({ where: { id: 42 } });
     expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.apple).toHaveBeenCalledWith(42);
+    expect(mocks.apple.mock.invocationCallOrder[0]).toBeLessThan(mocks.user.mock.invocationCallOrder[0]);
     expect(mocks.avatar.mock.invocationCallOrder[0]).toBeLessThan(mocks.user.mock.invocationCallOrder[0]);
   });
   it("does not delete the account when avatar cleanup fails", async () => {
