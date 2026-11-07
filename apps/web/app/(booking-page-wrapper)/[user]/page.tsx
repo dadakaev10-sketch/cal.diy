@@ -6,7 +6,7 @@ import { generateMeetingMetadata } from "app/_utils";
 import { withAppDirSsr } from "app/WithAppDirSsr";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import type React from "react";
+import { PublicBookingLanguage } from "~/users/views/PublicBookingLanguage";
 import type { PageProps as LegacyPageProps } from "~/users/views/users-public-view";
 import LegacyPage from "~/users/views/users-public-view";
 
@@ -18,7 +18,11 @@ const ServerPage = async ({ params, searchParams }: PageProps): Promise<JSX.Elem
     buildLegacyCtx(await headers(), await cookies(), await params, await searchParams)
   );
 
-  return <LegacyPage {...props} />;
+  return (
+    <PublicBookingLanguage username={(await params).user} requested={(await searchParams).lang}>
+      <LegacyPage {...props} />
+    </PublicBookingLanguage>
+  );
 };
 
 export const generateMetadata = async ({ params, searchParams }: PageProps): Promise<Metadata> => {

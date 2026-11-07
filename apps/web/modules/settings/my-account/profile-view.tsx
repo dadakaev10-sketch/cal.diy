@@ -9,6 +9,14 @@ import { emailSchema } from "@calcom/lib/emailSchema";
 import { getUserAvatarUrl } from "@calcom/lib/getAvatarUrl";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { md } from "@calcom/lib/markdownIt";
+import type { PublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
+import {
+  publicBookingLanguageNames,
+  publicBookingLanguageSchema,
+  publicBookingLanguages,
+  readPublicBookingLanguage,
+  resolvePublicBookingLanguage,
+} from "@calcom/lib/publicBookingLanguage";
 import turndown from "@calcom/lib/turndownService";
 import { IdentityProvider } from "@calcom/prisma/enums";
 import { readStudioAddress, studioAddressSchema } from "@calcom/prisma/zod-utils";
@@ -61,7 +69,7 @@ export type FormValues = {
   name: string;
   email: string;
   bio: string;
-  metadata: { defaultInPersonAddress: string };
+  metadata: { defaultInPersonAddress: string; bookingPageLanguage: PublicBookingLanguage };
   secondaryEmails: Email[];
 };
 type Props = {
@@ -239,7 +247,13 @@ const ProfileView = ({ user }: Props) => {
     name: user.name || "",
     email: userEmail,
     bio: user.bio || "",
-    metadata: { defaultInPersonAddress: readStudioAddress(user.metadata) },
+    metadata: {
+      defaultInPersonAddress: readStudioAddress(user.metadata),
+      bookingPageLanguage: resolvePublicBookingLanguage(
+        readPublicBookingLanguage(user.metadata),
+        user.locale
+      ),
+    },
     // We add the primary email as the first item in the list
     secondaryEmails: [
       {
@@ -536,7 +550,10 @@ const ProfileForm = ({
       }),
     email: emailSchema.toLowerCase(),
     bio: z.string(),
-    metadata: z.object({ defaultInPersonAddress: studioAddressSchema }),
+    metadata: z.object({
+      defaultInPersonAddress: studioAddressSchema,
+      bookingPageLanguage: publicBookingLanguageSchema,
+    }),
     secondaryEmails: z.array(
       z.object({
         id: z.number(),
@@ -729,6 +746,22 @@ const ProfileForm = ({
             {...formMethods.register("metadata.defaultInPersonAddress")}
           />
           <p className="text-subtle mt-2 text-sm">{t("studio_address_help")}</p>
+        </div>
+        <div className="mt-6">
+          <label htmlFor="booking-page-language" className="text-default mb-2 block text-sm font-medium">
+            {t("booking_page_language")}
+          </label>
+          <select
+            id="booking-page-language"
+            className="border-subtle bg-default text-default w-full rounded-md border px-3 py-2"
+            {...formMethods.register("metadata.bookingPageLanguage")}>
+            {publicBookingLanguages.map((code) => (
+              <option key={code} value={code}>
+                {publicBookingLanguageNames[code]}
+              </option>
+            ))}
+          </select>
+          <p className="text-subtle mt-2 text-sm">{t("booking_page_language_help")}</p>
         </div>
         {usersAttributes && usersAttributes?.length > 0 && (
           <div className="mt-6 flex flex-col">

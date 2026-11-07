@@ -1,14 +1,12 @@
 import { WEBAPP_URL } from "@calcom/lib/constants";
-import { loadTranslations } from "@calcom/i18n/server";
 import { buildLegacyCtx, decodeParams } from "@lib/buildLegacyCtx";
 import { getServerSideProps } from "@server/lib/[user]/[type]/getServerSideProps";
 import type { PageProps } from "app/_types";
 import { generateMeetingMetadata } from "app/_utils";
-import { CustomI18nProvider } from "app/CustomI18nProvider";
 import { withAppDirSsr } from "app/WithAppDirSsr";
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
-import type React from "react";
+import { PublicBookingLanguage } from "~/users/views/PublicBookingLanguage";
 import type { PageProps as LegacyPageProps } from "~/users/views/users-type-public-view";
 import LegacyPage from "~/users/views/users-type-public-view";
 
@@ -19,18 +17,14 @@ const ServerPage = async ({ params, searchParams }: PageProps): Promise<JSX.Elem
   const legacyCtx = buildLegacyCtx(await headers(), await cookies(), await params, await searchParams);
   const props = await getData(legacyCtx);
 
-  const locale = props.eventData?.interfaceLanguage;
-  if (locale) {
-    const ns = "common";
-    const translations = await loadTranslations(locale, ns);
-    return (
-      <CustomI18nProvider translations={translations} locale={locale} ns={ns}>
-        <LegacyPage {...props} />
-      </CustomI18nProvider>
-    );
-  }
-
-  return <LegacyPage {...props} />;
+  return (
+    <PublicBookingLanguage
+      username={(await params).user}
+      requested={(await searchParams).lang}
+      eventLanguage={props.eventData?.interfaceLanguage}>
+      <LegacyPage {...props} />
+    </PublicBookingLanguage>
+  );
 };
 
 export const generateMetadata = async ({ params, searchParams }: PageProps): Promise<Metadata> => {
