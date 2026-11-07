@@ -90,6 +90,12 @@ export async function PublicInfo({
         ))}
         {page === "privacy" && (
           <section>
+            <h2>{t("public_privacy_social_heading")}</h2>
+            <p>{t("public_privacy_social_text")}</p>
+          </section>
+        )}
+        {page === "privacy" && (
+          <section>
             <h2>{t("public_privacy_push_heading")}</h2>
             <p>{t("public_privacy_push_text")}</p>
           </section>
@@ -109,7 +115,9 @@ export async function PublicInfo({
             <a href="https://resend.com/legal/privacy-policy">Resend Privacy</a> ·{" "}
             <a href="https://stripe.com/privacy">Stripe Privacy</a> ·{" "}
             <a href="https://www.paypal.com/privacy">PayPal Privacy</a> ·{" "}
-            <a href="https://www.paddle.com/legal/privacy">Paddle Privacy</a>
+            <a href="https://www.paddle.com/legal/privacy">Paddle Privacy</a> ·{" "}
+            <a href="https://policies.google.com/privacy">Google Privacy</a> ·{" "}
+            <a href="https://www.apple.com/legal/privacy/">Apple Privacy</a>
           </p>
         )}
       </main>
