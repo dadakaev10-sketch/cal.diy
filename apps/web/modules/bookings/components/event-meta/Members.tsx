@@ -4,6 +4,7 @@ import { useBookerStore } from "@calcom/features/bookings/Booker/store";
 import type { BookerEvent } from "@calcom/features/bookings/types";
 import { WEBAPP_URL } from "@calcom/lib/constants";
 import { getUserAvatarUrl } from "@calcom/lib/getAvatarUrl";
+import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { SchedulingType } from "@calcom/prisma/enums";
 import { AvatarGroup } from "@calcom/ui/components/avatar";
 
@@ -30,6 +31,7 @@ export const EventMembers = ({
   roundRobinHideOrgAndTeam,
   hideOrgTeamAvatar,
 }: EventMembersProps) => {
+  const { i18n } = useLocale();
   const username = useBookerStore((state) => state.username);
   const isDynamic = !!(username && username.indexOf("+") > -1);
   const isEmbed = useIsEmbed();
@@ -80,7 +82,7 @@ export const EventMembers = ({
             href:
               isPlatform || isPrivateLink || entity.hideProfileLink
                 ? null
-                : `${WEBAPP_URL}/${user.profile?.username}?redirect=false`,
+                : `${WEBAPP_URL}/${user.profile?.username}?redirect=false&lang=${encodeURIComponent(i18n.language || "en")}`,
             alt: user.name || "",
             title: user.name || "",
             image: getUserAvatarUrl(user),

@@ -4648,5 +4648,15 @@
   "service_category_other": "Altri servizi",
   "service_category_subcategories": "Sottocategorie",
   "landing_back": "Indietro",
-  "service_category_choose": "Seleziona"
+  "service_category_choose": "Seleziona",
+  "booking_payment_total": "Prezzo totale",
+  "booking_payment_balance": "Pagamento del saldo",
+  "booking_payment_deposit": "Acconto",
+  "booking_payment_remaining": "Da pagare",
+  "booking_payment_paid": "Pagato",
+  "booking_payment_summary": "Riepilogo del pagamento",
+  "booking_payment_balance_help": "Paga il saldo in studio o successivamente tramite un link di pagamento.",
+  "booking_payment_config_error": "L’acconto non è configurato correttamente. Contatta lo studio.",
+  "booking_payment_deposit_paid": "Acconto pagato",
+  "booking_payment_received": "Pagamento ricevuto"
 }

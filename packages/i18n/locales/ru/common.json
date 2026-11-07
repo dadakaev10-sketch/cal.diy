@@ -4793,5 +4793,15 @@
   "service_category_other": "Другие услуги",
   "service_category_subcategories": "Подкатегории",
   "landing_back": "Назад",
-  "service_category_choose": "Выбрать"
+  "service_category_choose": "Выбрать",
+  "booking_payment_total": "Общая стоимость",
+  "booking_payment_balance": "Оплата остатка",
+  "booking_payment_deposit": "Предоплата",
+  "booking_payment_remaining": "Осталось оплатить",
+  "booking_payment_paid": "Оплачено",
+  "booking_payment_summary": "Сводка платежей",
+  "booking_payment_balance_help": "Оплатите остаток в студии или позже по платёжной ссылке.",
+  "booking_payment_config_error": "Предоплата настроена неверно. Свяжитесь со студией.",
+  "booking_payment_deposit_paid": "Предоплата внесена",
+  "booking_payment_received": "Платёж получен"
 }

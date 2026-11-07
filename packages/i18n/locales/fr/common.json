@@ -4648,5 +4648,15 @@
   "service_category_other": "Autres prestations",
   "service_category_subcategories": "Sous-catégories",
   "landing_back": "Retour",
-  "service_category_choose": "Choisir"
+  "service_category_choose": "Choisir",
+  "booking_payment_total": "Prix total",
+  "booking_payment_balance": "Paiement du solde",
+  "booking_payment_deposit": "Acompte",
+  "booking_payment_remaining": "Reste à payer",
+  "booking_payment_paid": "Payé",
+  "booking_payment_summary": "Récapitulatif du paiement",
+  "booking_payment_balance_help": "Réglez le solde au studio ou plus tard via un lien de paiement.",
+  "booking_payment_config_error": "L’acompte n’est pas configuré correctement. Veuillez contacter le studio.",
+  "booking_payment_deposit_paid": "Acompte payé",
+  "booking_payment_received": "Paiement reçu"
 }

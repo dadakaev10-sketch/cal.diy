@@ -4648,5 +4648,15 @@
   "service_category_other": "Otros servicios",
   "service_category_subcategories": "Subcategorías",
   "landing_back": "Volver",
-  "service_category_choose": "Seleccionar"
+  "service_category_choose": "Seleccionar",
+  "booking_payment_total": "Precio total",
+  "booking_payment_balance": "Pago del saldo",
+  "booking_payment_deposit": "Anticipo",
+  "booking_payment_remaining": "Pendiente",
+  "booking_payment_paid": "Pagado",
+  "booking_payment_summary": "Resumen del pago",
+  "booking_payment_balance_help": "Paga el saldo en el estudio o más tarde mediante un enlace de pago.",
+  "booking_payment_config_error": "El anticipo no está configurado correctamente. Contacta con el estudio.",
+  "booking_payment_deposit_paid": "Anticipo pagado",
+  "booking_payment_received": "Pago recibido"
 }
