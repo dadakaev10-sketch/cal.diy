@@ -22,6 +22,7 @@ const publicPages = new Set([
   "/support",
   "/",
   "/auth/login",
+  "/auth/social",
   "/auth/error",
   "/auth/logout",
   "/register",
@@ -48,6 +49,8 @@ const publicAssets = new Set([
   "/android-chrome-192x192.png",
   "/android-chrome-256x256.png",
   "/cal-com-icon-white.svg",
+  "/google-icon-colored.svg",
+  "/fixmit/apple-logo.svg",
 ]);
 const authEndpoints = new Set([
   "/api/auth/session",
@@ -85,6 +88,17 @@ export function studioRouteAccess(path: string, method: string) {
   ) {
     return "public";
   }
+  if (
+    (method === "GET" &&
+      ["/api/studio-web-auth/options", "/api/studio-web-auth/status"].includes(normalized)) ||
+    (["GET", "POST"].includes(method) &&
+      /^\/api\/studio-web-auth\/callback\/(apple|google)$/.test(normalized)) ||
+    (method === "POST" &&
+      ["start", "exchange", "onboard", "cancel"].some(
+        (action) => normalized === `/api/studio-web-auth/${action}`
+      ))
+  )
+    return "public";
   if (normalized === "/api/studio-auth/options" && method === "GET") return "public";
   if (
     [
