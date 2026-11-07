@@ -4635,5 +4635,18 @@
   "paypal_step_7": "Dovresti essere pronto dopo questo.",
   "dashboard": "dashboard",
   "paypal_webhook_reminder": "La nostra integrazione crea un webhook specifico sul tuo account PayPal che utilizziamo per comunicare le transazioni al nostro sistema. Se elimini questo webhook, non saremo in grado di comunicare e dovrai disinstallare e reinstallare l'app affinché funzioni correttamente. La disinstallazione dell'app non eliminerà la configurazione attuale di prezzo/valuta del tipo di evento, ma non potrai ricevere prenotazioni.",
-  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Aggiungi le tue nuove stringhe qui sopra ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑"
+  "ADD_NEW_STRINGS_ABOVE_THIS_LINE_TO_PREVENT_MERGE_CONFLICTS": "↑↑↑↑↑↑↑↑↑↑↑↑↑ Aggiungi le tue nuove stringhe qui sopra ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+  "booking_page_language": "Lingua della pagina di prenotazione",
+  "booking_page_language_help": "Lingua predefinita della pagina pubblica di prenotazione. I visitatori possono cambiarla. Le tue descrizioni non vengono tradotte.",
+  "landing_book": "Prenota un appuntamento",
+  "landing_links": "Altri link",
+  "landing_section_open": "Scopri di più",
+  "landing_socials": "Social media",
+  "service_catalog_title": "Categorie di servizi",
+  "service_category_all": "Tutti i servizi",
+  "service_category_filter": "Filtra i servizi per categoria",
+  "service_category_other": "Altri servizi",
+  "service_category_subcategories": "Sottocategorie",
+  "landing_back": "Indietro",
+  "service_category_choose": "Seleziona"
 }

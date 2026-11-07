@@ -1,11 +1,13 @@
 import { FULL_NAME_LENGTH_MAX_LIMIT } from "@calcom/lib/constants";
 import { timeZoneSchema } from "@calcom/lib/dayjs/timeZone.schema";
+import { publicBookingLanguageSchema } from "@calcom/lib/publicBookingLanguage";
 import { landingPageSchema } from "@calcom/prisma/landingPage";
 import { serviceCatalogSchema } from "@calcom/prisma/serviceCatalog";
 import { bookerLayouts, studioAddressSchema, userMetadata } from "@calcom/prisma/zod-utils";
 import { z } from "zod";
 
 export type TUpdateUserMetadataAllowedKeys = {
+  bookingPageLanguage?: z.infer<typeof publicBookingLanguageSchema>;
   defaultInPersonAddress?: string;
   landingPage?: z.infer<typeof landingPageSchema>;
   serviceCatalog?: z.infer<typeof serviceCatalogSchema>;
@@ -18,6 +20,7 @@ export const updateUserMetadataAllowedKeys: z.ZodType<
   z.ZodTypeDef,
   Omit<TUpdateUserMetadataAllowedKeys, "landingPage"> & { landingPage?: z.input<typeof landingPageSchema> }
 > = z.object({
+  bookingPageLanguage: publicBookingLanguageSchema.optional(),
   defaultInPersonAddress: studioAddressSchema.optional(),
   serviceCatalog: serviceCatalogSchema.optional(),
   landingPage: landingPageSchema.optional(),

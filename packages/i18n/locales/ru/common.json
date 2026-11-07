@@ -4780,5 +4780,18 @@
   "studio_social_delete_ack": "Я понимаю, что мой аккаунт и перечисленные данные будут удалены навсегда.",
   "studio_social_deleting": "Аккаунт удаляется …",
   "studio_social_delete_final": "Удалить аккаунт навсегда",
-  "public_pricing_description": "Fixmit пока бесплатен. Страница онлайн-записи, управление встречами и услугами для студий и салонов. Возможности и информация о тарифах."
+  "public_pricing_description": "Fixmit пока бесплатен. Страница онлайн-записи, управление встречами и услугами для студий и салонов. Возможности и информация о тарифах.",
+  "booking_page_language": "Язык страницы записи",
+  "booking_page_language_help": "Язык по умолчанию для публичной страницы записи. Посетители могут его изменить. Ваши описания не переводятся.",
+  "landing_book": "Записаться на приём",
+  "landing_links": "Дополнительные ссылки",
+  "landing_section_open": "Подробнее",
+  "landing_socials": "Социальные сети",
+  "service_catalog_title": "Категории услуг",
+  "service_category_all": "Все услуги",
+  "service_category_filter": "Фильтр услуг по категории",
+  "service_category_other": "Другие услуги",
+  "service_category_subcategories": "Подкатегории",
+  "landing_back": "Назад",
+  "service_category_choose": "Выбрать"
 }

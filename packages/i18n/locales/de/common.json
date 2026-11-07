@@ -5083,5 +5083,7 @@
   "studio_social_delete_ack": "Ich verstehe, dass mein Konto und die genannten Daten dauerhaft gelöscht werden.",
   "studio_social_deleting": "Konto wird gelöscht …",
   "studio_social_delete_final": "Konto endgültig löschen",
-  "public_pricing_description": "Fixmit ist derzeit kostenlos: eigene Buchungsseite, Terminverwaltung und Dienstleistungen für Studios, Salons und Selbstständige. Alle Tarifinformationen."
+  "public_pricing_description": "Fixmit ist derzeit kostenlos: eigene Buchungsseite, Terminverwaltung und Dienstleistungen für Studios, Salons und Selbstständige. Alle Tarifinformationen.",
+  "booking_page_language": "Sprache der Buchungsseite",
+  "booking_page_language_help": "Standardsprache deiner öffentlichen Buchungsseite. Besucher können sie wechseln. Eigene Beschreibungen werden nicht übersetzt."
 }

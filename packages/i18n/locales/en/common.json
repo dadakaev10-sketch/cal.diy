@@ -5219,5 +5219,7 @@
   "studio_social_delete_ack": "I understand that my account and the listed data will be permanently deleted.",
   "studio_social_deleting": "Deleting account …",
   "studio_social_delete_final": "Permanently delete account",
-  "public_pricing_description": "Fixmit is currently free. Create your booking page and manage appointments and services for your studio or salon. See included features and pricing."
+  "public_pricing_description": "Fixmit is currently free. Create your booking page and manage appointments and services for your studio or salon. See included features and pricing.",
+  "booking_page_language": "Booking page language",
+  "booking_page_language_help": "Default language for your public booking page. Visitors can change it. Your own descriptions are not translated."
 }

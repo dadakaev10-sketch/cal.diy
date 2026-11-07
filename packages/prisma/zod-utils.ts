@@ -1,3 +1,4 @@
+import { publicBookingLanguageSchema } from "@calcom/lib/publicBookingLanguage";
 import type { UnitTypeLongPlural } from "dayjs";
 import type { TFunction } from "i18next";
 import type {
@@ -390,6 +391,7 @@ export function readStudioAddress(metadata: unknown): string {
 
 export const userMetadata = z
   .object({
+    bookingPageLanguage: publicBookingLanguageSchema.optional(),
     defaultInPersonAddress: studioAddressSchema.optional(),
     serviceCatalog: serviceCatalogSchema.optional(),
     landingPage: landingPageSchema.optional(),
