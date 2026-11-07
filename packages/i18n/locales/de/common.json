@@ -160,7 +160,7 @@
   "home_faq_1": "Wie funktioniert die Online-Terminbuchung mit Fixmit?",
   "home_faq_1_text": "Du richtest dein Profil ein, ergänzt Leistungen und legst deine verfügbaren Zeiten fest. Anschließend teilst du deinen Buchungslink. Kunden wählen dort eine Leistung und einen verfügbaren Termin.",
   "home_faq_2": "Brauche ich Stripe für meine Termine?",
-  "home_faq_2_text": "Nein. Du kannst Termine für Leistungen mit Bezahlung vor Ort anbieten. Die Stripe-Integration für Onlinezahlungen ist noch in Entwicklung. Ein angezeigter Preis löst keine Onlinezahlung aus.",
+  "home_faq_2_text": "Nein. Du kannst Termine mit Bezahlung im Studio anbieten. Ist Stripe für dein Studio und die jeweilige Leistung eingerichtet, sind Online-Anzahlungen als Prozentsatz oder fixer Betrag möglich. Der Rest kann im Studio oder über einen Online-Zahlungslink bezahlt werden. Ein angezeigter Preis allein löst keine Zahlung aus.",
   "home_faq_3": "Für wen ist Fixmit geeignet?",
   "home_faq_3_text": "Fixmit richtet sich an Studios, Salons, Coaches und Selbstständige, die Termine online anbieten und ihre Leistungen auf einer eigenen Profilseite präsentieren möchten.",
   "home_footer": "Terminplanung für deinen Arbeitsalltag.",
@@ -5082,5 +5082,6 @@
   "studio_social_delete_reauth": "Bestätige deine Identität erneut mit einem verknüpften Anbieter. Anschließend kannst du das Konto endgültig löschen.",
   "studio_social_delete_ack": "Ich verstehe, dass mein Konto und die genannten Daten dauerhaft gelöscht werden.",
   "studio_social_deleting": "Konto wird gelöscht …",
-  "studio_social_delete_final": "Konto endgültig löschen"
+  "studio_social_delete_final": "Konto endgültig löschen",
+  "public_pricing_description": "Fixmit ist derzeit kostenlos: eigene Buchungsseite, Terminverwaltung und Dienstleistungen für Studios, Salons und Selbstständige. Alle Tarifinformationen."
 }

@@ -11,7 +11,7 @@ Official website: https://fixmit.com/
 - [Русский](https://fixmit.com/?lang=ru): Онлайн-запись и собственная страница для студий, салонов и частных специалистов.
 - [Sitemap](https://fixmit.com/sitemap.xml): Public marketing page URLs and language alternatives.
 
-- [Pricing](https://fixmit.com/pricing): Current subscription price, billing interval and included features.
+- [Pricing](https://fixmit.com/pricing): Current free access, included features and published plan information.
 - [Terms](https://fixmit.com/terms) · [Privacy](https://fixmit.com/privacy) · [Refund policy](https://fixmit.com/refund) · [Legal notice](https://fixmit.com/imprint)
 
 ## What Fixmit does
@@ -27,9 +27,9 @@ Businesses create a profile, describe their services and define available appoin
 
 ## Payments and scope
 
-Appointments can be offered with payment in person. Displaying a service price does not collect an online payment. The Stripe integration for online payments is still in development.
+Appointments can be offered with payment at the studio. Where Stripe is configured for a studio and its service, booking can require an online deposit set as a percentage or a fixed amount. The remaining balance can be paid at the studio or through an online payment link. Payments for treatments go to the studio through its configured Stripe payment account. Displaying a service price alone does not collect a payment.
 
-This document does not specify subscription prices, free-plan entitlements, service-level guarantees or payment availability. Refer to the current official product pages for published information. Sample businesses and calendars shown on the homepage are demonstrations, not customer testimonials or live availability.
+This document does not specify subscription prices, free-plan entitlements or service-level guarantees. Refer to the current official product pages for published information. Sample businesses and calendars shown on the homepage are demonstrations, not customer testimonials or live availability.
 
 ## Getting started
 

@@ -160,7 +160,7 @@
   "home_faq_1": "How does online booking with Fixmit work?",
   "home_faq_1_text": "Set up your profile, add your services and define your availability. Then share your booking link. Customers choose a service and an available appointment on your page.",
   "home_faq_2": "Do I need Stripe for my appointments?",
-  "home_faq_2_text": "No. You can offer appointments for services paid for in person. The Stripe integration for online payments is still in development. Displaying a price does not trigger an online payment.",
+  "home_faq_2_text": "No. You can offer appointments paid for at the studio. Where Stripe is configured for your studio and the service, online deposits can be a percentage or a fixed amount. The remaining balance can be paid at the studio or through an online payment link. Displaying a price alone does not collect a payment.",
   "home_faq_3": "Who is Fixmit for?",
   "home_faq_3_text": "Fixmit is for studios, salons, coaches and independent businesses that want to offer online appointments and present their services on their own profile page.",
   "home_footer": "Scheduling for your working day.",
@@ -5218,5 +5218,6 @@
   "studio_social_delete_reauth": "Confirm your identity again with a linked provider. You can then permanently delete your account.",
   "studio_social_delete_ack": "I understand that my account and the listed data will be permanently deleted.",
   "studio_social_deleting": "Deleting account …",
-  "studio_social_delete_final": "Permanently delete account"
+  "studio_social_delete_final": "Permanently delete account",
+  "public_pricing_description": "Fixmit is currently free. Create your booking page and manage appointments and services for your studio or salon. See included features and pricing."
 }

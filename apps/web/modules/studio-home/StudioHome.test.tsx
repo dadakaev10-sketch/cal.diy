@@ -13,8 +13,13 @@ describe("public studio homepage", () => {
   it("normalizes unknown languages and keeps private pages out of the sitemap", () => {
     expect(homeLanguage("fr")).toBe("de");
     expect(homeLanguage(undefined)).toBe("de");
-    expect(sitemap()).toHaveLength(3);
-    for (const entry of sitemap()) expect(entry.url).toMatch(/^https:\/\/fixmit\.com\/\?lang=(de|en|ru)$/);
+    const entries = sitemap();
+    expect(entries).toHaveLength(8);
+    const publicUrls = new Set([
+      ...["de", "en", "ru"].map((language) => `https://fixmit.com/?lang=${language}`),
+      ...["pricing", "terms", "privacy", "refund", "imprint"].map((page) => `https://fixmit.com/${page}`),
+    ]);
+    for (const entry of entries) expect(publicUrls.has(entry.url)).toBe(true);
   });
   it("escapes script delimiters in translated structured data", async () => {
     const i18n = createInstance();
