@@ -110,3 +110,49 @@ describe("Apple token lifecycle", () => {
     });
   });
 });
+
+describe("Apple web and native credential binding", () => {
+  beforeEach(() => vi.stubEnv("APPLE_SIGNIN_WEB_CLIENT_ID", "com.fixmit.studio.web"));
+  it("signs a web secret for the Service ID without changing the native client", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response("{}"));
+    vi.stubGlobal("fetch", fetch);
+    await appleRequest("revoke", { token: "web-refresh" }, "com.fixmit.studio.web");
+    const body = fetch.mock.calls[0][1].body as URLSearchParams;
+    expect(body.get("client_id")).toBe("com.fixmit.studio.web");
+    const claims = JSON.parse(Buffer.from(body.get("client_secret")!.split(".")[1], "base64url").toString());
+    expect(claims.sub).toBe("com.fixmit.studio.web");
+  });
+  it("rejects unconfigured Apple clients before making a request", async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    await expect(appleRequest("token", {}, "com.attacker.web")).rejects.toThrow("invalid_social_proof");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it("refreshes web credentials with their original client ID", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response("{}"));
+    vi.stubGlobal("fetch", fetch);
+    m.update.mockResolvedValue({});
+    const refresh_token = sealSocial(
+      JSON.stringify({ token: "web-refresh", clientId: "com.fixmit.studio.web" })
+    );
+    expect(await validAppleAccount({ id: "web-account", refresh_token, expires_at: 0 })).toBe(true);
+    const body = fetch.mock.calls[0][1].body as URLSearchParams;
+    expect(body.get("refresh_token")).toBe("web-refresh");
+    expect(body.get("client_id")).toBe("com.fixmit.studio.web");
+  });
+  it("revokes web refresh credentials with the bound Service ID", async () => {
+    m.findMany.mockResolvedValue([
+      {
+        id: 4,
+        identifier: `studio-apple-revoke:${sealSocial(JSON.stringify({ token: "web-refresh", clientId: "com.fixmit.studio.web" }))}`,
+      },
+    ]);
+    const fetch = vi.fn().mockResolvedValue(new Response("{}"));
+    vi.stubGlobal("fetch", fetch);
+    await retryAppleRevocations();
+    const body = fetch.mock.calls[0][1].body as URLSearchParams;
+    expect(body.get("token")).toBe("web-refresh");
+    expect(body.get("client_id")).toBe("com.fixmit.studio.web");
+    expect(m.deleteMany).toHaveBeenCalledWith({ where: { id: 4 } });
+  });
+});
