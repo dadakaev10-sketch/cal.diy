@@ -459,7 +459,7 @@ export const getOptions = ({
       }
       const autoMergeIdentities = async () => {
         const existingUser = await prisma.user.findFirst({
-          where: { email: token.email! },
+          where: token.studioSocial ? { id: Number(token.sub) } : { email: token.email! },
           select: {
             id: true,
             username: true,

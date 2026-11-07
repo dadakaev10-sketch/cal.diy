@@ -12,6 +12,7 @@ import {
   sealSocial,
   socialError,
 } from "@calcom/features/auth/lib/studioSocialIdentity";
+import { WEBAPP_URL } from "@calcom/lib/constants";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 
@@ -22,6 +23,21 @@ export function googleClient() {
   if (!id || !/^[A-Za-z0-9-]+\.apps\.googleusercontent\.com$/.test(id)) return null;
   return { id, scheme: `com.googleusercontent.apps.${id.split(".apps.")[0]}` };
 }
+export function webProviderClient(provider: SocialProvider) {
+  const id =
+    provider === "google" ? process.env.GOOGLE_WEB_CLIENT_ID : process.env.APPLE_SIGNIN_WEB_CLIENT_ID;
+  if (
+    !id ||
+    (provider === "google" && !process.env.GOOGLE_WEB_CLIENT_SECRET) ||
+    (provider === "apple" && !appleReady())
+  )
+    return null;
+  return { id, redirect: `${new URL(WEBAPP_URL).origin}/api/studio-web-auth/callback/${provider}` };
+}
+export const webOptions = () => ({
+  google: !!webProviderClient("google"),
+  apple: !!webProviderClient("apple"),
+});
 export const options = () => ({
   google: !!googleClient(),
   apple: appleReady(),
@@ -31,24 +47,46 @@ export async function startProvider(
   provider: SocialProvider,
   challenge: string,
   mode: "login" | "link" | "reauth",
-  actor?: number
+  actor?: number,
+  surface: "native" | "web" = "native",
+  intent?: "link" | "delete"
 ) {
   const state = oauthState.parse({
     provider,
+    surface,
+    intent,
     challenge,
     mode,
     actor,
     nonce: randomBytes(32).toString("hex"),
   });
-  if ((provider === "apple" && !appleReady()) || (provider === "google" && !googleClient()))
+  if (
+    surface === "web"
+      ? !webProviderClient(provider)
+      : (provider === "apple" && !appleReady()) || (provider === "google" && !googleClient())
+  )
     return socialError("social_auth_unavailable");
   const token = await createSocialProof("state", state, 10);
-  if (provider === "apple") return { state: token, nonce: state.nonce };
-  const client = googleClient()!;
+  if (provider === "apple" && surface === "native") return { state: token, nonce: state.nonce };
+  if (provider === "apple") {
+    const client = webProviderClient("apple")!;
+    const url = new URL("https://appleid.apple.com/auth/authorize");
+    url.search = new URLSearchParams({
+      client_id: client.id,
+      redirect_uri: client.redirect,
+      response_type: "code id_token",
+      response_mode: "form_post",
+      scope: "name email",
+      state: token,
+      nonce: state.nonce,
+    }).toString();
+    return { state: token, authorizationURL: url.href };
+  }
+  const client = surface === "web" ? webProviderClient("google")! : googleClient()!;
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   url.search = new URLSearchParams({
     client_id: client.id,
-    redirect_uri: `${client.scheme}:/oauthredirect`,
+    redirect_uri: "redirect" in client ? client.redirect : `${client.scheme}:/oauthredirect`,
     response_type: "code",
     scope: "openid email profile",
     state: token,
@@ -57,7 +95,11 @@ export async function startProvider(
     code_challenge_method: "S256",
     prompt: "select_account",
   }).toString();
-  return { state: token, authorizationURL: url.href, callbackScheme: client.scheme };
+  return {
+    state: token,
+    authorizationURL: url.href,
+    callbackScheme: "scheme" in client ? client.scheme : undefined,
+  };
 }
 export async function finishProvider(input: {
   state: string;
@@ -71,16 +113,17 @@ export async function finishProvider(input: {
   let idToken = input.idToken,
     refresh: string | undefined;
   if (state.provider === "google") {
-    const client = googleClient();
+    const client = state.surface === "web" ? webProviderClient("google") : googleClient();
     if (!client) return socialError("social_auth_unavailable");
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         client_id: client.id,
+        ...(state.surface === "web" ? { client_secret: process.env.GOOGLE_WEB_CLIENT_SECRET! } : {}),
         code: input.code,
         code_verifier: input.verifier,
-        redirect_uri: `${client.scheme}:/oauthredirect`,
+        redirect_uri: "redirect" in client ? client.redirect : `${client.scheme}:/oauthredirect`,
         grant_type: "authorization_code",
       }),
       signal: AbortSignal.timeout(8000),
@@ -96,7 +139,12 @@ export async function finishProvider(input: {
       state.provider === "apple"
         ? "https://appleid.apple.com"
         : ["https://accounts.google.com", "accounts.google.com"],
-    audience: state.provider === "apple" ? appleClientId() : googleClient()!.id,
+    audience:
+      state.surface === "web"
+        ? webProviderClient(state.provider)!.id
+        : state.provider === "apple"
+          ? appleClientId()
+          : googleClient()!.id,
     clockTolerance: 10,
     maxTokenAge: "10m",
   });
@@ -108,11 +156,21 @@ export async function finishProvider(input: {
     const result = z
       .object({ refresh_token: z.string(), id_token: z.string() })
       .passthrough()
-      .parse(await appleRequest("token", { grant_type: "authorization_code", code: input.code }));
+      .parse(
+        await appleRequest(
+          "token",
+          {
+            grant_type: "authorization_code",
+            code: input.code,
+            ...(state.surface === "web" ? { redirect_uri: webProviderClient("apple")!.redirect } : {}),
+          },
+          state.surface === "web" ? webProviderClient("apple")!.id : appleClientId()
+        )
+      );
     const exchanged = await jwtVerify(result.id_token, appleKeys, {
       algorithms: ["RS256"],
       issuer: "https://appleid.apple.com",
-      audience: appleClientId(),
+      audience: state.surface === "web" ? webProviderClient("apple")!.id : appleClientId(),
       clockTolerance: 10,
     });
     if (
@@ -120,7 +178,11 @@ export async function finishProvider(input: {
       (exchanged.payload.nonce !== undefined && exchanged.payload.nonce !== state.nonce)
     )
       return socialError("invalid_social_proof");
-    refresh = sealSocial(result.refresh_token);
+    refresh = sealSocial(
+      state.surface === "web"
+        ? JSON.stringify({ token: result.refresh_token, clientId: webProviderClient("apple")!.id })
+        : result.refresh_token
+    );
   }
   await consumeSocialProof(row);
   const identity = {

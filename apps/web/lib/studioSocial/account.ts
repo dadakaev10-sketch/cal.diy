@@ -186,6 +186,9 @@ export async function methods(request: NextRequest) {
   return reply({
     userId: current.user.id,
     passwordAvailable: !passwordless(current.user),
+    socialReauthFresh:
+      typeof current.token.studioSocialReauthenticatedAt === "number" &&
+      Date.now() / 1000 - current.token.studioSocialReauthenticatedAt < 300,
     sessionFresh:
       typeof current.token.studioAuthenticatedAt === "number" &&
       Date.now() / 1000 - current.token.studioAuthenticatedAt < 300,

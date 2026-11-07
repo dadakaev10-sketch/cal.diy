@@ -11,7 +11,7 @@ export const appleReady = () =>
     process.env.APPLE_SIGNIN_KEY_ID &&
     process.env.APPLE_SIGNIN_TEAM_ID
   );
-function appleSecret() {
+function appleSecret(clientId = appleClientId()) {
   if (!appleReady()) throw ErrorWithCode.Factory.InternalServerError("apple_auth_unavailable");
   const header = Buffer.from(JSON.stringify({ alg: "ES256", kid: process.env.APPLE_SIGNIN_KEY_ID })).toString(
     "base64url"
@@ -23,17 +23,23 @@ function appleSecret() {
       iat: now,
       exp: now + 600,
       aud: "https://appleid.apple.com",
-      sub: appleClientId(),
+      sub: clientId,
     })
   ).toString("base64url");
   const key = createPrivateKey(Buffer.from(process.env.APPLE_SIGNIN_PRIVATE_KEY_BASE64 || "", "base64"));
   return `${header}.${body}.${sign("sha256", Buffer.from(`${header}.${body}`), { key, dsaEncoding: "ieee-p1363" }).toString("base64url")}`;
 }
-export async function appleRequest(path: "token" | "revoke", params: Record<string, string>) {
+export async function appleRequest(
+  path: "token" | "revoke",
+  params: Record<string, string>,
+  clientId = appleClientId()
+) {
+  if (clientId !== appleClientId() && clientId !== process.env.APPLE_SIGNIN_WEB_CLIENT_ID)
+    throw ErrorWithCode.Factory.Unauthorized("invalid_social_proof");
   const response = await fetch(`https://appleid.apple.com/auth/${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ client_id: appleClientId(), client_secret: appleSecret(), ...params }),
+    body: new URLSearchParams({ ...params, client_id: clientId, client_secret: appleSecret(clientId) }),
     signal: AbortSignal.timeout(8000),
     cache: "no-store",
   });
@@ -50,6 +56,14 @@ export async function appleRequest(path: "token" | "revoke", params: Record<stri
     throw ErrorWithCode.Factory.InternalServerError("apple_auth_unavailable");
   }
   return value;
+}
+export function appleRefreshCredential(encrypted: string) {
+  const plain = openSocial(encrypted);
+  if (!plain.startsWith("{")) return { token: plain, clientId: appleClientId() };
+  return z
+    .object({ token: z.string().min(1), clientId: z.string().min(1) })
+    .strict()
+    .parse(JSON.parse(plain));
 }
 export async function queueAppleRevocation(refresh: string) {
   if (
@@ -88,10 +102,12 @@ export async function retryAppleRevocations() {
   await Promise.allSettled(
     jobs.map(async (job) => {
       try {
-        await appleRequest("revoke", {
-          token: openSocial(job.identifier.slice("studio-apple-revoke:".length)),
-          token_type_hint: "refresh_token",
-        });
+        const credential = appleRefreshCredential(job.identifier.slice("studio-apple-revoke:".length));
+        await appleRequest(
+          "revoke",
+          { token: credential.token, token_type_hint: "refresh_token" },
+          credential.clientId
+        );
         await prisma.verificationToken.deleteMany({ where: { id: job.id } });
       } catch {
         console.warn("APPLE_REVOCATION_RETRY_PENDING");
@@ -139,10 +155,12 @@ export async function validAppleAccount(account: {
   if (!account.refresh_token) return false;
   if ((account.expires_at || 0) > Date.now() / 1000) return true;
   try {
-    await appleRequest("token", {
-      grant_type: "refresh_token",
-      refresh_token: openSocial(account.refresh_token),
-    });
+    const credential = appleRefreshCredential(account.refresh_token);
+    await appleRequest(
+      "token",
+      { grant_type: "refresh_token", refresh_token: credential.token },
+      credential.clientId
+    );
     await prisma.account.update({
       where: { id: account.id },
       data: { expires_at: Math.floor(Date.now() / 1000) + 86400 },

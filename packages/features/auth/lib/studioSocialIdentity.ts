@@ -16,6 +16,8 @@ export const socialIdentity = z.object({
 export type SocialIdentity = z.infer<typeof socialIdentity>;
 export const oauthState = z.object({
   provider: socialProvider,
+  surface: z.enum(["native", "web"]).default("native"),
+  intent: z.enum(["link", "delete"]).optional(),
   challenge: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   nonce: z.string(),
   mode: z.enum(["login", "link", "reauth"]),
