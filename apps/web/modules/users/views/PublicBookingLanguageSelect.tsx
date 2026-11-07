@@ -5,7 +5,7 @@ import { publicBookingLanguageNames, publicBookingLanguages } from "@calcom/lib/
 
 export function PublicBookingLanguageSelect({ language }: { language: PublicBookingLanguage }) {
   return (
-    <div className="mx-auto flex w-full max-w-5xl justify-end px-4 py-3">
+    <div className="mx-auto flex w-full max-w-5xl justify-start px-4 py-3">
       <label className="text-default flex items-center gap-2 text-sm">
         <span aria-hidden="true">🌐</span>
         <select
