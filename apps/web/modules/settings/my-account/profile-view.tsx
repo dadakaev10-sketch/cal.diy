@@ -1,5 +1,4 @@
 "use client";
-
 import process from "node:process";
 import { ErrorCode } from "@calcom/features/auth/lib/ErrorCode";
 import { Dialog } from "@calcom/features/components/controlled-dialog";
@@ -24,6 +23,7 @@ import { Editor } from "@calcom/ui/components/editor";
 import { Form, Label, PasswordField, TextField } from "@calcom/ui/components/form";
 import { ImageUploader } from "@calcom/ui/components/image-uploader";
 import { showToast } from "@calcom/ui/components/toast";
+import { SocialDeleteEntry } from "@calcom/web/modules/auth/studio-social-delete";
 import { DisplayInfo } from "@calcom/web/modules/users/components/UserTable/EditSheet/DisplayInfo";
 import TwoFactor from "@components/auth/TwoFactor";
 import CustomEmailTextField from "@components/settings/CustomEmailTextField";
@@ -187,6 +187,10 @@ const ProfileView = ({ user }: Props) => {
   });
 
   const isCALIdentityProvider = user?.identityProvider === IdentityProvider.CAL;
+  const hasLocalPassword = !z
+    .object({ studioSocialPasswordless: z.literal(true) })
+    .passthrough()
+    .safeParse(user.metadata).success;
 
   const onConfirmPassword = (e: Event | React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault();
@@ -321,54 +325,57 @@ const ProfileView = ({ user }: Props) => {
         <Label className="mb-0 font-semibold text-base text-red-700">{t("danger_zone")}</Label>
         <p className="text-sm text-subtle">{t("account_deletion_cannot_be_undone")}</p>
       </div>
+      <SocialDeleteEntry />
       {/* Delete account Dialog */}
-      <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
-        <SectionBottomActions align="end">
-          <DialogTrigger asChild>
-            <Button data-testid="delete-account" color="destructive" className="mt-1" StartIcon="trash-2">
-              {t("delete_account")}
-            </Button>
-          </DialogTrigger>
-        </SectionBottomActions>
-        <DialogContent
-          title={t("delete_account_modal_title")}
-          description={t("confirm_delete_account_modal", { appName: APP_NAME })}
-          type="creation"
-          Icon="triangle-alert">
-          <div className="mb-10">
-            <p className="mb-4 text-sm text-subtle">{t("delete_account_confirmation_message")}</p>
-            {isCALIdentityProvider && (
-              <PasswordField
-                data-testid="password"
-                name="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                label="Password"
-                ref={passwordRef}
-              />
-            )}
+      {hasLocalPassword && (
+        <Dialog open={deleteAccountOpen} onOpenChange={setDeleteAccountOpen}>
+          <SectionBottomActions align="end">
+            <DialogTrigger asChild>
+              <Button data-testid="delete-account" color="destructive" className="mt-1" StartIcon="trash-2">
+                {t("delete_account")}
+              </Button>
+            </DialogTrigger>
+          </SectionBottomActions>
+          <DialogContent
+            title={t("delete_account_modal_title")}
+            description={t("confirm_delete_account_modal", { appName: APP_NAME })}
+            type="creation"
+            Icon="triangle-alert">
+            <div className="mb-10">
+              <p className="mb-4 text-sm text-subtle">{t("delete_account_confirmation_message")}</p>
+              {isCALIdentityProvider && (
+                <PasswordField
+                  data-testid="password"
+                  name="password"
+                  id="password"
+                  autoComplete="current-password"
+                  required
+                  label="Password"
+                  ref={passwordRef}
+                />
+              )}
 
-            {user?.twoFactorEnabled && isCALIdentityProvider && (
-              <Form handleSubmit={onConfirm} className="pb-4" form={form}>
-                <TwoFactor center={false} />
-              </Form>
-            )}
+              {user?.twoFactorEnabled && isCALIdentityProvider && (
+                <Form handleSubmit={onConfirm} className="pb-4" form={form}>
+                  <TwoFactor center={false} />
+                </Form>
+              )}
 
-            {hasDeleteErrors && <Alert severity="error" title={deleteErrorMessage} />}
-          </div>
-          <DialogFooter showDivider>
-            <DialogClose />
-            <Button
-              color="destructive"
-              data-testid="delete-account-confirm"
-              onClick={(e) => onConfirmButton(e)}
-              loading={deleteMeMutation.isPending}>
-              {t("delete_my_account")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              {hasDeleteErrors && <Alert severity="error" title={deleteErrorMessage} />}
+            </div>
+            <DialogFooter showDivider>
+              <DialogClose />
+              <Button
+                color="destructive"
+                data-testid="delete-account-confirm"
+                onClick={(e) => onConfirmButton(e)}
+                loading={deleteMeMutation.isPending}>
+                {t("delete_my_account")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* If changing email, confirm password */}
       <Dialog open={confirmPasswordOpen} onOpenChange={setConfirmPasswordOpen}>

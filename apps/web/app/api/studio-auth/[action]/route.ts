@@ -153,7 +153,13 @@ export async function POST(request: NextRequest, context: Context) {
         return socialError("reauth_required");
       await deleteUser(current.user);
       const out = response({ status: "deleted" });
-      out.cookies.delete("__Secure-next-auth.session-token");
+      out.cookies.set("__Secure-next-auth.session-token", "", {
+        secure: true,
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0,
+      });
       return out;
     }
     return response({ error: "not_found" }, 404);
