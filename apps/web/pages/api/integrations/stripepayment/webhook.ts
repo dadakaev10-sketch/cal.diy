@@ -15,17 +15,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") return res.status(405).end();
   if (!stripeBookingEnabled())
     return res.status(503).json({ message: "Stripe booking payments are not enabled" });
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const secrets = [process.env.STRIPE_WEBHOOK_SECRET].filter((value): value is string => !!value);
   const signature = req.headers["stripe-signature"];
-  if (!secret) return res.status(503).json({ message: "Stripe not configured" });
+  if (!secrets.length) return res.status(503).json({ message: "Stripe not configured" });
   if (typeof signature !== "string") return res.status(400).end();
   let event;
   try {
     const raw = await getRawBody(req, { limit: "256kb" });
-    event = stripe.webhooks.constructEvent(raw, signature, secret);
+    for (const secret of secrets) {
+      try {
+        event = stripe.webhooks.constructEvent(raw, signature, secret);
+        break;
+      } catch {}
+    }
+    if (!event) throw new Error("Invalid Stripe signature");
   } catch {
     return res.status(400).json({ message: "Invalid Stripe event" });
   }
+  const account = event.account || process.env.FIXMIT_STRIPE_DIRECT_ACCOUNT_ID;
+  if (
+    !account ||
+    (process.env.FIXMIT_STRIPE_DIRECT_ACCOUNT_ID &&
+      account !== process.env.FIXMIT_STRIPE_DIRECT_ACCOUNT_ID) ||
+    !stripeBookingEnabled()
+  )
+    return res.status(400).end();
   const live = stripeBookingLiveMode();
   if (event.livemode !== live) return res.status(400).end();
   try {
