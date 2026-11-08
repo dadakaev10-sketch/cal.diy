@@ -76,6 +76,11 @@ const getTabs = (
           href: "/settings/my-account/push-notifications",
           trackingMetadata: { section: "my_account", page: "push_notifications" },
         },
+        {
+          name: "stripe_rak_management",
+          href: "/settings/my-account/payments",
+          trackingMetadata: { section: "my_account", page: "payments" },
+        },
         // TODO
         // { name: "referrals", href: "/settings/my-account/referrals" },
       ],
