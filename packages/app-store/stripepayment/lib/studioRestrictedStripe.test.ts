@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const m = vi.hoisted(() => ({
   account: vi.fn(),
   probe: vi.fn(),
+  unneeded: vi.fn(),
   endpoint: vi.fn(),
   remove: vi.fn(),
   rows: vi.fn(),
@@ -17,11 +18,11 @@ const m = vi.hoisted(() => ({
 vi.mock("stripe", () => ({
   default: class {
     accounts = { retrieve: m.account };
-    balance = { retrieve: m.probe };
+    balance = { retrieve: m.unneeded };
     customers = { list: m.probe };
     paymentIntents = { list: m.probe };
     refunds = { list: m.probe };
-    checkout = { sessions: { list: m.probe } };
+    checkout = { sessions: { list: m.unneeded } };
     webhookEndpoints = { create: m.endpoint, del: m.remove };
   },
 }));
@@ -53,6 +54,7 @@ beforeEach(() => {
   vi.stubEnv("FIXMIT_STRIPE_DIRECT_USER_ID", "42");
   m.account.mockResolvedValue({ id: "acct_other", default_currency: "eur", charges_enabled: true });
   m.probe.mockResolvedValue({});
+  m.unneeded.mockRejectedValue(new Error("Unused Stripe resource permission denied"));
   m.endpoint.mockResolvedValue({ id: "we_test", secret: "whsec_onlyserver" });
   m.rows.mockResolvedValue([]);
   m.findMany.mockResolvedValue([]);

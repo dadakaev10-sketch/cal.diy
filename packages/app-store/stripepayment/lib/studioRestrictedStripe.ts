@@ -29,11 +29,9 @@ export async function connectRestrictedStripe(userId: number, input: z.infer<typ
     throw ErrorWithCode.Factory.Forbidden("stripe_existing_direct_connection");
   // These read probes detect missing resources without creating a charge or customer.
   await Promise.all([
-    client.balance.retrieve(),
     client.customers.list({ limit: 1 }),
     client.paymentIntents.list({ limit: 1 }),
     client.refunds.list({ limit: 1 }),
-    client.checkout.sessions.list({ limit: 1 }),
   ]);
   const origin = new URL(process.env.WEBAPP_URL || "https://fixmit.com");
   if (origin.protocol !== "https:" || origin.username || origin.password)

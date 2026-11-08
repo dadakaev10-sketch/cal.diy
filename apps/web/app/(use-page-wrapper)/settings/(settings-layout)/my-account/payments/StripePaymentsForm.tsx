@@ -2,6 +2,7 @@
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { Button } from "@calcom/ui/components/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@calcom/ui/components/dialog";
+import { TextField } from "@calcom/ui/components/form";
 import { useCallback, useEffect, useState } from "react";
 
 type Status = {
@@ -101,31 +102,29 @@ export default function StripePaymentsForm() {
             <summary className="cursor-pointer">{t("stripe_rak_permissions_title")}</summary>
             <p className="mt-3 whitespace-pre-line">{t("stripe_rak_permissions")}</p>
           </details>
-          <label className="block text-sm">
-            {t("stripe_rak_restricted_key")}
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              autoComplete="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              className="border-default bg-default mt-2 w-full rounded-md"
-              required
-            />
-          </label>
-          <label className="block text-sm">
-            {t("stripe_rak_public_key")}
-            <input
-              value={publishableKey}
-              onChange={(e) => setPublishableKey(e.target.value)}
-              autoComplete="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              className="border-default bg-default mt-2 w-full rounded-md"
-              required
-            />
-          </label>
+          <TextField
+            name="stripeRestrictedKey"
+            label={t("stripe_rak_restricted_key")}
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="rk_test_… / rk_live_…"
+            required
+          />
+          <TextField
+            name="stripePublishableKey"
+            label={t("stripe_rak_public_key")}
+            value={publishableKey}
+            onChange={(e) => setPublishableKey(e.target.value)}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="pk_test_… / pk_live_…"
+            required
+          />
           <p className="text-subtle text-sm">{t("stripe_rak_same_mode")}</p>
           <Button
             type="submit"
