@@ -89,8 +89,18 @@ export default function StripePaymentsForm() {
             void submit("connect");
           }}
           className="my-6 max-w-xl space-y-4">
-          <p className="text-sm">{t("stripe_rak_instructions")}</p>
-          <p className="text-subtle text-sm">{t("stripe_rak_permissions")}</p>
+          <p className="whitespace-pre-line text-sm">{t("stripe_rak_instructions")}</p>
+          <a
+            href="https://dashboard.stripe.com/apikeys"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emphasis inline-block text-sm underline">
+            {t("stripe_rak_open")}
+          </a>
+          <details className="text-subtle text-sm">
+            <summary className="cursor-pointer">{t("stripe_rak_permissions_title")}</summary>
+            <p className="mt-3 whitespace-pre-line">{t("stripe_rak_permissions")}</p>
+          </details>
           <label className="block text-sm">
             {t("stripe_rak_restricted_key")}
             <input

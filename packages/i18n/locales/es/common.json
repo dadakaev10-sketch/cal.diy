@@ -4662,8 +4662,8 @@
   "stripe_rak_check": "Comprobar conexión",
   "stripe_rak_disconnect": "Desconectar Stripe",
   "stripe_rak_disconnect_warning": "Fixmit eliminará las claves guardadas. Los nuevos pagos y saldos online dejarán de funcionar hasta reconectar. Los pagos existentes permanecen en Stripe. Revoca también la clave en Stripe.",
-  "stripe_rak_instructions": "Crea una clave API restringida para Fixmit en tu cuenta de Stripe. No uses una clave secreta sin restricciones.",
-  "stripe_rak_permissions": "Lectura: cuenta. Escritura: clientes, Payment Intents, reembolsos y webhooks. Desactiva los demás permisos, especialmente payouts y transferencias. Limita la clave a la IP del VPS de Fixmit si es posible.",
+  "stripe_rak_instructions": "1. En «Claves de API», selecciona «Crear una clave».\n2. Elige «Compartir con un servicio de terceros». Proveedor: Fixmit. URL: https://fixmit.com.\n3. Elige permisos personalizados, crea la clave y pégala abajo.",
+  "stripe_rak_permissions": "Accounts: Lectura\nCustomers: Escritura\nPayment Intents: Escritura\nCharges and Refunds: Escritura\nWebhook Endpoints / Event Destinations: Escritura\n\nOtros permisos: Ninguno. Sin permisos para cuentas conectadas.",
   "stripe_rak_restricted_key": "Clave restringida (rk_…)",
   "stripe_rak_public_key": "Clave pública (pk_…)",
   "stripe_rak_same_mode": "Ambas claves deben pertenecer a la misma cuenta y modo de Stripe (test o real).",
@@ -4676,5 +4676,7 @@
   "stripe_rak_not_ready": "Revisa la conexión",
   "stripe_rak_failed": "No se pudo conectar. Revisa las claves, su modo y los permisos en Stripe.",
   "stripe_rak_test_mode": "Modo de prueba — sin pagos reales",
-  "stripe_rak_pending": "Finaliza o cancela los pagos online pendientes antes de desconectar Stripe."
+  "stripe_rak_pending": "Finaliza o cancela los pagos online pendientes antes de desconectar Stripe.",
+  "stripe_rak_open": "Abrir Stripe",
+  "stripe_rak_permissions_title": "Permisos necesarios"
 }
