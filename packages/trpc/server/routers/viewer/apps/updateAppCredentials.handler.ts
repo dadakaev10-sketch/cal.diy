@@ -1,8 +1,6 @@
 import { prisma } from "@calcom/prisma";
 import type { Prisma } from "@calcom/prisma/client";
-
 import { TRPCError } from "@trpc/server";
-
 import type { TrpcSessionUser } from "../../../types";
 import type { TUpdateAppCredentialsInputSchema } from "./updateAppCredentials.schema";
 
@@ -53,6 +51,9 @@ export const updateAppCredentialsHandler = async ({ ctx, input }: UpdateAppCrede
       message: `Could not find credential ${input.credentialId}`,
     });
   }
+
+  if (credential.appId === "stripe")
+    throw new TRPCError({ code: "FORBIDDEN", message: "Use the secure Stripe connection settings" });
 
   const validatedKeys = await handleCustomValidations({ ctx, input, appId: credential.appId || "" });
 
