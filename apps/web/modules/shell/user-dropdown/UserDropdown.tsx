@@ -141,7 +141,7 @@ export function UserDropdown({ small }: UserDropdownProps) {
           <span className="flex grow items-center gap-2">
             <span className="w-24 shrink-0 text-sm leading-none">
               <span className="text-emphasis block truncate py-0.5 font-medium leading-normal">
-                {isPending ? "Loading..." : (user?.name ?? "Nameless User")}
+                {isPending ? t("loading") : (user?.name ?? user?.username ?? t("my_account"))}
               </span>
             </span>
             {menuOpen ? (

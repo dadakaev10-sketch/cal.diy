@@ -109,7 +109,6 @@ export function PublicLandingPage({
             {page.links.map((link, index) => (
               <a key={`${index}-${link.url}`} href={link.url} target="_blank" rel="noopener noreferrer">
                 {link.label}
-                <span aria-hidden="true"> ↗</span>
               </a>
             ))}
           </nav>

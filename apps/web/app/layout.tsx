@@ -1,3 +1,4 @@
+import { publicBookingLanguageSchema } from "@calcom/lib/publicBookingLanguage";
 import { getLocale } from "@calcom/features/auth/lib/getLocale";
 import { loadTranslations } from "@calcom/i18n/server";
 import { IconSprites } from "@calcom/ui/components/icon";
@@ -83,7 +84,7 @@ const getInitialProps = async () => {
   const embedColorScheme = h.get("x-embedColorScheme");
   const publicLanguage = h.get("x-fixmit-home-language");
   const newLocale =
-    publicLanguage === "de" || publicLanguage === "en" || publicLanguage === "ru"
+    publicLanguage && publicBookingLanguageSchema.safeParse(publicLanguage).success
       ? publicLanguage
       : ((await getLocale(buildLegacyRequest(h, await cookies()))) ?? "en");
   const direction = dir(newLocale) ?? "ltr";

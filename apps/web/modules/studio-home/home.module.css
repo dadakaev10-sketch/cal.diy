@@ -22,3 +22,18 @@
 
 .languages{display:flex;gap:4px;flex-shrink:0}.languages a{padding:5px;border-radius:5px}.languages a[aria-current="page"]{background:var(--ink);color:#fff}.header{flex-wrap:wrap}.headerActions{flex-wrap:wrap}.heroCopy{min-width:0}.hero h1{overflow-wrap:break-word}
 @media(max-width:400px){.headerActions{width:100%;justify-content:space-between}.hero h1{font-size:38px}}
+
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid var(--ink);
+  border-radius: 9px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.previewButton:hover { background: #e8f0e8; }
+.actions { flex-wrap: wrap; }

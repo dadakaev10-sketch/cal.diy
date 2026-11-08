@@ -1,5 +1,7 @@
 import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
+import { resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
+import { PublicBookingLanguageSelect } from "../users/views/PublicBookingLanguageSelect";
 import styles from "./public-info.module.css";
 export const INFO_PAGES = ["pricing", "terms", "privacy", "refund", "imprint", "support"] as const;
 type InfoPage = (typeof INFO_PAGES)[number];
@@ -11,24 +13,34 @@ export async function PublicInfo({
   page: InfoPage;
   searchParams: Promise<{ lang?: string }>;
 }) {
-  const language = (await searchParams).lang === "en" ? "en" : "de";
+  const requested = (await searchParams).lang;
+  const language =
+    page === "pricing" ? resolvePublicBookingLanguage(requested, "de") : requested === "en" ? "en" : "de";
   const t = await getTranslation(language, "common");
   const isFree = process.env.FIXMIT_BILLING_ENABLED !== "true";
   const isTest = process.env.PAYPAL_USE_TEST_PLAN === "true";
   return (
     <div className={styles.shell} lang={language}>
       <header className={styles.header}>
-        <a href="/" aria-label="Fixmit">
+        <a href={`/?lang=${language}`} aria-label="Fixmit">
           <img src="/api/logo?brand=fixmit" alt="Fixmit" width={180} height={60} />
         </a>
         <nav>
-          <a href={`/${page}?lang=de`} lang="de">
-            DE
+          {page === "pricing" ? (
+            <PublicBookingLanguageSelect language={language} label={t("language")} />
+          ) : (
+            <>
+              <a href={`/${page}?lang=de`} lang="de">
+                DE
+              </a>
+              <a href={`/${page}?lang=en`} lang="en">
+                EN
+              </a>
+            </>
+          )}
+          <a className={styles.loginButton} href={`/auth/login?lang=${language}`}>
+            {t("home_login")}
           </a>
-          <a href={`/${page}?lang=en`} lang="en">
-            EN
-          </a>
-          <a href="/auth/login">{t("home_login")}</a>
         </nav>
       </header>
       <main className={styles.main}>

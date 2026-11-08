@@ -168,3 +168,17 @@
     gap: 12px;
   }
 }
+
+.header nav { align-items: center; }
+.header nav > div { width: auto; padding: 0; }
+.header .loginButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 1px solid #73958a;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.header .loginButton:hover { background: #e8f0e8; }

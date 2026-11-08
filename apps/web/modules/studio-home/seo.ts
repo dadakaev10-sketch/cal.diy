@@ -1,25 +1,28 @@
+import { publicBookingLanguages, resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
 import type { TFunction } from "i18next";
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://fixmit.com";
-export const HOME_LANGUAGES = ["de", "en", "ru"] as const;
+export const HOME_LANGUAGES = publicBookingLanguages;
 export type HomeLanguage = (typeof HOME_LANGUAGES)[number];
 export const FAQ_ITEMS = [1, 2, 3, 4, 5] as const;
-export const homeLanguage = (value: unknown): HomeLanguage =>
-  value === "en" || value === "ru" ? value : "de";
+export const homeLanguage = (value: unknown): HomeLanguage => resolvePublicBookingLanguage(value, "de");
 export const homeUrl = (language: HomeLanguage) => `${SITE_URL}/?lang=${language}`;
 
 export function homeMetadata(t: TFunction, language: HomeLanguage): Metadata {
   const title = t("home_seo_title");
   const description = t("home_seo_description");
   const image = `${SITE_URL}/fixmit/logo-white-background.png`;
-  const locales = { de: "de_DE", en: "en_US", ru: "ru_RU" };
+  const locales = { de: "de_DE", en: "en_US", ru: "ru_RU", es: "es_ES", it: "it_IT", fr: "fr_FR" };
   return {
     title: { absolute: title },
     description,
     alternates: {
       canonical: homeUrl(language),
-      languages: { de: homeUrl("de"), en: homeUrl("en"), ru: homeUrl("ru"), "x-default": SITE_URL },
+      languages: {
+        ...Object.fromEntries(HOME_LANGUAGES.map((code) => [code, homeUrl(code)])),
+        "x-default": SITE_URL,
+      },
     },
     openGraph: {
       type: "website",

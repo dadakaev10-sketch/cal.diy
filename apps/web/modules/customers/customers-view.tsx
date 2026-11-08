@@ -117,7 +117,7 @@ export default function CustomersView({ customers }: { customers: Customer[] }) 
                     <p className="text-subtle text-sm">{customer.phoneNumber || t("customer_no_phone")}</p>
                   </div>
                   <span className="text-subtle shrink-0 text-sm">
-                    {t("customer_appointments", { count: customer.bookings.length })} →
+                    {t("customer_appointments", { count: customer.bookings.length })}
                   </span>
                 </button>
               </li>

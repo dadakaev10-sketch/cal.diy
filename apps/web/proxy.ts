@@ -1,3 +1,4 @@
+import { resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
 import process from "node:process";
 import { getCspHeader, getCspNonce } from "@lib/csp";
 import { fixmitCanonicalUrl } from "@lib/fixmitCanonicalUrl";
@@ -82,9 +83,9 @@ const proxy = async (req: NextRequest): Promise<NextResponse<unknown>> => {
   const requestHeaders = new Headers(reqWithEnrichedHeaders.headers);
   // Derive the public page language here: layouts do not receive searchParams.
   requestHeaders.delete("x-fixmit-home-language");
-  if (url.pathname === "/") {
+  if (["/", "/pricing", "/register", "/register/verify"].includes(url.pathname) || (url.pathname === "/auth/login" && url.searchParams.has("lang"))) {
     const language = url.searchParams.get("lang");
-    requestHeaders.set("x-fixmit-home-language", language === "en" || language === "ru" ? language : "de");
+    requestHeaders.set("x-fixmit-home-language", resolvePublicBookingLanguage(language, "de"));
   }
 
   if (url.pathname.startsWith("/api/auth/signup")) {

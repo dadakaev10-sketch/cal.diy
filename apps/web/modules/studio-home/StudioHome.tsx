@@ -1,3 +1,6 @@
+import { publicBookingLanguageNames } from "@calcom/lib/publicBookingLanguage";
+import type { HomeLanguage } from "./seo";
+import { HOME_LANGUAGES } from "./seo";
 import type { TFunction } from "i18next";
 import styles from "./home.module.css";
 import { FAQ_ITEMS } from "./seo";
@@ -9,7 +12,7 @@ export default function StudioHome({
   registrationEnabled = false,
 }: {
   t: TFunction;
-  language: "de" | "en" | "ru";
+  language: HomeLanguage;
   signedIn?: boolean;
   registrationEnabled?: boolean;
 }) {
@@ -35,29 +38,23 @@ export default function StudioHome({
         </nav>
         <div className={styles.headerActions}>
           <nav className={styles.languages} aria-label={t("home_language")}>
-            {(
-              [
-                ["de", "Deutsch"],
-                ["en", "English"],
-                ["ru", "Русский"],
-              ] as const
-            ).map(([code, label]) => (
+            {HOME_LANGUAGES.map((code) => (
               <a
                 key={code}
                 href={`/?lang=${code}`}
                 hrefLang={code}
                 lang={code}
-                aria-label={label}
+                aria-label={publicBookingLanguageNames[code]}
                 aria-current={language === code ? "page" : undefined}>
                 {code.toUpperCase()}
               </a>
             ))}
           </nav>
-          <a href={signedIn ? "/event-types" : "/auth/login"}>
+          <a href={signedIn ? "/event-types" : `/auth/login?lang=${language}`}>
             {t(signedIn ? "studio_open_dashboard" : "home_login")}
           </a>
           <a className={styles.buttonSmall} href={`/register?lang=${language}`}>
-            {t("home_register")} <span aria-hidden="true">↗</span>
+            {t("home_register")}
           </a>
         </div>
       </header>
@@ -78,15 +75,13 @@ export default function StudioHome({
             <p className={styles.lead}>{t("home_description")}</p>
             <div className={styles.actions}>
               <a className={styles.button} href={`/register?lang=${language}`}>
-                {t("home_register")} <span aria-hidden="true">↗</span>
+                {t("home_register")}
               </a>
-              <a className={styles.textLink} href="#preview">
-                {t("home_demo")} <span aria-hidden="true">↓</span>
+              <a className={styles.previewButton} href="#preview">
+                {t("home_demo")}
               </a>
             </div>
-            <p className={styles.note}>
-              {t(registrationEnabled ? "studio_registration_testing" : "home_early")}
-            </p>
+            {!registrationEnabled && <p className={styles.note}>{t("home_early")}</p>}
           </div>
           <figure className={styles.preview} id="preview" aria-label={t("home_preview")}>
             <div className={styles.previewTop}>
@@ -94,7 +89,6 @@ export default function StudioHome({
                 ● ● ●
               </span>
               <span>fixmit.com / studio-morgen</span>
-              <span aria-hidden="true">↗</span>
             </div>
             <div className={styles.booking}>
               <div className={styles.studio}>
@@ -188,10 +182,7 @@ export default function StudioHome({
           </div>
           <ul>
             {[1, 2, 3].map((n) => (
-              <li key={n}>
-                <span aria-hidden="true">↗</span>
-                {t(`home_roadmap_${n}`)}
-              </li>
+              <li key={n}>{t(`home_roadmap_${n}`)}</li>
             ))}
           </ul>
         </section>
@@ -211,7 +202,7 @@ export default function StudioHome({
           <h2>{t("home_join_title")}</h2>
           <p>{t("home_join_text")}</p>
           <a className={styles.button} href={`/register?lang=${language}`}>
-            {t("home_register")} <span aria-hidden="true">↗</span>
+            {t("home_register")}
           </a>
         </section>
       </main>

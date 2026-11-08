@@ -91,13 +91,13 @@ export default function StripePaymentsForm() {
           }}
           className="my-6 max-w-xl space-y-4">
           <p className="whitespace-pre-line text-sm">{t("stripe_rak_instructions")}</p>
-          <a
+          <Button
+            color="secondary"
             href="https://dashboard.stripe.com/apikeys"
             target="_blank"
-            rel="noopener noreferrer"
-            className="text-emphasis inline-block text-sm underline">
+            rel="noopener noreferrer">
             {t("stripe_rak_open")}
-          </a>
+          </Button>
           <details className="text-subtle text-sm">
             <summary className="cursor-pointer">{t("stripe_rak_permissions_title")}</summary>
             <p className="mt-3 whitespace-pre-line">{t("stripe_rak_permissions")}</p>

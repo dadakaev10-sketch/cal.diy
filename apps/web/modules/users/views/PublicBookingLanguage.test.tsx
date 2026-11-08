@@ -9,14 +9,14 @@ vi.mock("@calcom/i18n/server", () => ({ loadTranslations: mocks.load }));
 describe("public booking page language integration", () => {
   beforeEach(() => {
     mocks.findFirst.mockResolvedValue({ metadata: { bookingPageLanguage: "es" }, locale: "de" });
-    mocks.load.mockResolvedValue({});
+    mocks.load.mockResolvedValue({ language: "Idioma" });
   });
   it("loads the studio preference independently of the signed-in UI language", async () => {
     render(
       await PublicBookingLanguage({ username: "demo-studio", requested: undefined, children: <p>Studio</p> })
     );
     expect(mocks.load).toHaveBeenCalledWith("es", "common");
-    expect(screen.getByRole("combobox", { name: "Language" })).toHaveValue("es");
+    expect(screen.getByRole("combobox", { name: "Idioma" })).toHaveValue("es");
     expect(screen.getAllByRole("option")).toHaveLength(6);
     expect(screen.getByText("Studio").closest("[lang]")).toHaveAttribute("lang", "es");
   });

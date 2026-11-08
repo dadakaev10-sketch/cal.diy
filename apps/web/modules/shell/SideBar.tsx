@@ -44,7 +44,8 @@ export function SideBarContainer({ bannersHeight }: SideBarContainerProps) {
 export function SideBar({ bannersHeight, user }: SideBarProps) {
   const { t, isLocaleReady } = useLocale();
 
-  const publicPageUrl = `${WEBAPP_URL}/${user?.orgAwareUsername}`;
+  const username = user?.orgAwareUsername ?? user?.username;
+  const publicPageUrl = username ? `${WEBAPP_URL}/${username}` : null;
 
   const bottomNavItems = useBottomNavItems({
     publicPageUrl,

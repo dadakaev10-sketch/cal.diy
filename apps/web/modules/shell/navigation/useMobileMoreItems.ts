@@ -6,7 +6,8 @@ import type { NavigationItemType } from "./NavigationItem";
 export function useMobileMoreItems(): NavigationItemType[] {
   const { data: session } = useSession();
   const user = session?.user;
-  const publicPageUrl = `${WEBAPP_URL}/${user?.orgAwareUsername ?? user?.username}`;
+  const username = user?.orgAwareUsername ?? user?.username;
+  const publicPageUrl = username ? `${WEBAPP_URL}/${username}` : null;
 
   const bottomNavItems = useBottomNavItems({
     publicPageUrl,

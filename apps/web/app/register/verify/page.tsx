@@ -1,3 +1,4 @@
+import { resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
 import process from "node:process";
 import { studioTokenHash } from "@calcom/features/auth/lib/studioAccountSecurity";
 import { getTranslation } from "@calcom/i18n/server";
@@ -21,7 +22,7 @@ export default async function Page({
 }) {
   if (process.env.STUDIO_REGISTRATION_ENABLED !== "true") notFound();
   const params = await searchParams;
-  const locale = params.lang === "en" || params.lang === "ru" ? params.lang : "de";
+  const locale = resolvePublicBookingLanguage(params.lang, "de");
   const t = await getTranslation(locale, "common");
   const token = params.token || "";
   const request = /^[a-f0-9]{64}$/.test(token)

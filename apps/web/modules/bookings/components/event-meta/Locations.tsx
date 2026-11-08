@@ -51,7 +51,7 @@ export const EventLocations = ({ event }: { event: BookerEvent }) => {
                               ? "dark:invert-[.65]"
                               : ""
                           )}
-                          alt={`${getLocationByType(location.type)?.label} icon`}
+                          alt=""
                         />
                         <span>{getLocationToDisplay(location)}</span>
                       </div>

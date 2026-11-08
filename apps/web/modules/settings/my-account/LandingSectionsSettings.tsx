@@ -4,6 +4,15 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { type LandingPage, type LandingSection, socialPlatforms } from "@calcom/prisma/landingPage";
 import { Button } from "@calcom/ui/components/button";
 
+const socialLabels = {
+  instagram: "Instagram",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  x: "X",
+  linkedin: "LinkedIn",
+  facebook: "Facebook",
+} satisfies Record<(typeof socialPlatforms)[number], string>;
+
 const inputClass = "border-default bg-default text-default mt-1 w-full rounded-md border px-3 py-2 text-sm";
 export function LandingSectionsSettings({
   page,
@@ -39,7 +48,7 @@ export function LandingSectionsSettings({
         <p className="text-subtle text-xs">{t("landing_socials_help")}</p>
         {socialPlatforms.map((platform) => (
           <label key={platform} className="block text-sm">
-            {platform === "x" ? "X" : platform.charAt(0).toUpperCase() + platform.slice(1)}
+            {socialLabels[platform]}
             <input
               type="url"
               className={inputClass}

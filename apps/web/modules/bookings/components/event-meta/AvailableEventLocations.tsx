@@ -26,7 +26,7 @@ function RenderIcon({
     <img
       src={`${isPlatform ? process.env.NEXT_PUBLIC_WEBAPP_URL : ""}${eventLocationType.iconUrl}`}
       className={classNames(invertLogoOnDark(eventLocationType?.iconUrl, isTooltip), "me-[10px] h-4 w-4")}
-      alt={`${eventLocationType.label} icon`}
+      alt=""
     />
   );
 }

@@ -9,7 +9,6 @@ import { showToast } from "@calcom/ui/components/toast";
 import { PublicLandingPage } from "@calcom/web/modules/users/views/PublicLandingPage";
 import { getPublicPagePalette } from "@lib/publicPagePalette";
 import { revalidateSettingsAppearance } from "app/(use-page-wrapper)/settings/(settings-layout)/my-account/appearance/actions";
-import Link from "next/link";
 import { type CSSProperties, useState } from "react";
 import { LandingSectionsSettings } from "./LandingSectionsSettings";
 
@@ -254,9 +253,9 @@ export function LandingPageSettings({
         )}
         <div className="flex flex-wrap items-center justify-end gap-2">
           {user.username && (
-            <Link href={`/${user.username}`} target="_blank" className="mr-auto text-sm underline">
+            <Button color="secondary" href={`/${user.username}`} target="_blank" rel="noopener noreferrer" className="mr-auto">
               {t("landing_open")}
-            </Link>
+            </Button>
           )}
           <Button
             type="button"

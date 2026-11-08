@@ -1,5 +1,8 @@
 import de from "@calcom/i18n/locales/de/common.json";
 import en from "@calcom/i18n/locales/en/common.json";
+import es from "@calcom/i18n/locales/es/common.json";
+import itLocale from "@calcom/i18n/locales/it/common.json";
+import fr from "@calcom/i18n/locales/fr/common.json";
 import ru from "@calcom/i18n/locales/ru/common.json";
 import { cleanup, render, screen } from "@testing-library/react";
 import { createInstance } from "i18next";
@@ -11,12 +14,12 @@ import { homeLanguage, homeMetadata, homeStructuredData, serializeStructuredData
 afterEach(cleanup);
 describe("public studio homepage", () => {
   it("normalizes unknown languages and keeps private pages out of the sitemap", () => {
-    expect(homeLanguage("fr")).toBe("de");
+    expect(homeLanguage("xx")).toBe("de");
     expect(homeLanguage(undefined)).toBe("de");
     const entries = sitemap();
-    expect(entries).toHaveLength(8);
+    expect(entries).toHaveLength(11);
     const publicUrls = new Set([
-      ...["de", "en", "ru"].map((language) => `https://fixmit.com/?lang=${language}`),
+      ...["de", "en", "ru", "fr", "it", "es"].map((language) => `https://fixmit.com/?lang=${language}`),
       ...["pricing", "terms", "privacy", "refund", "imprint"].map((page) => `https://fixmit.com/${page}`),
     ]);
     for (const entry of entries) expect(publicUrls.has(entry.url)).toBe(true);
@@ -38,11 +41,21 @@ describe("public studio homepage", () => {
     "de",
     "en",
     "ru",
+    "es",
+    "it",
+    "fr",
   ] as const)("renders %s without missing copy or broken anchors", async (language) => {
     const i18n = createInstance();
     await i18n.init({
       lng: language,
-      resources: { de: { translation: de }, en: { translation: en }, ru: { translation: ru } },
+      resources: {
+        de: { translation: de },
+        en: { translation: en },
+        ru: { translation: ru },
+        es: { translation: es },
+        it: { translation: itLocale },
+        fr: { translation: fr },
+      },
     });
     const { container } = render(<StudioHome t={i18n.t} language={language} />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
@@ -53,6 +66,9 @@ describe("public studio homepage", () => {
       de: "https://fixmit.com/?lang=de",
       en: "https://fixmit.com/?lang=en",
       ru: "https://fixmit.com/?lang=ru",
+      es: "https://fixmit.com/?lang=es",
+      it: "https://fixmit.com/?lang=it",
+      fr: "https://fixmit.com/?lang=fr",
       "x-default": "https://fixmit.com",
     });
     expect(metadata.title).toEqual({ absolute: i18n.t("home_seo_title") });
@@ -72,11 +88,11 @@ describe("public studio homepage", () => {
       expect(href).toBeTruthy();
       if (href) expect(container.querySelector(href)).not.toBeNull();
     }
-    expect(container.querySelector('a[href="/auth/login"]')).not.toBeNull();
+    expect(container.querySelector(`a[href="/auth/login?lang=${language}"]`)).not.toBeNull();
     expect(container.querySelector(`a[href="/register?lang=${language}"]`)).not.toBeNull();
     expect(container.querySelector('a[href="/signup"]')).toBeNull();
     expect(container.querySelector("form")).toBeNull();
-    for (const code of ["de", "en", "ru"]) {
+    for (const code of ["de", "en", "ru", "fr", "it", "es"]) {
       const link = container.querySelector(`a[href="/?lang=${code}"]`);
       expect(link).not.toBeNull();
       expect(link?.getAttribute("aria-current")).toBe(code === language ? "page" : null);

@@ -107,7 +107,7 @@ export default function Login({
   totpEmail,
 }: PageProps) {
   const searchParams = useCompatSearchParams();
-  const { t } = useLocale();
+  const { t, i18n } = useLocale();
   const router = useRouter();
   const formSchema = z
     .object({
@@ -380,11 +380,11 @@ export default function Login({
           <div
             className={`${styles.loginFooter} mt-6 flex flex-wrap items-center justify-center gap-4 text-center`}>
             {showSignupLink && (
-              <Link href="/register" className={styles.primary}>
+              <Link href={`/register?lang=${encodeURIComponent(i18n.language || "de")}`} className={styles.primary}>
                 {t("home_register")}
               </Link>
             )}
-            <a href="/" className={styles.secondary}>
+            <a href={`/?lang=${encodeURIComponent(i18n.language || "de")}`} className={styles.secondary}>
               {t("studio_back_home")}
             </a>
           </div>

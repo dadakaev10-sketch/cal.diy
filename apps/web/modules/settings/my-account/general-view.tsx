@@ -364,7 +364,6 @@ const GeneralView = ({ user, travelSchedules }: GeneralViewProps) => {
         <SettingsToggle
           toggleSwitchAtTheEnd={true}
           title={t("monthly_digest_email")}
-          description={t("monthly_digest_email")}
           disabled={mutation.isPending}
           checked={isReceiveMonthlyDigestEmailChecked}
           onCheckedChange={(checked) => {
@@ -389,9 +388,9 @@ const GeneralView = ({ user, travelSchedules }: GeneralViewProps) => {
         <div className="mt-6 rounded-xl border border-subtle p-5">
           <h2 className="font-semibold">{t("studio_social_methods")}</h2>
           <p className="my-2 text-sm text-subtle">{t("studio_social_link_intro")}</p>
-          <a className="text-sm font-semibold underline" href="/auth/social?link=1">
+          <Button color="secondary" href="/auth/social?link=1">
             {t("studio_social_manage")}
-          </a>
+          </Button>
         </div>
         <TravelScheduleModal
           open={isTZScheduleOpen}

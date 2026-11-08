@@ -1,5 +1,6 @@
 "use client";
 
+import type { PublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
 import { type FormEvent, useEffect, useState } from "react";
 import styles from "./studio-auth.module.css";
 
@@ -11,7 +12,7 @@ export default function StudioRegistrationForm({
   labels,
 }: {
   mode: "request" | "complete" | "admin";
-  locale: "de" | "en" | "ru";
+  locale: PublicBookingLanguage;
   token?: string;
   studioName?: string | null;
   labels: Record<string, string>;
@@ -59,7 +60,7 @@ export default function StudioRegistrationForm({
         {mode === "complete" ? (
           <>
             <p>{labels.studio_choose_availability}</p>
-            <a className={styles.primary} href="/auth/login">
+            <a className={styles.primary} href={`/auth/login?lang=${locale}`}>
               {labels.home_login}
             </a>
           </>
@@ -102,7 +103,7 @@ export default function StudioRegistrationForm({
               pattern="[a-z0-9][a-z0-9-]{2,48}[a-z0-9]"
               minLength={4}
               maxLength={50}
-              placeholder="mein-studio"
+              placeholder="studio-morgen"
               required
             />
           </label>

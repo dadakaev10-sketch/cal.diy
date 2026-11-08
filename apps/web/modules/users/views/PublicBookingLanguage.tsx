@@ -33,7 +33,7 @@ export async function PublicBookingLanguage({
   return (
     <CustomI18nProvider translations={translations} locale={language} ns="common">
       <div lang={language}>
-        <PublicBookingLanguageSelect language={language} />
+        <PublicBookingLanguageSelect language={language} label={translations.language} />
         {children}
       </div>
     </CustomI18nProvider>

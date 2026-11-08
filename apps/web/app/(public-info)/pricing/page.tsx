@@ -1,4 +1,5 @@
 import { getTranslation } from "@calcom/i18n/server";
+import { resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
 import type { Metadata } from "next";
 import { PublicInfo } from "../../../modules/public-info/PublicInfo";
 export const dynamic = "force-dynamic";
@@ -7,7 +8,7 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
-  const language = (await searchParams).lang === "en" ? "en" : "de";
+  const language = resolvePublicBookingLanguage((await searchParams).lang, "de");
   const t = await getTranslation(language, "common");
   return {
     title: `${t("public_pricing_title")} | Fixmit`,

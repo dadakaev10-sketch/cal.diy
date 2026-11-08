@@ -358,7 +358,9 @@ describe("Middleware Integration Tests", () => {
       ["/?lang=en", "en"],
       ["/?lang=ru", "ru"],
       ["/", "de"],
-      ["/?lang=fr", "de"],
+      ["/?lang=fr", "fr"],
+      ["/pricing?lang=it", "it"],
+      ["/?lang=xx", "de"],
       ["/event-types", null],
     ])("derives a trusted homepage language for %s", async (path, expected) => {
       const spy = vi.spyOn(NextResponse, "next");

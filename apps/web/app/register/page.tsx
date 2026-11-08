@@ -1,3 +1,8 @@
+import {
+  publicBookingLanguages,
+  publicBookingLanguageNames,
+  resolvePublicBookingLanguage,
+} from "@calcom/lib/publicBookingLanguage";
 import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
 import { redirect } from "next/navigation";
@@ -19,7 +24,7 @@ export default async function RegisterPage({
   searchParams: Promise<{ lang?: string; recovery?: string }>;
 }) {
   const params = await searchParams;
-  const language = params.lang === "en" || params.lang === "ru" ? params.lang : "de";
+  const language = resolvePublicBookingLanguage(params.lang, "de");
   if (params.recovery === "1") redirect("/recover");
   const enabled = process.env.STUDIO_REGISTRATION_ENABLED === "true";
   const t = await getTranslation(language, "common");
@@ -40,20 +45,14 @@ export default async function RegisterPage({
             labels={Object.fromEntries(studioRegistrationKeys.map((key) => [key, t(key)]))}
           />
         ) : null}
-        <a className={enabled ? styles.secondary : styles.primary} href="/auth/login">
+        <a className={enabled ? styles.secondary : styles.primary} href={`/auth/login?lang=${language}`}>
           {t("home_login")}
         </a>
         <a className={styles.secondary} href={`/?lang=${language}`}>
           {t("studio_back_home")}
         </a>
         <nav aria-label={t("home_language")}>
-          {(
-            [
-              ["de", "Deutsch"],
-              ["en", "English"],
-              ["ru", "Русский"],
-            ] as const
-          ).map(([code, label]) => (
+          {publicBookingLanguages.map((code) => (
             <a
               key={code}
               className={styles.language}
@@ -61,7 +60,7 @@ export default async function RegisterPage({
               lang={code}
               aria-current={language === code ? "page" : undefined}
               style={{ marginInlineEnd: 16 }}>
-              {label}
+              {publicBookingLanguageNames[code]}
             </a>
           ))}
         </nav>

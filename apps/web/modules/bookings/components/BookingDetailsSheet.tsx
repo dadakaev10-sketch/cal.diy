@@ -755,7 +755,7 @@ function PaymentSection({
   booking: BookingOutput;
   payment: NonNullable<BookingOutput["payment"]>[number];
 }) {
-  const { t } = useLocale();
+  const { t, i18n } = useLocale();
 
   // Get refund policy from event type metadata
   const parsedEventTypeMetadata = booking.eventType?.metadata
@@ -778,7 +778,7 @@ function PaymentSection({
     refundDaysCount,
   });
 
-  const formattedPrice = formatPrice(payment.amount, payment.currency);
+  const formattedPrice = formatPrice(payment.amount, payment.currency, i18n.language);
 
   return (
     <Section title={t("payment")}>
