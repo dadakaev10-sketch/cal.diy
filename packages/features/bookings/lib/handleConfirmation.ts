@@ -2,6 +2,7 @@ import { eventTypeAppMetadataOptionalSchema } from "@calcom/app-store/zod-utils"
 import { sendScheduledEmailsAndSMS } from "@calcom/emails/email-manager";
 import type { EventManagerUser } from "@calcom/features/bookings/lib/EventManager";
 import EventManager from "@calcom/features/bookings/lib/EventManager";
+import { notifyStudioBooking } from "@calcom/features/notifications/studioPush";
 import getWebhooks from "@calcom/features/webhooks/lib/getWebhooks";
 import { scheduleTrigger } from "@calcom/features/webhooks/lib/scheduleTrigger";
 import sendPayload from "@calcom/features/webhooks/lib/sendOrSchedulePayload";
@@ -307,6 +308,11 @@ export async function handleConfirmation(args: {
         uid: booking.uid,
       },
     ];
+  }
+
+  // A confirmed booking must notify its studio even if calendar sync or confirmation emails failed.
+  for (const confirmed of updatedBookings) {
+    await notifyStudioBooking(confirmed.uid, "created");
   }
 
   const triggerForUser = true;
