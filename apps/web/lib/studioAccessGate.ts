@@ -124,6 +124,11 @@ export async function studioAccessGate(req: NextRequest) {
     return NextResponse.redirect(new URL("/recover", req.url));
   }
   if (path === "/api/integrations/stripepayment/webhook" && req.method === "POST") return null;
+  if (
+    req.method === "POST" &&
+    /^\/api\/integrations\/stripepayment\/studio-webhook\/[a-f0-9]{48}$/.test(path)
+  )
+    return null;
   if (path === "/api/fixmit-billing/webhook" && req.method === "POST") return null;
   if (path === "/api/cron/expire-deposits" && req.method === "POST") return null;
   const access = studioRouteAccess(path, req.method);

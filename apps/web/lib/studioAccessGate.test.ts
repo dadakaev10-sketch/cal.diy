@@ -86,6 +86,22 @@ describe("studio access boundary", () => {
     expect((await studioAccessGate(new NextRequest(url)))?.status).toBe(401);
     expect((await studioAccessGate(new NextRequest(`${url}/admin`, { method: "POST" })))?.status).toBe(401);
   });
+  it("allows only exact per-studio signed webhook POST routes without a session", async () => {
+    const base = "https://test.local/api/integrations/stripepayment/studio-webhook/";
+    const url = base + "a".repeat(48);
+    expect(await studioAccessGate(new NextRequest(url, { method: "POST" }))).toBeNull();
+    expect((await studioAccessGate(new NextRequest(url)))?.status).toBe(401);
+    for (const suffix of ["a".repeat(47), "g".repeat(48), "a".repeat(48) + "/admin"]) {
+      expect((await studioAccessGate(new NextRequest(base + suffix, { method: "POST" })))?.status).toBe(401);
+    }
+    expect(
+      (
+        await studioAccessGate(
+          new NextRequest("https://test.local/api/studio/stripe/connect", { method: "POST" })
+        )
+      )?.status
+    ).toBe(401);
+  });
   it("allows guest booking pages and fails closed on booking mutation abuse", async () => {
     expect(await studioAccessGate(new NextRequest("https://test.local/dadakaev"))).toBeNull();
     const request = (origin: string) =>
