@@ -62,6 +62,19 @@ describe("studio native payment settings", () => {
   });
   it("validates a percentage and normalizes the event price", async () =>
     expect(await validateStudioPaymentSettings(settings(), 42)).toEqual({ price: 10000, currency: "eur" }));
+  it.each([
+    "EUR",
+    "USD",
+    "GBP",
+    "CHF",
+    "CAD",
+    "AUD",
+  ])("keeps selected %s separate from the account default", async (currency) => {
+    expect(await validateStudioPaymentSettings(settings({ currency }), 42)).toEqual({
+      price: 10000,
+      currency: currency.toLowerCase(),
+    });
+  });
   it("validates a fixed deposit", async () =>
     expect(
       await validateStudioPaymentSettings(settings({ depositMode: "fixed", depositValue: 2500 }), 42)

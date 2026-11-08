@@ -105,6 +105,19 @@ describe("booking balance", () => {
       idempotencyKey: "booking-balance-deposit-uid",
     });
   });
+  it("uses the deposit currency for a USD balance rather than the merchant default", async () => {
+    m.payments.mockResolvedValue([{ ...deposit, currency: "usd" }]);
+    m.create.mockImplementation(async ({ data }) => ({ ...data, id: 2, uid: "balance-uid" }));
+    m.update.mockImplementation(async ({ data }) => ({ ...balance, currency: "usd", ...data }));
+    expect(await bookingBalance("booking", 42, "link")).toMatchObject({ currency: "usd", remaining: 7000 });
+    expect(m.intent).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: 7000, currency: "usd" }),
+      expect.objectContaining({ stripeAccount: "acct_studio" })
+    );
+    expect(m.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ currency: "usd", amount: 7000 }) })
+    );
+  });
   it("reuses the existing link", async () => {
     m.payments.mockResolvedValue([deposit, balance]);
     expect(await bookingBalance("booking", 42, "link")).toMatchObject({ link: "/payment/balance-uid" });

@@ -24,7 +24,8 @@ import { BuildPaymentService } from "./PaymentService";
 beforeEach(() => {
   vi.resetAllMocks();
   vi.stubEnv("STRIPE_PRIVATE_KEY", "sk_test_unit");
-  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_unit");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_USER_ID", "4");
   m.booking.mockResolvedValue({
     eventType: { metadata: { apps: { stripe: { depositMode: "percent", depositValue: 30 } } } },
   });
@@ -56,6 +57,37 @@ describe("Stripe initial deposit creation", () => {
           amount: 3000,
           data: expect.objectContaining({ kind: "deposit", totalAmount: 10000, depositAmount: 3000 }),
         }),
+      })
+    );
+  });
+  it.each([
+    ["eur", "percent", 30, 1170],
+    ["usd", "percent", 30, 1170],
+    ["usd", "fixed", 1100, 1100],
+    ["chf", "none", undefined, 3900],
+  ])("passes selected %s currency to Stripe for %s payment", async (currency, depositMode, depositValue, due) => {
+    m.booking.mockResolvedValue({
+      eventType: { metadata: { apps: { stripe: { depositMode, depositValue } } } },
+    });
+    const service = BuildPaymentService({
+      key: { stripe_user_id: "acct_unit", stripe_publishable_key: "pk_test_unit", default_currency: "eur" },
+    });
+    await service.create(
+      { amount: 3900, currency },
+      7,
+      4,
+      "studio",
+      "Test",
+      "ON_BOOKING",
+      "test@example.invalid"
+    );
+    expect(m.intent).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: due, currency: currency.toLowerCase() }),
+      expect.objectContaining({ stripeAccount: "acct_unit" })
+    );
+    expect(m.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ amount: due, currency: currency.toLowerCase() }),
       })
     );
   });
