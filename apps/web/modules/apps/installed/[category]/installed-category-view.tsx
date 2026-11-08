@@ -1,6 +1,6 @@
 "use client";
 
-import getAppCategoryTitle from "@calcom/app-store/_utils/getAppCategoryTitle";
+import { type ActiveAppCategoryKeys, APP_CATEGORY_ENTRIES } from "@calcom/app-store/_utils/getAppCategories";
 import { AppList, type HandleDisconnect } from "@calcom/features/apps/components/AppList";
 import type { UpdateUsersDefaultConferencingAppParams } from "@calcom/features/apps/components/AppSetDefaultLinkDialog";
 import type { RemoveAppParams } from "@calcom/features/apps/components/DisconnectIntegrationModal";
@@ -20,7 +20,6 @@ import { CalendarListContainer } from "@components/apps/CalendarListContainer";
 import InstalledAppsLayout from "@components/apps/layouts/InstalledAppsLayout";
 import { QueryCell } from "@lib/QueryCell";
 import { useReducer } from "react";
-import { APP_CATEGORY_ENTRIES, ActiveAppCategoryKeys } from "@calcom/app-store/_utils/getAppCategories";
 
 interface IntegrationsContainerProps {
   variant?: AppCategories;
@@ -114,7 +113,7 @@ const IntegrationsContainer = ({
       success={({ data }) => {
         if (!data.items.length) {
           const resolvedVariant = resolveEmptyStateVariant(variant);
-          const emptyHeaderCategory = getAppCategoryTitle(resolvedVariant, true);
+          const emptyHeaderCategory = t(resolvedVariant);
 
           return (
             <EmptyScreen
@@ -128,7 +127,11 @@ const IntegrationsContainer = ({
                   color="secondary"
                   data-testid={`connect-${resolvedVariant}-apps`}
                   href={`/apps/categories/${resolvedVariant}`}>
-                  {t(`connect_${resolvedVariant}_apps`)}
+                  {t(
+                    resolvedVariant === "conferencing"
+                      ? "connect_conference_apps"
+                      : `connect_${resolvedVariant}_apps`
+                  )}
                 </Button>
               }
             />
