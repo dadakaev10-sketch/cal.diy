@@ -4807,7 +4807,7 @@
   "stripe_rak_check": "Проверить подключение",
   "stripe_rak_disconnect": "Отключить Stripe",
   "stripe_rak_disconnect_warning": "Fixmit удалит сохранённые ключи. Новые онлайн-платежи и доплаты будут недоступны до повторного подключения. Прошлые платежи останутся в Stripe. Также отзовите ключ в Stripe.",
-  "stripe_rak_instructions": "1. В разделе «API-ключи» выберите «Создать ключ».\n2. Выберите «Поделиться со сторонним сервисом». Название: Fixmit. URL: https://fixmit.com.\n3. Выберите настраиваемые разрешения, создайте ключ и вставьте его ниже.",
+  "stripe_rak_instructions": "1. В разделе «API-ключи» выберите «Создать ключ».\n2. Выберите «Поделиться со сторонним сервисом». Название: Fixmit. URL: https://fixmit.com.\n3. Выберите «Стандартные», создайте ключ и вставьте его ниже. Чтобы предоставить меньше прав, выберите «Настраиваемые».",
   "stripe_rak_permissions": "Connect / Accounts (v1): Чтение\nAccounts v2: Нет\nCustomers: Запись\nPayment Intents: Запись\nCharges and Refunds: Запись\nWebhook Endpoints / Event Destinations: Запись\n\nОстальные права: Нет. Права для подключённых счетов не нужны.",
   "stripe_rak_restricted_key": "Ограниченный ключ (rk_…)",
   "stripe_rak_public_key": "Публичный ключ (pk_…)",
@@ -4823,5 +4823,5 @@
   "stripe_rak_test_mode": "Тестовый режим — без реальных платежей",
   "stripe_rak_pending": "Завершите или отмените ожидающие онлайн-платежи перед отключением Stripe.",
   "stripe_rak_open": "Открыть Stripe",
-  "stripe_rak_permissions_title": "Нужные разрешения"
+  "stripe_rak_permissions_title": "Свои разрешения (необязательно)"
 }

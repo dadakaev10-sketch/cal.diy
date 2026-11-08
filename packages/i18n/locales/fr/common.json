@@ -4662,7 +4662,7 @@
   "stripe_rak_check": "Vérifier la connexion",
   "stripe_rak_disconnect": "Déconnecter Stripe",
   "stripe_rak_disconnect_warning": "Fixmit supprimera les clés enregistrées. Les nouveaux paiements et soldes en ligne seront suspendus jusqu’à la reconnexion. Les paiements existants restent dans Stripe. Révoquez aussi la clé dans Stripe.",
-  "stripe_rak_instructions": "1. Dans «Clés API», choisissez «Créer une clé».\n2. Choisissez «Partager avec un service tiers». Fournisseur : Fixmit. URL : https://fixmit.com.\n3. Choisissez les autorisations personnalisées, créez la clé et collez-la ci-dessous.",
+  "stripe_rak_instructions": "1. Dans «Clés API», choisissez «Créer une clé».\n2. Choisissez «Partager avec un service tiers». Fournisseur : Fixmit. URL : https://fixmit.com.\n3. Choisissez «Standard», créez la clé et collez-la ci-dessous. Pour accorder moins de droits, choisissez «Personnalisées».",
   "stripe_rak_permissions": "Connect / Accounts (v1): Lecture\nAccounts v2: Aucun\nCustomers : Écriture\nPayment Intents : Écriture\nCharges and Refunds : Écriture\nWebhook Endpoints / Event Destinations : Écriture\n\nAutres droits : Aucun. Aucun droit pour les comptes connectés.",
   "stripe_rak_restricted_key": "Clé restreinte (rk_…)",
   "stripe_rak_public_key": "Clé publique (pk_…)",
@@ -4678,5 +4678,5 @@
   "stripe_rak_test_mode": "Mode test — aucun paiement réel",
   "stripe_rak_pending": "Terminez ou annulez les paiements en ligne en attente avant de déconnecter Stripe.",
   "stripe_rak_open": "Ouvrir Stripe",
-  "stripe_rak_permissions_title": "Autorisations requises"
+  "stripe_rak_permissions_title": "Droits personnalisés (facultatif)"
 }

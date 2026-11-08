@@ -6,7 +6,9 @@ Fixmit uses a studio-owned restricted API key, not Stripe Connect. Existing Amin
 
 Open Settings → Payments in the web app, or Studio → Payments in Fixmit Studio. Create a dedicated restricted API key in the studio's own activated Stripe account. Enter its `rk_` key and the matching `pk_` key into that authenticated form, never chat, source files, or URLs. Unrestricted `sk_` keys are rejected. Use sandbox keys first.
 
-Grant only:
+The third-party setup wizard can create a restricted key with Standard permissions for easier setup. Standard grants broader access; merchants can instead choose Custom and grant only the permissions below. Fixmit accepts restricted keys in both cases and never accepts unrestricted secret keys.
+
+For Custom permissions:
 
 - Account details: read (current account identity, currency and activation).
 - Customers: write (find/create booking customers).
