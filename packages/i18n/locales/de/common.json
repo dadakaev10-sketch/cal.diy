@@ -5090,7 +5090,7 @@
   "stripe_rak_disconnect": "Stripe trennen",
   "stripe_rak_disconnect_warning": "Fixmit entfernt die gespeicherten Zugangsschlüssel. Neue Onlinezahlungen und Online-Restzahlungen sind bis zur erneuten Verbindung nicht möglich. Bisherige Zahlungen bleiben in Stripe. Widerrufe den eingeschränkten Schlüssel zusätzlich in Stripe.",
   "stripe_rak_instructions": "1. Unter „API-Schlüssel“ auf „Erstellen Sie einen Schlüssel“ klicken.\n2. „Mit einem Drittanbieter-Service teilen“ wählen. Anbietername: Fixmit. URL: https://fixmit.com.\n3. „Benutzerdefinierte Berechtigungen“ wählen, Schlüssel erstellen und unten einfügen.",
-  "stripe_rak_permissions": "Accounts: Lesen\nCustomers: Schreiben\nPayment Intents: Schreiben\nCharges and Refunds: Schreiben\nWebhook Endpoints / Event Destinations: Schreiben\n\nAlle anderen Rechte: Keine. Keine Rechte für verbundene Konten.",
+  "stripe_rak_permissions": "Connect / Accounts (v1): Lesen\nAccounts v2: Keine\nCustomers: Schreiben\nPayment Intents: Schreiben\nCharges and Refunds: Schreiben\nWebhook Endpoints / Event Destinations: Schreiben\n\nAlle anderen Rechte: Keine. Keine Rechte für verbundene Konten.",
   "stripe_rak_restricted_key": "Eingeschränkter Schlüssel (rk_…)",
   "stripe_rak_public_key": "Öffentlicher Schlüssel (pk_…)",
   "stripe_rak_same_mode": "Beide Schlüssel müssen zum selben Stripe-Konto und Modus gehören (Test oder Live).",

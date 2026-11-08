@@ -5226,7 +5226,7 @@
   "stripe_rak_disconnect": "Disconnect Stripe",
   "stripe_rak_disconnect_warning": "Fixmit will remove its stored access keys. New online payments and online balances will stop until you reconnect. Existing payments stay in Stripe. Revoke the restricted key in Stripe as well.",
   "stripe_rak_instructions": "1. Under “API keys”, choose “Create a key”.\n2. Choose “Sharing with a third-party service”. Provider name: Fixmit. URL: https://fixmit.com.\n3. Choose custom permissions, create the key and paste it below.",
-  "stripe_rak_permissions": "Accounts: Read\nCustomers: Write\nPayment Intents: Write\nCharges and Refunds: Write\nWebhook Endpoints / Event Destinations: Write\n\nAll other permissions: None. No permissions for connected accounts.",
+  "stripe_rak_permissions": "Connect / Accounts (v1): Read\nAccounts v2: None\nCustomers: Write\nPayment Intents: Write\nCharges and Refunds: Write\nWebhook Endpoints / Event Destinations: Write\n\nAll other permissions: None. No permissions for connected accounts.",
   "stripe_rak_restricted_key": "Restricted key (rk_…)",
   "stripe_rak_public_key": "Publishable key (pk_…)",
   "stripe_rak_same_mode": "Both keys must belong to the same Stripe account and mode (test or live).",

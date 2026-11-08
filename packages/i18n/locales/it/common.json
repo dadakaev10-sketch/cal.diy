@@ -4663,7 +4663,7 @@
   "stripe_rak_disconnect": "Disconnetti Stripe",
   "stripe_rak_disconnect_warning": "Fixmit rimuoverà le chiavi salvate. Nuovi pagamenti e saldi online saranno sospesi fino alla riconnessione. I pagamenti esistenti restano in Stripe. Revoca la chiave anche in Stripe.",
   "stripe_rak_instructions": "1. In «Chiavi API», scegli «Crea una chiave».\n2. Scegli «Condividi con un servizio di terze parti». Fornitore: Fixmit. URL: https://fixmit.com.\n3. Scegli le autorizzazioni personalizzate, crea la chiave e incollala qui sotto.",
-  "stripe_rak_permissions": "Accounts: Lettura\nCustomers: Scrittura\nPayment Intents: Scrittura\nCharges and Refunds: Scrittura\nWebhook Endpoints / Event Destinations: Scrittura\n\nAltri permessi: Nessuno. Nessun permesso per conti connessi.",
+  "stripe_rak_permissions": "Connect / Accounts (v1): Lettura\nAccounts v2: Nessuno\nCustomers: Scrittura\nPayment Intents: Scrittura\nCharges and Refunds: Scrittura\nWebhook Endpoints / Event Destinations: Scrittura\n\nAltri permessi: Nessuno. Nessun permesso per conti connessi.",
   "stripe_rak_restricted_key": "Chiave con restrizioni (rk_…)",
   "stripe_rak_public_key": "Chiave pubblicabile (pk_…)",
   "stripe_rak_same_mode": "Entrambe le chiavi devono appartenere allo stesso conto e modalità Stripe (test o live).",
