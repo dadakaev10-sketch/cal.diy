@@ -998,7 +998,7 @@ function VariantFields({
           onCheckedChange={(checked) => {
             fieldForm.setValue("variant", checked ? otherVariant : defaultVariant);
           }}
-          tooltip={t("Toggle Variant")}
+          tooltip={t("toggle_field_variant")}
         />
       ) : (
         <VariantSelector />

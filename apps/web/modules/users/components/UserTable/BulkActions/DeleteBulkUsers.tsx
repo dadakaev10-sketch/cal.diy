@@ -25,7 +25,7 @@ export function DeleteBulkUsers({ users, onRemove }: Props) {
     <Dialog>
       <DialogTrigger asChild>
         <DataTableSelectionBar.Button icon="ban" color="destructive">
-          {t("Delete")}
+          {t("delete")}
         </DataTableSelectionBar.Button>
       </DialogTrigger>
       <ConfirmationDialogContent

@@ -111,8 +111,8 @@ const IntegrationsContainer = ({
       query={query}
       customLoader={<SkeletonLoader />}
       success={({ data }) => {
+        const resolvedVariant = resolveEmptyStateVariant(variant);
         if (!data.items.length) {
-          const resolvedVariant = resolveEmptyStateVariant(variant);
           const emptyHeaderCategory = t(resolvedVariant);
 
           return (
@@ -140,8 +140,8 @@ const IntegrationsContainer = ({
         return (
           <div className="border-subtle rounded-md border p-7">
             <ShellSubHeading
-              title={t(variant || "other")}
-              subtitle={t(`installed_app_${variant || "other"}_description`)}
+              title={t(resolvedVariant)}
+              subtitle={t(`installed_app_${resolvedVariant}_description`)}
               className="mb-6"
               actions={
                 <Button

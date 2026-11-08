@@ -139,7 +139,7 @@ const PremiumTextfield = (props: ICustomUsernameProps) => {
             className="mx-2"
             href={paymentLink}
             data-testid="reserve-username-btn">
-            {t("Reserve")}
+            {t("reserve")}
           </Button>
         </div>
       );

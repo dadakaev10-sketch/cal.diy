@@ -173,7 +173,7 @@ export const EventSetupTab = (
           </div>
           <TextField
             required
-            label={isPlatform ? "Slug" : t("URL")}
+            label={isPlatform ? "Slug" : t("url")}
             {...(isManagedEventType || isChildrenManagedEventType ? urlLockedProps : {})}
             defaultValue={eventType.slug}
             data-testid="event-slug"

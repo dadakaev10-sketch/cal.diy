@@ -196,7 +196,7 @@ export const TeamInviteEmail = (
                 />{" "}
                 <ServerTrans
                   t={props.language}
-                  i18nKey="existing_user_added_link_will_change"
+                  i18nKey="email|existing_user_added_link_will_change"
                   values={{ teamName, appName: APP_NAME }}
                 />
               </>

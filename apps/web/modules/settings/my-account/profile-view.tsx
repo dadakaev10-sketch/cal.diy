@@ -153,7 +153,7 @@ const ProfileView = ({ user }: Props) => {
     await utils.viewer.me.invalidate();
     revalidateSettingsProfile();
 
-    showToast(t("Your account was deleted"), "success");
+    showToast(t("account_deleted_confirmation"), "success");
 
     setHasDeleteErrors(false); // dismiss any open errors
     if (process.env.NEXT_PUBLIC_WEBAPP_URL === "https://app.cal.com") {

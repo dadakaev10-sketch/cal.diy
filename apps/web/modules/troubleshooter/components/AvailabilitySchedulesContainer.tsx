@@ -33,7 +33,7 @@ export function AvailabiltySchedulesContainer() {
       <p className="text-sm font-medium leading-none">{t("availabilty_schedules")}</p>
       <AvailabiltyItem />
       <Button color="secondary" className="justify-center gap-2">
-        {t("manage_availabilty_schedules")}
+        {t("manage_availability_schedules")}
       </Button>
     </div>
   );
