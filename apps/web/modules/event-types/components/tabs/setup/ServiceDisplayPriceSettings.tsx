@@ -1,6 +1,6 @@
 import type { FormValues } from "@calcom/features/eventtypes/lib/types";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import { serviceDisplayPriceSchema } from "@calcom/prisma/serviceDisplayPrice";
+import { serviceDisplayPriceCurrencies } from "@calcom/prisma/serviceDisplayPrice";
 import { Label, Switch, TextField } from "@calcom/ui/components/form";
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -8,6 +8,7 @@ export function ServiceDisplayPriceSettings() {
   const { t } = useLocale();
   const { watch, setValue, control, register } = useFormContext<FormValues>();
   const price = watch("metadata.serviceDisplayPrice");
+  const online = watch("metadata.apps.stripe.enabled") === true;
 
   return (
     <section className="border-subtle rounded-lg border">
@@ -32,7 +33,7 @@ export function ServiceDisplayPriceSettings() {
           }
         />
       </div>
-      {price?.enabled && (
+      {price?.enabled && !online && (
         <div className="grid gap-4 p-6 sm:grid-cols-2">
           <Controller
             control={control}
@@ -64,7 +65,7 @@ export function ServiceDisplayPriceSettings() {
               id="service-display-currency"
               className="border-default bg-default text-default h-9 w-full rounded-md border px-3 text-sm"
               {...register("metadata.serviceDisplayPrice.currency")}>
-              {serviceDisplayPriceSchema.shape.currency.options.map((currency) => (
+              {serviceDisplayPriceCurrencies.map((currency) => (
                 <option key={currency} value={currency}>
                   {currency}
                 </option>
@@ -73,6 +74,14 @@ export function ServiceDisplayPriceSettings() {
           </div>
           <p className="text-subtle text-sm sm:col-span-2">{t("service_display_price_payment_note")}</p>
         </div>
+      )}
+      {online && (
+        <p className="text-subtle px-6 pb-6 text-sm">
+          {t("studio_payment_price_location")}{" "}
+          <a href="#studio-payment-title" className="underline">
+            {t("studio_payment_title")}
+          </a>
+        </p>
       )}
     </section>
   );

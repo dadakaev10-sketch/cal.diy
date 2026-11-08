@@ -33,6 +33,18 @@ describe("optional public service prices", () => {
       false
     );
   });
+  it.each([
+    "EUR",
+    "USD",
+    "GBP",
+    "CHF",
+    "CAD",
+    "AUD",
+  ])("accepts the native picker currency %s and normalizes old lowercase clients", (currency) => {
+    expect(
+      serviceDisplayPriceSchema.parse({ enabled: true, amountMinor: 7000, currency: currency.toLowerCase() })
+    ).toEqual({ enabled: true, amountMinor: 7000, currency });
+  });
   it("rejects unsupported currencies and missing activation", () => {
     expect(
       serviceDisplayPriceSchema.safeParse({ enabled: true, amountMinor: 100, currency: "<script>" }).success
