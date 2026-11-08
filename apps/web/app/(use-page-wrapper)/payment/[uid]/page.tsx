@@ -1,10 +1,6 @@
-import {
-  stripeBookingEnabled,
-  stripeBookingLiveMode,
-} from "@calcom/app-store/stripepayment/lib/bookingConfig";
+import { bookingClient, bookingLiveMode } from "@calcom/app-store/stripepayment/lib/bookingClient";
 import { bookingStripeData, verifyBookingIntent } from "@calcom/app-store/stripepayment/lib/bookingPayment";
 import { balanceSnapshotSchema, depositSnapshotSchema } from "@calcom/app-store/stripepayment/lib/deposit";
-import stripe from "@calcom/app-store/stripepayment/lib/server";
 import prisma from "@calcom/prisma";
 import type { PageProps } from "app/_types";
 import { notFound } from "next/navigation";
@@ -15,7 +11,6 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Payment | Fixmit", robots: { index: false, follow: false } };
 
 export default async function Page({ params }: PageProps) {
-  if (!stripeBookingEnabled()) notFound();
   const { uid } = await params;
   if (!z.string().uuid().safeParse(uid).success || typeof uid !== "string") notFound();
   const payment = await prisma.payment.findUnique({
@@ -54,10 +49,11 @@ export default async function Page({ params }: PageProps) {
   let clientSecret: string | null = null;
   let processing = false;
   if (!unavailable && !payment.success) {
+    const stripe = await bookingClient(parsed.data.stripeAccount);
     const intent = await stripe.paymentIntents.retrieve(payment.externalId, {
       stripeAccount: parsed.data.stripeAccount,
     });
-    verifyBookingIntent(intent, payment, stripeBookingLiveMode());
+    verifyBookingIntent(intent, payment, await bookingLiveMode(parsed.data.stripeAccount));
     processing = ["succeeded", "processing"].includes(intent.status);
     if (intent.status !== "canceled" && !processing) clientSecret = intent.client_secret;
   }

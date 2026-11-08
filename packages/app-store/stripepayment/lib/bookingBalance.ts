@@ -3,14 +3,15 @@ import process from "node:process";
 import { ErrorCode } from "@calcom/lib/errorCodes";
 import { ErrorWithCode } from "@calcom/lib/errors";
 import prisma from "@calcom/prisma";
-import { assertStripeBookingAccount, stripeBookingLiveMode } from "./bookingConfig";
+import { bookingClient, bookingLiveMode } from "./bookingClient";
 import { bookingStripeData, verifyBookingIntent } from "./bookingPayment";
 import { balanceSnapshotSchema, depositSnapshotSchema } from "./deposit";
-import stripe from "./server";
+import { assertStudioStripeOwner } from "./studioConnection";
 
 export async function bookingBalance(uid: string, userId: number, action?: "link" | "studio") {
   return prisma.$transaction(
     async (tx) => {
+      if (action && userId) await tx.$executeRaw`SELECT pg_advisory_xact_lock(73166, ${userId})`;
       const booking = await tx.booking.findFirst({
         where: { uid, userId },
         select: { id: true, status: true },
@@ -46,7 +47,9 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
       const balanceAmount = snapshot.totalAmount - deposit.amount;
       if (action && (!active || balance?.refunded))
         throw new ErrorWithCode(ErrorCode.BadRequest, "Payment unavailable");
-      if (action) assertStripeBookingAccount(credentials.stripeAccount, userId);
+      if (action === "link") {
+        await assertStudioStripeOwner(credentials.stripeAccount, userId);
+      }
       if (action && !balance?.success) {
         if (!balance) {
           balance = await tx.payment.create({
@@ -88,10 +91,15 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
         };
         if (action === "studio") {
           if (balance.externalId.startsWith("pi_")) {
+            const stripe = await bookingClient(credentials.stripeAccount);
             const intent = await stripe.paymentIntents.retrieve(balance.externalId, {
               stripeAccount: credentials.stripeAccount,
             });
-            verifyBookingIntent(intent, { ...balance, bookingId: booking.id }, stripeBookingLiveMode());
+            verifyBookingIntent(
+              intent,
+              { ...balance, bookingId: booking.id },
+              await bookingLiveMode(credentials.stripeAccount)
+            );
             if (["succeeded", "processing"].includes(intent.status)) {
               throw new ErrorWithCode(ErrorCode.BadRequest, "Online payment is being processed");
             }
@@ -117,6 +125,7 @@ export async function bookingBalance(uid: string, userId: number, action?: "link
             },
           });
         } else if (!balance.externalId.startsWith("pi_")) {
+          const stripe = await bookingClient(credentials.stripeAccount);
           // Persisting the intent ID is atomic with the link; retries reuse the same Stripe intent.
           const intent = await stripe.paymentIntents.create(
             {

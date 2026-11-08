@@ -4,9 +4,9 @@ import { HttpError } from "@calcom/lib/http-error";
 import { distributedTracing } from "@calcom/lib/tracing/factory";
 import prisma from "@calcom/prisma";
 import type Stripe from "stripe";
+import { bookingClient, bookingLiveMode } from "./bookingClient";
 import { bookingStripeData, verifyBookingIntent } from "./bookingPayment";
 import { balanceSnapshotSchema, depositSnapshotSchema } from "./deposit";
-import stripe from "./server";
 
 export async function handleStripeBookingEvent(event: Stripe.Event) {
   if (event.type !== "payment_intent.succeeded") return;
@@ -16,6 +16,7 @@ export async function handleStripeBookingEvent(event: Stripe.Event) {
     throw new HttpError({ statusCode: 400, message: "Connected account required" });
   }
   const externalId = object.id;
+  const stripe = await bookingClient(account);
   const payment = await prisma.payment.findUnique({
     where: { externalId },
     select: {

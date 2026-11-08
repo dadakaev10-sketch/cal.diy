@@ -2,15 +2,13 @@ import handleCancelBooking from "@calcom/features/bookings/lib/handleCancelBooki
 import { ErrorCode } from "@calcom/lib/errorCodes";
 import { ErrorWithCode } from "@calcom/lib/errors";
 import prisma from "@calcom/prisma";
-import { stripeBookingEnabled, stripeBookingLiveMode } from "./bookingConfig";
+import { bookingClient, bookingLiveMode } from "./bookingClient";
 import { bookingStripeData, verifyBookingIntent } from "./bookingPayment";
 import { balanceSnapshotSchema, depositSnapshotSchema } from "./deposit";
-import stripe from "./server";
 
 export const DEPOSIT_TIMEOUT_MS = 15 * 60 * 1000;
 
 export async function cancelUnpaidBooking(uid: string, automatic = false) {
-  if (!stripeBookingEnabled()) throw new ErrorWithCode(ErrorCode.NotFound);
   const payment = await prisma.payment.findUnique({ where: { uid }, select: { id: true } });
   if (!payment) throw new ErrorWithCode(ErrorCode.NotFound);
   return prisma.$transaction(
@@ -73,9 +71,10 @@ export async function cancelUnpaidBooking(uid: string, automatic = false) {
       ) {
         return { cancelled: false };
       }
+      const stripe = await bookingClient(account.data.stripeAccount);
       const options = { stripeAccount: account.data.stripeAccount };
       const intent = await stripe.paymentIntents.retrieve(current.externalId, options);
-      verifyBookingIntent(intent, current, stripeBookingLiveMode());
+      verifyBookingIntent(intent, current, await bookingLiveMode(account.data.stripeAccount));
       if (
         automatic &&
         (intent.amount_received > 0 || !["canceled", "requires_payment_method"].includes(intent.status))

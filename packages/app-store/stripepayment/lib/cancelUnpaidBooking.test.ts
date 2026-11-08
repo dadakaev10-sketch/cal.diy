@@ -51,6 +51,8 @@ const intent = (status = "requires_payment_method") => ({
 });
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_test");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_USER_ID", "42");
   vi.stubEnv("STRIPE_PRIVATE_KEY", "sk_test_unit");
   m.find.mockResolvedValue({ id: 1 });
   m.current.mockResolvedValue(record());

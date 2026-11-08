@@ -5,32 +5,32 @@ import tasker from "@calcom/features/tasker";
 import { ErrorCode } from "@calcom/lib/errorCodes";
 import { ErrorWithCode } from "@calcom/lib/errors";
 import logger from "@calcom/lib/logger";
-import { safeStringify } from "@calcom/lib/safeStringify";
-import { getServerErrorFromUnknown } from "@calcom/lib/server/getServerErrorFromUnknown";
 import prisma from "@calcom/prisma";
 import type { Booking, Payment, PaymentOption, Prisma } from "@calcom/prisma/client";
 import type { EventTypeMetadata } from "@calcom/prisma/zod-utils";
 import type { CalendarEvent } from "@calcom/types/Calendar";
 import type { IAbstractPaymentService } from "@calcom/types/PaymentService";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { v4 as uuidv4 } from "uuid";
-import z from "zod";
+import type z from "zod";
 import { paymentOptionEnum } from "../zod";
-import { assertStripeBookingAccount } from "./bookingConfig";
+import { bookingClient, usesRestrictedKey } from "./bookingClient";
 import { retrieveOrCreateStripeCustomerByEmail } from "./customer";
 import { calculateDeposit, depositFromMetadata } from "./deposit";
 import type { StripePaymentData, StripeSetupIntentData } from "./server";
+import { assertStudioStripeOwner } from "./studioConnection";
 
 const log = logger.getSubLogger({ prefix: ["payment-service:stripe"] });
 
-export const stripeCredentialKeysSchema = z.object({
-  stripe_user_id: z.string(),
-  default_currency: z.string(),
-  stripe_publishable_key: z.string(),
-});
+export { bookingCredentialSchema as stripeCredentialKeysSchema } from "./credentialSchema";
+
+import { bookingCredentialSchema as stripeCredentialKeysSchema } from "./credentialSchema";
 
 class StripePaymentService implements IAbstractPaymentService {
-  private stripe: Stripe;
+  private async client() {
+    if (!this.credentials) throw ErrorWithCode.Factory.BadRequest("stripe_account_unavailable");
+    return bookingClient(this.credentials.stripe_user_id);
+  }
   private credentials: z.infer<typeof stripeCredentialKeysSchema> | null;
 
   constructor(credentials: { key: Prisma.JsonValue }) {
@@ -40,9 +40,6 @@ class StripePaymentService implements IAbstractPaymentService {
     } else {
       this.credentials = null;
     }
-    this.stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY || "", {
-      apiVersion: "2020-08-27",
-    });
   }
 
   private async getPayment(where: Prisma.PaymentWhereInput) {
@@ -59,7 +56,21 @@ class StripePaymentService implements IAbstractPaymentService {
   }
 
   /* This method is for creating charges at the time of booking */
-  async create(
+  async create(...args: Parameters<StripePaymentService["createUnlocked"]>) {
+    if (!this.credentials || !usesRestrictedKey(this.credentials.stripe_user_id))
+      return this.createUnlocked(...args);
+    const userId = args[2];
+    if (!userId) throw ErrorWithCode.Factory.Forbidden("stripe_account_unavailable");
+    return prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(73166, ${userId})`;
+        return this.createUnlocked(...args);
+      },
+      { timeout: 90000, maxWait: 5000 }
+    );
+  }
+
+  private async createUnlocked(
     payment: Pick<Prisma.PaymentUncheckedCreateInput, "amount" | "currency">,
     bookingId: Booking["id"],
     userId: Booking["userId"],
@@ -81,7 +92,7 @@ class StripePaymentService implements IAbstractPaymentService {
         throw new Error("Stripe credentials not found");
       }
 
-      assertStripeBookingAccount(this.credentials.stripe_user_id, userId);
+      await assertStudioStripeOwner(this.credentials.stripe_user_id, userId);
       const booking = await prisma.booking.findUniqueOrThrow({
         where: { id: bookingId },
         select: { eventType: { select: { metadata: true } } },
@@ -120,7 +131,7 @@ class StripePaymentService implements IAbstractPaymentService {
         },
       };
 
-      const paymentIntent = await this.stripe.paymentIntents.create(params, {
+      const paymentIntent = await (await this.client()).paymentIntents.create(params, {
         idempotencyKey: `fixmit-booking-${bookingId}-${userId}`,
         stripeAccount: this.credentials.stripe_user_id,
       });
@@ -157,7 +168,7 @@ class StripePaymentService implements IAbstractPaymentService {
       }
       return paymentData;
     } catch (error) {
-      log.error("Stripe: Payment could not be created", bookingId, safeStringify(error));
+      log.error("Stripe: Payment could not be created", bookingId, "stripe_request_failed");
       throw new Error("payment_not_created_error");
     }
   }
@@ -194,7 +205,7 @@ class StripePaymentService implements IAbstractPaymentService {
         },
       };
 
-      const setupIntent = await this.stripe.setupIntents.create(params, {
+      const setupIntent = await (await this.client()).setupIntents.create(params, {
         stripeAccount: this.credentials.stripe_user_id,
       });
 
@@ -234,7 +245,7 @@ class StripePaymentService implements IAbstractPaymentService {
       log.error(
         "Stripe: Payment method could not be collected for bookingId",
         bookingId,
-        safeStringify(error)
+        "stripe_request_failed"
       );
 
       throw new ErrorWithCode(ErrorCode.CollectCardFailure, "Stripe: Payment method could not be collected");
@@ -259,12 +270,15 @@ class StripePaymentService implements IAbstractPaymentService {
       const setupIntent = paymentObject.setupIntent;
 
       // Ensure that the stripe customer & payment method still exists
-      const customer = await this.stripe.customers.retrieve(setupIntent.customer as string, {
+      const customer = await (await this.client()).customers.retrieve(setupIntent.customer as string, {
         stripeAccount: this.credentials.stripe_user_id,
       });
-      const paymentMethod = await this.stripe.paymentMethods.retrieve(setupIntent.payment_method as string, {
-        stripeAccount: this.credentials.stripe_user_id,
-      });
+      const paymentMethod = await (await this.client()).paymentMethods.retrieve(
+        setupIntent.payment_method as string,
+        {
+          stripeAccount: this.credentials.stripe_user_id,
+        }
+      );
 
       if (!customer) {
         throw new Error(`Stripe customer does not exist for setupIntent ${setupIntent.id}`);
@@ -297,7 +311,7 @@ class StripePaymentService implements IAbstractPaymentService {
         }),
       };
 
-      const paymentIntent = await this.stripe.paymentIntents.create(params, {
+      const paymentIntent = await (await this.client()).paymentIntents.create(params, {
         stripeAccount: this.credentials.stripe_user_id,
       });
 
@@ -320,7 +334,7 @@ class StripePaymentService implements IAbstractPaymentService {
 
       return paymentData;
     } catch (error) {
-      log.error("Stripe: Could not charge card for payment", bookingId, safeStringify(error));
+      log.error("Stripe: Could not charge card for payment", bookingId, "stripe_request_failed");
 
       const errorMappings = {
         "your card was declined": "your_card_was_declined",
@@ -374,7 +388,7 @@ class StripePaymentService implements IAbstractPaymentService {
       return payment;
     }
     try {
-      const refund = await this.stripe.refunds.create(
+      const refund = await (await this.client()).refunds.create(
         {
           payment_intent: payment.externalId,
         },
@@ -395,8 +409,7 @@ class StripePaymentService implements IAbstractPaymentService {
       });
       return updatedPayment;
     } catch (e) {
-      const err = getServerErrorFromUnknown(e);
-      throw err;
+      throw ErrorWithCode.Factory.BadRequest("stripe_payment_failed");
     }
   }
 
@@ -445,20 +458,26 @@ class StripePaymentService implements IAbstractPaymentService {
         throw new Error("Stripe account not found");
       }
       // Expire all current sessions
-      const sessions = await this.stripe.checkout.sessions.list(
-        {
-          payment_intent: payment.externalId,
-        },
-        { stripeAccount }
-      );
-      for (const session of sessions.data) {
-        await this.stripe.checkout.sessions.expire(session.id, { stripeAccount });
+      if (!usesRestrictedKey(stripeAccount)) {
+        const sessions = await (await this.client()).checkout.sessions.list(
+          {
+            payment_intent: payment.externalId,
+          },
+          { stripeAccount }
+        );
+        for (const session of sessions.data) {
+          await (await this.client()).checkout.sessions.expire(session.id, { stripeAccount });
+        }
       }
       // Then cancel the payment intent
-      await this.stripe.paymentIntents.cancel(payment.externalId, { stripeAccount });
+      await (await this.client()).paymentIntents.cancel(payment.externalId, { stripeAccount });
       return true;
     } catch (e) {
-      log.error("Stripe: Unable to delete Payment in stripe of paymentId", paymentId, safeStringify(e));
+      log.error(
+        "Stripe: Unable to delete Payment in stripe of paymentId",
+        paymentId,
+        "stripe_request_failed"
+      );
       return false;
     }
   }

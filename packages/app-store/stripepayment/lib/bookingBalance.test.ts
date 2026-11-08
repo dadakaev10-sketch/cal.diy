@@ -49,6 +49,8 @@ const balance = {
 };
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_studio");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_USER_ID", "42");
   vi.stubEnv("STRIPE_PRIVATE_KEY", "sk_test_unit");
   m.booking.mockResolvedValue({ id: 7, status: "ACCEPTED" });
   m.payments.mockResolvedValue([deposit]);
@@ -151,5 +153,14 @@ describe("booking balance", () => {
     expect(await bookingBalance("booking", 42, "link")).toMatchObject({ remaining: 0, link: null });
     expect(m.intent).not.toHaveBeenCalled();
     expect(m.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("studio settlement without online credentials", () => {
+  it("keeps the local ledger usable after disconnecting a restricted account when no online balance intent exists", async () => {
+    vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_different");
+    expect(await bookingBalance("booking", 42, "studio")).toMatchObject({ remaining: 0 });
+    expect(m.retrieve).not.toHaveBeenCalled();
+    expect(m.intent).not.toHaveBeenCalled();
   });
 });

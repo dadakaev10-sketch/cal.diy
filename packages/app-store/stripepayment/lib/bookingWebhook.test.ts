@@ -65,7 +65,9 @@ const current = {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_test");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_USER_ID", "42");
+  vi.stubEnv("FIXMIT_STRIPE_DIRECT_ACCOUNT_ID", "acct_test");
   mocks.find.mockResolvedValue(payment);
   mocks.current.mockResolvedValue(current);
   mocks.retrieve.mockResolvedValue(intent);

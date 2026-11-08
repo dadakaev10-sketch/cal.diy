@@ -1,6 +1,7 @@
 import { HttpError as HttpCode } from "@calcom/lib/http-error";
 import { prisma } from "@calcom/prisma";
 import type { Prisma } from "@calcom/prisma/client";
+import { bookingClient, bookingLiveMode } from "./bookingClient";
 import stripe from "./server";
 
 export async function getStripeCustomerIdFromUserId(userId: number) {
@@ -91,7 +92,8 @@ export async function retrieveOrCreateStripeCustomerByEmail(
   email: string,
   phoneNumber?: string | null
 ) {
-  const customer = await stripe.customers.list(
+  const client = await bookingClient(stripeAccountId);
+  const customer = await client.customers.list(
     {
       email,
       limit: 1,
@@ -104,7 +106,7 @@ export async function retrieveOrCreateStripeCustomerByEmail(
   if (customer.data[0]?.id) {
     return customer.data[0];
   } else {
-    const newCustomer = await stripe.customers.create(
+    const newCustomer = await client.customers.create(
       { email, phone: phoneNumber ?? undefined },
       {
         stripeAccount: stripeAccountId,
