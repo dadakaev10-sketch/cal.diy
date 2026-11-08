@@ -18,6 +18,7 @@ export const autoChargeNoShowFeeTimeUnitEnum = z.enum(["minutes", "hours", "days
 export const appDataSchema = eventTypeAppCardZod.merge(
   z.object({
     ...depositSettingsSchema.shape,
+    nativeExpectedRevision: z.string().regex(/^[a-f0-9]{64}$/).optional(),
     price: z.number(),
     currency: z.string(),
     paymentOption: paymentOptionEnum.optional(),

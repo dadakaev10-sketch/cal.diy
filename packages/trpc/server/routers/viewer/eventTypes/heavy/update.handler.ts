@@ -1,5 +1,9 @@
 import type { appDataSchemas } from "@calcom/app-store/apps.schemas.generated";
 import { DailyLocationType } from "@calcom/app-store/constants";
+import {
+  paymentSettingsRevision,
+  validateStudioPaymentSettings,
+} from "@calcom/app-store/stripepayment/lib/studioPaymentSettings";
 import { eventTypeAppMetadataOptionalSchema } from "@calcom/app-store/zod-utils";
 import { CalVideoSettingsRepository } from "@calcom/features/calVideoSettings/repositories/CalVideoSettingsRepository";
 import { HashedLinkRepository } from "@calcom/features/hashedLink/lib/repository/HashedLinkRepository";
@@ -8,6 +12,8 @@ import { MembershipRepository } from "@calcom/features/membership/repositories/M
 import { ScheduleRepository } from "@calcom/features/schedules/repositories/ScheduleRepository";
 import tasker from "@calcom/features/tasker";
 import { getTranslation } from "@calcom/i18n/server";
+import { ErrorCode } from "@calcom/lib/errorCodes";
+import { ErrorWithCode } from "@calcom/lib/errors";
 import { validateIntervalLimitOrder } from "@calcom/lib/intervalLimits/validateIntervalLimitOrder";
 import logger from "@calcom/lib/logger";
 import { validateBookerLayouts } from "@calcom/lib/validateBookerLayouts";
@@ -98,6 +104,10 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
   const eventType = await ctx.prisma.eventType.findUniqueOrThrow({
     where: { id },
     select: {
+      metadata: true,
+      price: true,
+      currency: true,
+      userId: true,
       title: true,
       locations: true,
       description: true,
@@ -209,6 +219,28 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
     (!hostGroups && eventType.hostGroups && eventType.hostGroups.length > 1)
   );
 
+  const nativePaymentRevision = input.metadata?.apps?.stripe?.nativeExpectedRevision;
+  if (
+    nativePaymentRevision &&
+    (eventType.userId !== ctx.user.id ||
+      paymentSettingsRevision({
+        metadata: eventType.metadata,
+        price: eventType.price,
+        currency: eventType.currency,
+      }) !== nativePaymentRevision)
+  )
+    throw new TRPCError({ code: "CONFLICT", message: "stripe_settings_changed" });
+  if (input.metadata?.apps?.stripe) delete input.metadata.apps.stripe.nativeExpectedRevision;
+  const paymentPricing = await validateStudioPaymentSettings(input.metadata, ctx.user.id).catch(
+    (error: unknown) => {
+      if (error instanceof ErrorWithCode)
+        throw new TRPCError({
+          code: error.code === ErrorCode.Forbidden ? "FORBIDDEN" : "BAD_REQUEST",
+          message: error.message,
+        });
+      throw error;
+    }
+  );
   const data: Prisma.EventTypeUpdateInput = {
     ...rest,
     // Only update autoTranslateInstantMeetingTitleEnabled when explicitly provided to avoid overwriting saved opt-out
@@ -700,12 +732,23 @@ export const updateHandler = async ({ ctx, input }: UpdateOptions) => {
   let updatedEventType: UpdatedEventTypeResult;
   try {
     updatedEventType = await ctx.prisma.eventType.update({
-      where: { id },
-      data,
+      where: {
+        id,
+        ...(nativePaymentRevision
+          ? {
+              metadata: { equals: eventType.metadata ?? Prisma.AnyNull },
+              price: eventType.price,
+              currency: eventType.currency,
+            }
+          : {}),
+      },
+      data: { ...data, ...(paymentPricing ?? {}) },
       select: updatedEventTypeSelect,
     });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === "P2025" && nativePaymentRevision)
+        throw new TRPCError({ code: "CONFLICT", message: "stripe_settings_changed" });
       if (e.code === "P2002") {
         // instead of throwing a 500 error, catch the conflict and throw a 400 error.
         throw new TRPCError({ message: "error_event_type_url_duplicate", code: "BAD_REQUEST" });

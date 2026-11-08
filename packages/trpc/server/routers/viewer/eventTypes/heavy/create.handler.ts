@@ -1,6 +1,9 @@
 import { getDefaultLocations } from "@calcom/app-store/_utils/getDefaultLocations";
 import { DailyLocationType } from "@calcom/app-store/constants";
+import { validateStudioPaymentSettings } from "@calcom/app-store/stripepayment/lib/studioPaymentSettings";
 import { EventTypeRepository } from "@calcom/features/eventtypes/repositories/eventTypeRepository";
+import { ErrorCode } from "@calcom/lib/errorCodes";
+import { ErrorWithCode } from "@calcom/lib/errors";
 import type { PrismaClient } from "@calcom/prisma";
 import { Prisma } from "@calcom/prisma/client";
 import { MembershipRole, SchedulingType } from "@calcom/prisma/enums";
@@ -12,9 +15,15 @@ import type { TCreateInputSchema } from "./create.schema";
 
 class PermissionCheckService {
   constructor(_prisma?: unknown) {}
-  async checkPermission(..._args: unknown[]) { return true; }
-  async hasPermission(..._args: unknown[]) { return true; }
-  async getTeamIdsWithPermission(..._args: unknown[]): Promise<number[]> { return []; }
+  async checkPermission(..._args: unknown[]) {
+    return true;
+  }
+  async hasPermission(..._args: unknown[]) {
+    return true;
+  }
+  async getTeamIdsWithPermission(..._args: unknown[]): Promise<number[]> {
+    return [];
+  }
 }
 
 type EventTypeLocation = z.infer<typeof eventTypeLocations>[number];
@@ -54,6 +63,15 @@ export const createHandler = async ({ ctx, input }: CreateOptions) => {
   } = input;
 
   const userId = ctx.user.id;
+  const paymentPricing = await validateStudioPaymentSettings(metadata, userId).catch((error: unknown) => {
+    if (error instanceof ErrorWithCode)
+      throw new TRPCError({
+        code: error.code === ErrorCode.Forbidden ? "FORBIDDEN" : "BAD_REQUEST",
+        message: error.message,
+      });
+    throw error;
+  });
+  if (metadata?.apps?.stripe) delete metadata.apps.stripe.nativeExpectedRevision;
   const isManagedEventType = schedulingType === SchedulingType.MANAGED;
   const isOrgAdmin = !!ctx.user?.organization?.isOrgAdmin;
 
@@ -77,6 +95,7 @@ export const createHandler = async ({ ctx, input }: CreateOptions) => {
 
   const data: Prisma.EventTypeCreateInput = {
     ...rest,
+    ...(paymentPricing ?? {}),
     owner: teamId ? undefined : { connect: { id: userId } },
     metadata: (metadata as Prisma.InputJsonObject) ?? undefined,
     // Only connecting the current user for non-managed event types and non team event types
