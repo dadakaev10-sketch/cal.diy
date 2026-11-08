@@ -136,6 +136,7 @@ export async function studioAccessGate(req: NextRequest) {
   if (access === "register") return NextResponse.redirect(new URL("/register", req.url));
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+  let failureStage = "booking-throttle";
   try {
     const bookingRoute = studioPublicBookingRoute(path, req.method);
     if (bookingRoute && bookingRoute !== "booking-page") {
@@ -199,14 +200,15 @@ export async function studioAccessGate(req: NextRequest) {
           headers: { "Cache-Control": "no-store" },
         });
     }
-    if (access === "public" && (!bookingRoute || bookingRoute === "booking-page")) return null;
+    // Public booking must remain available even when an unrelated studio session has expired.
+    if (access === "public") return null;
+    failureStage = "studio-session";
     const token = await getToken({
       req,
       secret,
       secureCookie: process.env.NEXTAUTH_URL?.startsWith("https://"),
     });
     const userId = Number(token?.sub || token?.id);
-    if (!token && access === "public") return null;
     if (Number.isSafeInteger(userId) && userId > 0) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -220,7 +222,7 @@ export async function studioAccessGate(req: NextRequest) {
         (await validSocialSession(user.id, token?.studioSocial, user.twoFactorEnabled))
       ) {
         const billingRoute = path === "/billing" || path.startsWith("/api/fixmit-billing/");
-        if (!billingRoute && access !== "public" && !(await entitled(user.id))) {
+        if (!billingRoute && !(await entitled(user.id))) {
           return path.startsWith("/api/")
             ? NextResponse.json(
                 { error: "subscription_required", billingUrl: "/billing" },
@@ -231,7 +233,13 @@ export async function studioAccessGate(req: NextRequest) {
         return null;
       }
     }
-  } catch {
+  } catch (error) {
+    const code = error && typeof error === "object" && "code" in error ? String(error.code) : "unknown";
+    console.warn(
+      "STUDIO_ACCESS_GATE_FAILED",
+      failureStage,
+      /^[A-Z0-9_]{1,32}$/.test(code) ? code : "unknown"
+    );
     return NextResponse.json(
       { error: "Service unavailable", url: new URL("/auth/login?error=InternalServerError", req.url).href },
       { status: 503, headers: { "Cache-Control": "no-store" } }

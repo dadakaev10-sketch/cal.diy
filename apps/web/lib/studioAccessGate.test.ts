@@ -117,6 +117,20 @@ describe("studio access boundary", () => {
     mocks.query.mockRejectedValue(new Error("unavailable"));
     expect((await studioAccessGate(request("https://test.local")))?.status).toBe(503);
   });
+  it("does not authenticate public booking requests, even with an unreadable session", async () => {
+    mocks.token.mockRejectedValue(new Error("Session provider unavailable"));
+    for (const path of [
+      "/api/trpc/slots/getSchedule",
+      "/api/trpc/timezones/cityTimezones",
+      "/api/trpc/features/map",
+    ]) {
+      expect(await studioAccessGate(new NextRequest("https://test.local" + path))).toBeNull();
+    }
+    expect(mocks.token).not.toHaveBeenCalled();
+    expect(mocks.user).not.toHaveBeenCalled();
+    expect(mocks.query).toHaveBeenCalledTimes(3);
+    expect((await studioAccessGate(new NextRequest("https://test.local/api/private")))?.status).toBe(503);
+  });
   it("opens only explicitly enabled registration routes and methods", () => {
     expect(studioRouteAccess("/api/studio-registration/request", "POST")).toBe("private");
     vi.stubEnv("STUDIO_REGISTRATION_ENABLED", "true");
@@ -127,14 +141,14 @@ describe("studio access boundary", () => {
     expect(studioRouteAccess("/api/studio-registration/complete", "GET")).toBe("private");
     expect(studioRouteAccess("/register/verify", "POST")).toBe("private");
   });
-  it("rejects password stamps from previous passwords and pre-rollout sessions", async () => {
+  it("rejects stale studio sessions only on private routes", async () => {
     mocks.user.mockResolvedValue({ id: 7, locked: false, password: { hash: "new-hash" } });
     for (const stamp of [undefined, studioPasswordStamp("old-hash", "test-secret")]) {
       mocks.token.mockResolvedValue({ sub: "7", studioPasswordStamp: stamp });
       expect((await studioAccessGate(new NextRequest("https://test.local/api/private")))?.status).toBe(401);
       expect(
-        (await studioAccessGate(new NextRequest("https://test.local/api/trpc/slots/getSchedule")))?.status
-      ).toBe(401);
+        await studioAccessGate(new NextRequest("https://test.local/api/trpc/slots/getSchedule"))
+      ).toBeNull();
     }
   });
 

@@ -1,18 +1,17 @@
-import { shallow } from "zustand/shallow";
-
 import type { Dayjs } from "@calcom/dayjs";
 import dayjs from "@calcom/dayjs";
+import { useSlotsViewOnSmallScreen } from "@calcom/embed-core/embed-iframe";
 import { useBookerStoreContext } from "@calcom/features/bookings/Booker/BookerStoreProvider";
 import type { DatePickerClassNames } from "@calcom/features/bookings/Booker/types";
+import type { Slots } from "@calcom/features/bookings/types";
 import { DatePicker as DatePickerComponent } from "@calcom/features/calendars/components/DatePicker";
-import { useNonEmptyScheduleDays } from "@calcom/web/modules/schedules/hooks/useNonEmptyScheduleDays";
 import { weekdayToWeekIndex } from "@calcom/lib/dayjs";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import type { User } from "@calcom/prisma/client";
 import type { PeriodData } from "@calcom/types/Event";
-import { useSlotsViewOnSmallScreen } from "@calcom/embed-core/embed-iframe";
-
-import type { Slots } from "@calcom/features/bookings/types";
+import { Button } from "@calcom/ui/components/button";
+import { useNonEmptyScheduleDays } from "@calcom/web/modules/schedules/hooks/useNonEmptyScheduleDays";
+import { shallow } from "zustand/shallow";
 
 const useMoveToNextMonthOnNoAvailability = ({
   browsingDate,
@@ -54,7 +53,7 @@ const useMoveToNextMonthOnNoAvailability = ({
 
 export const DatePicker = ({
   event,
-  slots = {},
+  slots,
   isLoading,
   classNames,
   scrollToTimeSlots,
@@ -78,7 +77,7 @@ export const DatePicker = ({
   showNoAvailabilityDialog?: boolean;
   onDateChange?: () => void;
 }) => {
-  const { i18n } = useLocale();
+  const { i18n, t } = useLocale();
   const [month, selectedDate, layout] = useBookerStoreContext(
     (state) => [state.month, state.selectedDate, state.layout],
     shallow
@@ -106,7 +105,7 @@ export const DatePicker = ({
     browsingDate,
     nonEmptyScheduleDays,
     onMonthChange,
-    isLoading: isLoading ?? true,
+    isLoading: (isLoading ?? true) || slots === undefined,
   });
   moveToNextMonthOnNoAvailability();
 
@@ -129,6 +128,17 @@ export const DatePicker = ({
       periodCountCalendarDays: event.data.periodCountCalendarDays,
     }),
   };
+  if (!isLoading && slots === undefined) {
+    return (
+      <div role="alert" className="flex flex-col gap-3 py-6">
+        <p>{t("unexpected_error_try_again")}</p>
+        <Button color="secondary" onClick={() => window.location.reload()}>
+          {t("try_again")}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <DatePickerComponent
       customClassNames={{

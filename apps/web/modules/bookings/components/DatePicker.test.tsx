@@ -1,10 +1,9 @@
-import React from "react";
-import { vi, afterEach } from "vitest";
-
 import dayjs from "@calcom/dayjs";
-import { DatePicker as DatePickerComponent } from "@calcom/features/calendars/components/DatePicker";
-
 import { render } from "@calcom/features/bookings/Booker/__tests__/test-utils";
+import { DatePicker as DatePickerComponent } from "@calcom/features/calendars/components/DatePicker";
+import { screen } from "@testing-library/react";
+import React from "react";
+import { afterEach, vi } from "vitest";
 import { DatePicker } from "./DatePicker";
 
 vi.mock("@calcom/features/calendars/components/DatePicker", () => {
@@ -31,6 +30,16 @@ describe("Tests for DatePicker Component", () => {
       }),
       expect.anything()
     );
+  });
+
+  test("a failed schedule request shows an error instead of an empty calendar", () => {
+    const setMonth = vi.fn();
+    render(<DatePicker event={{}} isLoading={false} />, {
+      mockStore: { month: dayjs().format("YYYY-MM"), setMonth },
+    });
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(DatePickerComponent).not.toHaveBeenCalled();
+    expect(setMonth).not.toHaveBeenCalled();
   });
 
   test("happy path, slots in current month", async () => {
