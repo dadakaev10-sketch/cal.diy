@@ -1,6 +1,7 @@
 import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
 import { resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
+import { FooterProjectLinks } from "../studio-home/FooterProjectLinks";
 import { PublicBookingLanguageSelect } from "../users/views/PublicBookingLanguageSelect";
 import styles from "./public-info.module.css";
 export const INFO_PAGES = ["pricing", "terms", "privacy", "refund", "imprint", "support"] as const;
@@ -145,6 +146,7 @@ export async function PublicInfo({
             </a>
           ))}
         </nav>
+        <FooterProjectLinks replivyLabel={t("footer_replivy_link")} />
       </footer>
     </div>
   );

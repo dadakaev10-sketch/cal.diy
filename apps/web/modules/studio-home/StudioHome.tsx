@@ -1,9 +1,9 @@
 import { publicBookingLanguageNames } from "@calcom/lib/publicBookingLanguage";
-import type { HomeLanguage } from "./seo";
-import { HOME_LANGUAGES } from "./seo";
 import type { TFunction } from "i18next";
+import { FooterProjectLinks } from "./FooterProjectLinks";
 import styles from "./home.module.css";
-import { FAQ_ITEMS } from "./seo";
+import type { HomeLanguage } from "./seo";
+import { FAQ_ITEMS, HOME_LANGUAGES } from "./seo";
 
 export default function StudioHome({
   t,
@@ -218,6 +218,7 @@ export default function StudioHome({
             </a>
           ))}
         </nav>
+        <FooterProjectLinks replivyLabel={t("footer_replivy_link")} />
       </footer>
     </div>
   );

@@ -1,0 +1,29 @@
+.links {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px 24px;
+  padding-top: 18px;
+  border-top: 1px solid #dbe5dd;
+  color: #426157;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.links p {
+  margin: 0;
+}
+.links a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.links a:hover {
+  color: #173e35;
+}
+.links a:focus-visible {
+  outline: 2px solid #173e35;
+  outline-offset: 4px;
+  border-radius: 2px;
+}

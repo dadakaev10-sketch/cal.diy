@@ -4991,5 +4991,6 @@
   "studio_payment_title": "Оплата и предоплата",
   "studio_payment_help": "Выберите способ оплаты этой услуги.",
   "studio_payment_total": "Общая стоимость",
-  "studio_payment_price_location": "Общую стоимость и предоплату для онлайн-оплаты задайте ниже в разделе"
+  "studio_payment_price_location": "Общую стоимость и предоплату для онлайн-оплаты задайте ниже в разделе",
+  "footer_replivy_link": "Replivy — автоматизация Instagram"
 }

@@ -5293,5 +5293,6 @@
   "studio_payment_title": "Payment and deposit",
   "studio_payment_help": "Choose how clients pay for this service.",
   "studio_payment_total": "Total price",
-  "studio_payment_price_location": "Set the online total and deposit below under"
+  "studio_payment_price_location": "Set the online total and deposit below under",
+  "footer_replivy_link": "Replivy – Instagram automation"
 }

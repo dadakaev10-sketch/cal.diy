@@ -4939,5 +4939,6 @@
   "studio_payment_title": "Paiement et acompte",
   "studio_payment_help": "Choisissez comment les clients paient cette prestation.",
   "studio_payment_total": "Prix total",
-  "studio_payment_price_location": "Configurez le prix en ligne et l’acompte ci-dessous dans"
+  "studio_payment_price_location": "Configurez le prix en ligne et l’acompte ci-dessous dans",
+  "footer_replivy_link": "Replivy – Automatisation Instagram"
 }
