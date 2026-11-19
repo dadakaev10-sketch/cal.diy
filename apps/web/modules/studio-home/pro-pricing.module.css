@@ -33,6 +33,8 @@
   line-height: 1.7;
 }
 .grid {
+  max-width: 880px;
+  margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
@@ -42,7 +44,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding: clamp(24px, 3vw, 36px);
+  padding: clamp(24px, 2.5vw, 28px);
   border: 1px solid #dbe5dd;
   border-radius: 24px;
   background: white;
@@ -53,20 +55,20 @@
 }
 .section .card h2,
 .section .card h3 {
-  font-size: clamp(32px, 4vw, 46px);
+  font-size: clamp(28px, 3vw, 36px);
   font-weight: 600;
   letter-spacing: -0.045em;
   margin: 0 0 12px;
 }
 .card .description {
   min-height: 48px;
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   color: #54675e;
   font-size: 14px;
   line-height: 1.7;
 }
 .card .price {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 28px;
@@ -95,12 +97,12 @@
 }
 .features {
   padding: 0;
-  margin: 0 0 32px;
+  margin: 0 0 24px;
   list-style: none;
 }
 .features li {
   position: relative;
-  padding: 10px 0 10px 26px;
+  padding: 8px 0 8px 26px;
   font-size: 15px;
   line-height: 1.5;
 }
