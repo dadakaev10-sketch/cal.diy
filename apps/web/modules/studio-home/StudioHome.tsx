@@ -1,7 +1,9 @@
+import process from "node:process";
 import { publicBookingLanguageNames } from "@calcom/lib/publicBookingLanguage";
 import type { TFunction } from "i18next";
 import { FooterProjectLinks } from "./FooterProjectLinks";
 import styles from "./home.module.css";
+import { ProPricing } from "./ProPricing";
 import type { HomeLanguage } from "./seo";
 import { FAQ_ITEMS, HOME_LANGUAGES } from "./seo";
 
@@ -186,6 +188,7 @@ export default function StudioHome({
             ))}
           </ul>
         </section>
+        <ProPricing t={t} language={language} upcoming={process.env.FIXMIT_BILLING_ENABLED !== "true"} link />
         <section className={styles.faq} id="faq">
           <h2>{t("home_faq_title")}</h2>
           <div>

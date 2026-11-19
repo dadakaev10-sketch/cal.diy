@@ -1,0 +1,163 @@
+.section {
+  box-sizing: border-box;
+  width: calc(100% - 48px);
+  max-width: 1120px;
+  margin: 64px auto;
+  color: #153c36;
+  overflow-wrap: anywhere;
+}
+.section * {
+  box-sizing: border-box;
+}
+.intro {
+  max-width: 760px;
+  margin: 0 auto 56px;
+  text-align: center;
+}
+.intro .eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.intro h1,
+.intro h2 {
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  margin: 16px 0 24px;
+}
+.intro p {
+  color: #54675e;
+  line-height: 1.7;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid #dbe5dd;
+  border-radius: 24px;
+  background: white;
+  box-shadow: 0 1px 4px #153c3605;
+}
+.card.featured {
+  border-color: #47846a;
+}
+.card h3 {
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  margin: 0 0 12px;
+}
+.card .description {
+  min-height: 48px;
+  margin: 0 0 32px;
+  color: #54675e;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.card .price {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 28px;
+  letter-spacing: -0.035em;
+}
+.price span {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  color: #54675e;
+  letter-spacing: 0;
+}
+.card .badge {
+  position: absolute;
+  top: -15px;
+  left: 24px;
+  max-width: calc(100% - 48px);
+  margin: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #c5d6c9;
+  background: #edf5ef;
+  color: #153c36;
+  font-size: 12px;
+  font-weight: 600;
+}
+.features {
+  padding: 0;
+  margin: 0 0 32px;
+  list-style: none;
+}
+.features li {
+  position: relative;
+  padding: 10px 0 10px 26px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #47846a;
+  font-weight: 700;
+}
+.button,
+.secondary {
+  display: block;
+  margin-top: auto;
+  padding: 14px 20px;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.card .button {
+  color: white;
+  background: #153c36;
+}
+.card .secondary {
+  color: #153c36;
+  background: #f2f6f2;
+  border: 1px solid #dbe5dd;
+}
+.section .fees,
+.section .note {
+  max-width: 850px;
+  margin: 28px auto 0;
+  text-align: center;
+  font-size: 14px;
+  color: #54675e;
+  line-height: 1.7;
+}
+.section .note {
+  margin-top: 12px;
+}
+.button:focus-visible,
+.secondary:focus-visible {
+  outline: 3px solid #47846a;
+  outline-offset: 4px;
+}
+@media (max-width: 680px) {
+  .section {
+    margin: 48px auto;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .intro {
+    margin-bottom: 40px;
+  }
+  .card .description {
+    min-height: 0;
+  }
+}
