@@ -72,6 +72,26 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("Fixmit subscription security", () => {
+  it("never requires payment for a permanent Pro grant, regardless of the billing cutoff", async () => {
+    db.user.mockResolvedValue({
+      role: "USER",
+      createdDate: new Date("2026-11-19"),
+      studioProGrant: { userId: 7 },
+    });
+    expect(await requiresBilling(7)).toBe(false);
+    expect(await entitled(7)).toBe(true);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("does not extend a founding grant to a later account without a grant record", async () => {
+    db.user.mockResolvedValue({
+      role: "USER",
+      createdDate: new Date("2026-11-20"),
+      studioProGrant: null,
+    });
+    expect(await requiresBilling(8)).toBe(true);
+  });
+
   it("does not extend access on a failed renewal", () => {
     expect(
       subscriptionAccess(

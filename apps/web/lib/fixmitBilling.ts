@@ -126,10 +126,10 @@ export async function requiresBilling(userId: number) {
   if (!billingEnabled()) return false;
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { role: true, createdDate: true },
+    select: { role: true, createdDate: true, studioProGrant: { select: { userId: true } } },
   });
   if (!user) return true;
-  if (user.role === "ADMIN") return false;
+  if (user.role === "ADMIN" || user.studioProGrant) return false;
   const cutoff = process.env.FIXMIT_BILLING_REQUIRED_FROM;
   if (!cutoff || !Number.isFinite(Date.parse(cutoff))) throw unavailable();
   return user.createdDate >= new Date(cutoff);

@@ -399,6 +399,7 @@ model TravelSchedule {
 
 // It holds Personal Profiles of a User plus it has email, password and other core things..
 model User {
+  studioProGrant StudioProGrant?
   studioCustomerProfiles StudioCustomerProfile[]
   fixmitPasses        FixmitPass[]
   fixmitSubscription  FixmitSubscription?
@@ -2949,4 +2950,11 @@ model StudioCustomerProfile {
   @@unique([userId, sourceEmail])
   @@unique([userId, email])
   @@index([userId])
+}
+
+model StudioProGrant {
+  userId    Int      @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedAt DateTime @default(now()) @db.Timestamp(3)
+  reason    String
 }
