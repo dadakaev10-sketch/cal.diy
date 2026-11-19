@@ -22,6 +22,7 @@
 }
 .intro h1,
 .intro h2 {
+  font-weight: 700;
   font-size: clamp(34px, 5vw, 58px);
   line-height: 1.08;
   letter-spacing: -0.045em;
@@ -50,7 +51,8 @@
 .card.featured {
   border-color: #47846a;
 }
-.card h3 {
+.section .card h2,
+.section .card h3 {
   font-size: clamp(32px, 4vw, 46px);
   font-weight: 600;
   letter-spacing: -0.045em;

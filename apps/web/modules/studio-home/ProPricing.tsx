@@ -13,8 +13,12 @@ export function ProPricing({
   link?: boolean;
 }) {
   const Heading = link ? "h2" : "h1";
+  const PlanHeading = link ? "h3" : "h2";
   return (
-    <section className={styles.section} aria-label={t("public_pricing_title")}>
+    <section
+      className={styles.section}
+      style={link ? undefined : { width: "100%", marginInline: "auto" }}
+      aria-label={t("public_pricing_title")}>
       <header className={styles.intro}>
         <p className={styles.eyebrow}>FIXMIT · {t("public_pricing_title")}</p>
         <Heading>{t("pro_public_title")}</Heading>
@@ -22,7 +26,7 @@ export function ProPricing({
       </header>
       <div className={styles.grid}>
         <article className={styles.card}>
-          <h3>Free</h3>
+          <PlanHeading>Free</PlanHeading>
           <p className={styles.description}>{t("pro_public_free_description")}</p>
           <p className={styles.price}>
             0 € <span>{t("pro_public_period")}</span>
@@ -37,7 +41,7 @@ export function ProPricing({
         </article>
         <article className={`${styles.card} ${styles.featured}`}>
           <p className={styles.badge}>{t("pro_public_badge")}</p>
-          <h3>Fixmit Pro</h3>
+          <PlanHeading>Fixmit Pro</PlanHeading>
           <p className={styles.description}>{t("pro_public_description")}</p>
           <p className={styles.price}>
             29 € <span>{t("pro_public_period")}</span>
