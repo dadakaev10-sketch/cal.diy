@@ -20,3 +20,6 @@ applies the migration before the server starts.
 Validation covers the cutoff boundary, idempotent grant insertion, exclusion
 of future registrations, cascade deletion, checkout exclusion, and permanent
 Pro rights without an active subscription.
+
+The production status/branding API exposes founding grants to the native app.
+It does not expose purchase or free-service selection actions before tariff launch.
