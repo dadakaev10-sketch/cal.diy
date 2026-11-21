@@ -83,6 +83,15 @@ export default function StudioHome({
                 {t("home_demo")}
               </a>
             </div>
+            <div className={styles.appDownload}>
+              <a href="https://apps.apple.com/app/id6831690331" aria-label={t("home_app_store_download")}>
+                <img
+                  src={`/app-store-badges/${language}.svg`}
+                  alt={t("home_app_store_download")}
+                  height={40}
+                />
+              </a>
+            </div>
             {!registrationEnabled && <p className={styles.note}>{t("home_early")}</p>}
           </div>
           <figure className={styles.preview} id="preview" aria-label={t("home_preview")}>
@@ -221,6 +230,12 @@ export default function StudioHome({
             </a>
           ))}
         </nav>
+        <a
+          className={styles.footerAppDownload}
+          href="https://apps.apple.com/app/id6831690331"
+          aria-label={t("home_app_store_download")}>
+          <img src={`/app-store-badges/${language}.svg`} alt={t("home_app_store_download")} height={40} />
+        </a>
         <FooterProjectLinks replivyLabel={t("footer_replivy_link")} />
       </footer>
     </div>
