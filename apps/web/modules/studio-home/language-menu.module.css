@@ -1,0 +1,28 @@
+.root { position: relative; flex-shrink: 0; color: inherit; }
+.trigger {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  border: 0; border-radius: 50%;
+  background: transparent; color: inherit; cursor: pointer;
+  transition: background 150ms ease;
+}
+.trigger:hover, .trigger[aria-expanded="true"] { background: rgb(128 128 128 / 14%); }
+.trigger:focus-visible, .option:focus-visible { outline: 2px solid #3b82f6; outline-offset: 3px; }
+.menu {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 100;
+  width: 208px; max-width: calc(100vw - 32px); padding: 6px;
+  border: 1px solid #3d3d3d; border-radius: 16px;
+  background: #171717; color: #f4f4f5;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+  animation: appear 120ms ease-out;
+}
+.option {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 12px; border: 0; border-radius: 10px;
+  background: transparent; color: inherit; text-align: left;
+  font-size: 15px; font-weight: 500; cursor: pointer;
+}
+.option:hover { background: #292929; }
+.option[aria-pressed="true"] { color: #60a5fa; font-weight: 650; }
+.label { flex: 1; }
+@keyframes appear { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .menu { animation: none; } }

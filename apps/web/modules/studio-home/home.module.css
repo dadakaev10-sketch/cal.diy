@@ -20,25 +20,13 @@
 .preview::before{display:none}
 @media(prefers-reduced-motion:reduce){.button{transition:none}}
 
-.languages{display:flex;gap:4px;flex-shrink:0}.languages a{padding:5px;border-radius:5px}.languages a[aria-current="page"]{background:var(--ink);color:#fff}.header{flex-wrap:wrap}.headerActions{flex-wrap:wrap}.heroCopy{min-width:0}.hero h1{overflow-wrap:break-word}
-@media(max-width:400px){.headerActions{width:100%;justify-content:space-between}.hero h1{font-size:38px}}
+.header{flex-wrap:wrap}.headerActions{flex-wrap:wrap}.heroCopy{min-width:0}.hero h1{overflow-wrap:break-word}
+@media(max-width:400px){.brand img{width:150px;height:50px}.headerActions{gap:8px}.hero h1{font-size:38px}}
 
-.previewButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 10px 15px;
-  border: 1px solid var(--ink);
-  border-radius: 9px;
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 600;
-}
-.previewButton:hover { background: #e8f0e8; }
-.actions { flex-wrap: wrap; }
-
-.appDownload { margin-top: 22px; }
-.appDownload a, .footerAppDownload { display: inline-flex; border-radius: 6px; }
-.appDownload img, .footerAppDownload img { display: block; height: 40px; width: auto; max-width: 100%; }
-.appDownload a:focus-visible, .footerAppDownload:focus-visible { outline: 3px solid #47846a; outline-offset: 4px; }
+.actions { flex-wrap: wrap; gap: 16px; }
+.heroRegister { min-height: 48px; padding: 0 21px; }
+.heroAppDownload { display: inline-flex; flex-shrink: 0; border-radius: 7px; }
+.heroAppDownload img { display: block; height: 48px; width: auto; }
+.footerAppDownload { display: inline-flex; border-radius: 6px; }
+.footerAppDownload img { display: block; height: 40px; width: auto; max-width: 100%; }
+.heroAppDownload:focus-visible, .footerAppDownload:focus-visible { outline: 3px solid #47846a; outline-offset: 4px; }

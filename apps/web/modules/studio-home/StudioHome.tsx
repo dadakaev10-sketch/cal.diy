@@ -1,11 +1,11 @@
 import process from "node:process";
-import { publicBookingLanguageNames } from "@calcom/lib/publicBookingLanguage";
 import type { TFunction } from "i18next";
 import { FooterProjectLinks } from "./FooterProjectLinks";
 import styles from "./home.module.css";
+import { LanguageMenu } from "./LanguageMenu";
 import { ProPricing } from "./ProPricing";
 import type { HomeLanguage } from "./seo";
-import { FAQ_ITEMS, HOME_LANGUAGES } from "./seo";
+import { FAQ_ITEMS } from "./seo";
 
 export default function StudioHome({
   t,
@@ -39,19 +39,7 @@ export default function StudioHome({
           <a href={`/pricing?lang=${language}`}>{t("public_pricing_title")}</a>
         </nav>
         <div className={styles.headerActions}>
-          <nav className={styles.languages} aria-label={t("home_language")}>
-            {HOME_LANGUAGES.map((code) => (
-              <a
-                key={code}
-                href={`/?lang=${code}`}
-                hrefLang={code}
-                lang={code}
-                aria-label={publicBookingLanguageNames[code]}
-                aria-current={language === code ? "page" : undefined}>
-                {code.toUpperCase()}
-              </a>
-            ))}
-          </nav>
+          <LanguageMenu language={language} label={t("home_language")} />
           <a href={signedIn ? "/event-types" : `/auth/login?lang=${language}`}>
             {t(signedIn ? "studio_open_dashboard" : "home_login")}
           </a>
@@ -76,19 +64,17 @@ export default function StudioHome({
             </h1>
             <p className={styles.lead}>{t("home_description")}</p>
             <div className={styles.actions}>
-              <a className={styles.button} href={`/register?lang=${language}`}>
+              <a className={`${styles.button} ${styles.heroRegister}`} href={`/register?lang=${language}`}>
                 {t("home_register")}
               </a>
-              <a className={styles.previewButton} href="#preview">
-                {t("home_demo")}
-              </a>
-            </div>
-            <div className={styles.appDownload}>
-              <a href="https://apps.apple.com/app/id6831690331" aria-label={t("home_app_store_download")}>
+              <a
+                className={styles.heroAppDownload}
+                href="https://apps.apple.com/app/id6831690331"
+                aria-label={t("home_app_store_download")}>
                 <img
                   src={`/app-store-badges/${language}.svg`}
                   alt={t("home_app_store_download")}
-                  height={40}
+                  height={48}
                 />
               </a>
             </div>

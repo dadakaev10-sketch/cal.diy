@@ -2,8 +2,8 @@ import process from "node:process";
 import { getTranslation } from "@calcom/i18n/server";
 import { resolvePublicBookingLanguage } from "@calcom/lib/publicBookingLanguage";
 import { FooterProjectLinks } from "../studio-home/FooterProjectLinks";
+import { LanguageMenu } from "../studio-home/LanguageMenu";
 import { ProPricing } from "../studio-home/ProPricing";
-import { PublicBookingLanguageSelect } from "../users/views/PublicBookingLanguageSelect";
 import styles from "./public-info.module.css";
 export const INFO_PAGES = ["pricing", "terms", "privacy", "refund", "imprint", "support"] as const;
 type InfoPage = (typeof INFO_PAGES)[number];
@@ -27,18 +27,11 @@ export async function PublicInfo({
           <img src="/api/logo?brand=fixmit" alt="Fixmit" width={180} height={60} />
         </a>
         <nav>
-          {page === "pricing" ? (
-            <PublicBookingLanguageSelect language={language} label={t("language")} />
-          ) : (
-            <>
-              <a href={`/${page}?lang=de`} lang="de">
-                DE
-              </a>
-              <a href={`/${page}?lang=en`} lang="en">
-                EN
-              </a>
-            </>
-          )}
+          <LanguageMenu
+            language={language}
+            label={t("home_language")}
+            available={page === "pricing" ? undefined : ["de", "en"]}
+          />
           <a className={styles.loginButton} href={`/auth/login?lang=${language}`}>
             {t("home_login")}
           </a>
